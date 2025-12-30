@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import GlobalETFSearch from '../components/GlobalETFSearch';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 interface Props {
   title: string;
@@ -276,5 +277,8 @@ const currentPath = Astro.url.pathname;
         mobileMenu?.classList.toggle('hidden');
       });
     </script>
+
+    <!-- Vercel Speed Insights -->
+    <SpeedInsights />
   </body>
 </html>
