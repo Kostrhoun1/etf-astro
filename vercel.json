@@ -1,5 +1,18 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
-  "framework": "astro"
+  "framework": "astro",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "etfpruvodce.cz"
+        }
+      ],
+      "destination": "https://www.etfpruvodce.cz/:path*",
+      "permanent": true
+    }
+  ]
 }
