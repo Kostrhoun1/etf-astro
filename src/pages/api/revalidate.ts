@@ -71,7 +71,15 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Verify secret key
     const secret = body.secret
-    const expectedSecret = import.meta.env.REVALIDATE_SECRET || 'etf_refresh_2025'
+    const expectedSecret = import.meta.env.REVALIDATE_SECRET
+
+    if (!expectedSecret) {
+      console.error('[Revalidate] REVALIDATE_SECRET not configured')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
     if (secret !== expectedSecret) {
       return new Response(
@@ -168,7 +176,14 @@ export const POST: APIRoute = async ({ request }) => {
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url)
   const secret = url.searchParams.get('secret')
-  const expectedSecret = import.meta.env.REVALIDATE_SECRET || 'etf_refresh_2025'
+  const expectedSecret = import.meta.env.REVALIDATE_SECRET
+
+  if (!expectedSecret) {
+    return new Response(
+      JSON.stringify({ error: 'Server configuration error' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
+  }
 
   if (secret !== expectedSecret) {
     return new Response(

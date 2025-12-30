@@ -81,6 +81,7 @@ const currentPath = Astro.url.pathname;
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@ETFpruvodce" />
     <meta name="twitter:title" content={finalTwitterTitle} />
     <meta name="twitter:description" content={finalTwitterDescription} />
     <meta name="twitter:image" content={fullOgImage} />
@@ -110,6 +111,11 @@ const currentPath = Astro.url.pathname;
   </head>
 
   <body class="min-h-screen bg-gray-50 font-sans antialiased">
+    <!-- Skip Link pro přístupnost -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-violet-600 focus:text-white focus:rounded-md focus:outline-none">
+      Přejít na hlavní obsah
+    </a>
+
     <!-- Header -->
     <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,7 +196,7 @@ const currentPath = Astro.url.pathname;
     </header>
 
     <!-- Main Content -->
-    <main>
+    <main id="main-content">
       <slot />
     </main>
 

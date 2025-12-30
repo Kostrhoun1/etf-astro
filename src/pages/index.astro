@@ -100,20 +100,20 @@ const relatedLinks = [
   ogTitle="ETF průvodce.cz - Kompletní průvodce ETF fondů pro české investory"
   ogDescription="ETF fondy pro začátečníky i pokročilé. Srovnání 4300+ ETF fondů, kde koupit ETF v ČR. Vše o ETF na jednom místě."
 >
-  <!-- HERO sekce -->
-  <HeroSection totalCount={totalETFCount || 4300} client:load />
+  <!-- HERO sekce (statická, bez hydratace) -->
+  <HeroSection totalCount={totalETFCount || 4300} />
 
-  <!-- USP sekce -->
+  <!-- USP sekce (statická, bez hydratace) -->
   <div class="content-auto">
-    <USPSection client:load />
+    <USPSection />
   </div>
 
   <!-- TOP ETF PODLE KATEGORII -->
-  <TopETFTabsWrapper categories={topETFCategories} totalETFCount={totalETFCount || 4300} client:load />
+  <TopETFTabsWrapper categories={topETFCategories} totalETFCount={totalETFCount || 4300} client:idle />
 
   <!-- SROVNANI BROKERU -->
   <div class="content-auto">
-    <BrokerComparisonSection client:load />
+    <BrokerComparisonSection client:visible />
   </div>
 
   <!-- FAQ sekce -->
@@ -122,13 +122,13 @@ const relatedLinks = [
       title="Často kladené otázky o ETF fondech"
       faqs={faqs}
       className="mt-16 bg-gray-50"
-      client:load
+      client:visible
     />
   </div>
 
   <!-- Portfolio Strategies Teaser -->
   <div class="content-auto">
-    <PortfolioStrategiesTeaser client:load />
+    <PortfolioStrategiesTeaser client:visible />
   </div>
 
   <!-- Related Content Links -->
