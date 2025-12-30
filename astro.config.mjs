@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.etfpruvodce.cz',
-  output: 'hybrid',
+  output: 'static',
   adapter: vercel(),
   integrations: [react(), sitemap()],
 
