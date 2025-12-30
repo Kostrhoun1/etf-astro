@@ -1,0 +1,359 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+
+const currentYear = new Date().getFullYear();
+
+// Breadcrumb Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": `Portfolio Strategie ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/portfolio-strategie"
+    }
+  ]
+};
+
+// FinancialProduct Schema
+const financialProductSchema = {
+  "@context": "https://schema.org",
+  "@type": "FinancialProduct",
+  "name": `Portfolio Strategie pro ETF Investory ${currentYear}`,
+  "description": "5 osvědčených portfolio strategií s reálnou performance z databáze ETF fondů",
+  "provider": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "url": "https://www.etfpruvodce.cz"
+  },
+  "category": "Investment Strategy",
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "investors"
+  }
+};
+
+const strategies = [
+  {
+    title: "Permanentní Portfolio",
+    description: "Strategie Harryho Browneho s rovnoměrným rozdělením mezi akcie, dluhopisy, zlato a hotovost. Cílem je stabilita v jakékoli ekonomické situaci.",
+    allocation: ["25% Akcie", "25% Dlouhodobé dluhopisy", "25% Zlato", "25% Hotovost/krátkodobé dluhopisy"],
+    performance: "~4% p.a.",
+    risk: "Nízké",
+    href: "/portfolio-strategie/permanentni-portfolio",
+    color: "emerald"
+  },
+  {
+    title: "Ray Dalio All-Weather",
+    description: "Portfolio navržené Rayem Daliem pro prosperitu v jakémkoli ekonomickém prostředí - inflace, deflace, růst i pokles.",
+    allocation: ["30% Akcie", "40% Dlouhodobé dluhopisy", "15% Střednědobé dluhopisy", "7,5% Zlato", "7,5% Komodity"],
+    performance: "~5-8% p.a.",
+    risk: "Střední",
+    href: "/portfolio-strategie/ray-dalio-all-weather",
+    color: "blue"
+  },
+  {
+    title: "Nobel Portfolio",
+    description: "Investiční strategie používaná Nobelovou nadací pro správu svého kapitálu. Kombinuje růstový potenciál akcií s konzervativními aktivy.",
+    allocation: ["55% Akcie", "25% Dluhopisy", "20% Nemovitosti"],
+    performance: "~6% p.a.",
+    risk: "Střední",
+    href: "/portfolio-strategie/nobel-portfolio",
+    color: "purple"
+  },
+  {
+    title: "Akciové Portfolio",
+    description: "80% akcie + 20% nemovitosti pro zkušené investory s dlouhodobým horizontem. Maximální růstový potenciál.",
+    allocation: ["80% Světové akcie", "20% Nemovitosti (REITs)"],
+    performance: "~7-8% p.a.",
+    risk: "Vysoké",
+    href: "/portfolio-strategie/akciove-portfolio",
+    color: "orange"
+  },
+  {
+    title: "Dividendové Portfolio",
+    description: "Zaměření na společnosti s dlouholetou tradicí růstu dividend - dividend aristocrats a kvalitní nemovitostní investice.",
+    allocation: ["95% Dividendové akcie", "5% Nemovitosti (REITs)"],
+    performance: "~4% dividendy + růst",
+    risk: "Střední",
+    href: "/portfolio-strategie/dividendove-portfolio",
+    color: "green"
+  }
+];
+
+const faqs = [
+  {
+    question: "Která portfolio strategie je nejlepší pro začátečníky?",
+    answer: "Pro začátečníky doporučujeme Nobel Portfolio nebo Dividendové portfolio. Jsou jednoduché na implementaci, vyžadují pouze 2-3 ETF fondy a historicky dosahují solidních výnosů kolem 6% ročně."
+  },
+  {
+    question: "Jak často mám rebalancovat portfolio podle strategie?",
+    answer: "Doporučujeme rebalancing 2x ročně nebo když některá alokace vybočí o více než 5% od cílové hodnoty. Například u 60/40 portfolia rebalancujte když máte 65/35 nebo 55/45."
+  },
+  {
+    question: "Jsou portfolio strategie vhodné i pro malé částky?",
+    answer: "Ano! Většina strategií funguje s částkami od 1000 Kč měsíčně. U malých částek doporučujeme začít s jedním širokým ETF (VWCE) a postupně přidávat další komponenty."
+  },
+  {
+    question: "Jak se liší výkonnost jednotlivých strategií?",
+    answer: "Naše analýza z období 1995-2024 ukazuje: Akciové 7-8% ročně, Nobel 6%, Dividendové 4% dividendy + růst, All-Weather 5-8%, Permanentní 4%. Vyšší výnos = vyšší volatilita."
+  }
+];
+
+// FAQ Schema
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+
+const relatedLinks = [
+  {
+    title: "Srovnání ETF fondů",
+    href: "/srovnani-etf",
+    description: "Najděte ETF pro vaši strategii",
+    icon: "📈"
+  },
+  {
+    title: "Backtest portfolia",
+    href: "/kalkulacky/backtest-portfolia",
+    description: "Otestujte historickou výkonnost",
+    icon: "📊"
+  },
+  {
+    title: "Kde koupit ETF",
+    href: "/kde-koupit-etf",
+    description: "Srovnání nejlepších brokerů",
+    icon: "🏦"
+  }
+];
+---
+
+<Layout
+  title={`5 Osvědčených Portfolio Strategií pro ETF Investory ${currentYear}`}
+  description={`Porovnejte reálnou performance 5 investičních strategií: Permanentní Portfolio, Ray Dalio All-Weather, Nobel Portfolio, Akciové a Dividendové. Včetně aktuálních dat z databáze 4300+ ETF.`}
+  canonical="/portfolio-strategie"
+  keywords={`portfolio strategie, ETF strategie ${currentYear}, investiční portfolio, Ray Dalio All Weather, Nobel portfolio, dividendové portfolio, permanentní portfolio, performance ETF, asset allocation`}
+  ogImage="/og-portfolio-strategie.jpg"
+  ogTitle={`5 Osvědčených Portfolio Strategií pro ETF Investory ${currentYear}`}
+  ogDescription={`Porovnejte reálnou performance 5 investičních strategií: Permanentní Portfolio, Ray Dalio All-Weather, Nobel Portfolio, Akciové a Dividendové. Včetně aktuálních dat z databáze ETF.`}
+  twitterTitle={`5 Osvědčených Portfolio Strategií ${currentYear}`}
+  twitterDescription={`Porovnejte reálnou performance 5 investičních strategií pro ETF investory.`}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(financialProductSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 via-purple-50/30 to-pink-50/50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <div class="inline-flex items-center bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-6 py-3 rounded-full text-sm font-medium mb-8">
+          <span class="mr-2">📊</span>
+          Portfolio strategie {currentYear}
+        </div>
+
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6">
+          Portfolio
+          <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Strategie
+          </span>
+        </h1>
+
+        <p class="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto mb-8">
+          5 osvědčených investičních strategií s reálnou výkonností.
+          Vyberte si strategii podle vašeho rizikového profilu.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="#strategie"
+            class="inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all"
+          >
+            <span class="mr-2">📊</span>
+            Zobrazit strategie
+          </a>
+          <a
+            href="/kalkulacky/backtest-portfolia"
+            class="inline-flex items-center justify-center border-2 border-indigo-300 text-indigo-700 hover:bg-indigo-50 px-8 py-4 text-lg font-semibold rounded-lg transition-all"
+          >
+            <span class="mr-2">🧮</span>
+            Backtest portfolia
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Strategies Grid -->
+  <section id="strategie" class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Investiční strategie
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Vyberte si strategii podle vašeho investičního horizontu a tolerance k riziku
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {strategies.map((strategy) => (
+          <a
+            href={strategy.href}
+            class="bg-white rounded-xl p-8 shadow hover:shadow-lg transition-all group block"
+          >
+            <div class="flex justify-between items-start mb-4">
+              <h3 class="text-2xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                {strategy.title}
+              </h3>
+              <div class={`px-3 py-1 rounded-full text-sm font-medium ${
+                strategy.risk === 'Nízké' ? 'bg-green-100 text-green-700' :
+                strategy.risk === 'Střední' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                Riziko: {strategy.risk}
+              </div>
+            </div>
+
+            <p class="text-gray-600 mb-6">{strategy.description}</p>
+
+            <div class="mb-4">
+              <h4 class="text-sm font-semibold text-gray-500 mb-2">ALOKACE:</h4>
+              <div class="flex flex-wrap gap-2">
+                {strategy.allocation.map((item) => (
+                  <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+              <div>
+                <span class="text-sm text-gray-500">Očekávaný výnos:</span>
+                <span class="ml-2 font-bold text-indigo-600">{strategy.performance}</span>
+              </div>
+              <span class="text-indigo-600 group-hover:translate-x-1 transition-transform">
+                Více info →
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Table -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Srovnání strategií
+        </h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full bg-white rounded-xl shadow-lg overflow-hidden">
+          <thead>
+            <tr class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+              <th class="py-4 px-6 text-left font-semibold">Strategie</th>
+              <th class="py-4 px-6 text-center font-semibold">Výkonnost</th>
+              <th class="py-4 px-6 text-center font-semibold">Riziko</th>
+              <th class="py-4 px-6 text-center font-semibold">Počet ETF</th>
+              <th class="py-4 px-6 text-center font-semibold">Pro koho</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-100 hover:bg-indigo-50 transition-colors">
+              <td class="py-4 px-6 font-medium">Permanentní Portfolio</td>
+              <td class="py-4 px-6 text-center">~4% p.a.</td>
+              <td class="py-4 px-6 text-center"><span class="bg-green-100 text-green-700 px-2 py-1 rounded">Nízké</span></td>
+              <td class="py-4 px-6 text-center">4</td>
+              <td class="py-4 px-6 text-center text-sm">Konzervativní investoři</td>
+            </tr>
+            <tr class="border-b border-gray-100 hover:bg-indigo-50 transition-colors">
+              <td class="py-4 px-6 font-medium">All-Weather</td>
+              <td class="py-4 px-6 text-center">~5-8% p.a.</td>
+              <td class="py-4 px-6 text-center"><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Střední</span></td>
+              <td class="py-4 px-6 text-center">5</td>
+              <td class="py-4 px-6 text-center text-sm">Vyvážení investoři</td>
+            </tr>
+            <tr class="border-b border-gray-100 hover:bg-indigo-50 transition-colors">
+              <td class="py-4 px-6 font-medium">Nobel Portfolio</td>
+              <td class="py-4 px-6 text-center">~6% p.a.</td>
+              <td class="py-4 px-6 text-center"><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Střední</span></td>
+              <td class="py-4 px-6 text-center">3</td>
+              <td class="py-4 px-6 text-center text-sm">Začátečníci</td>
+            </tr>
+            <tr class="border-b border-gray-100 hover:bg-indigo-50 transition-colors">
+              <td class="py-4 px-6 font-medium">Akciové Portfolio</td>
+              <td class="py-4 px-6 text-center">~7-8% p.a.</td>
+              <td class="py-4 px-6 text-center"><span class="bg-red-100 text-red-700 px-2 py-1 rounded">Vysoké</span></td>
+              <td class="py-4 px-6 text-center">2</td>
+              <td class="py-4 px-6 text-center text-sm">Agresivní investoři</td>
+            </tr>
+            <tr class="hover:bg-indigo-50 transition-colors">
+              <td class="py-4 px-6 font-medium">Dividendové Portfolio</td>
+              <td class="py-4 px-6 text-center">~4% + růst</td>
+              <td class="py-4 px-6 text-center"><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Střední</span></td>
+              <td class="py-4 px-6 text-center">2</td>
+              <td class="py-4 px-6 text-center text-sm">Příjmoví investoři</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Často kladené otázky
+        </h2>
+      </div>
+
+      <div class="bg-white rounded-2xl p-8 shadow-md">
+        <div class="max-w-4xl mx-auto space-y-6">
+          {faqs.map((faq) => (
+            <details class="group border border-gray-200 rounded-lg hover:border-indigo-200 transition-colors">
+              <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-indigo-50 rounded-lg group-open:rounded-b-none transition-colors">
+                <span class="font-semibold text-lg text-gray-900 group-hover:text-indigo-800">{faq.question}</span>
+                <svg class="w-5 h-5 text-gray-500 group-hover:text-indigo-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+                {faq.answer}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související stránky" />
+  </div>
+</Layout>

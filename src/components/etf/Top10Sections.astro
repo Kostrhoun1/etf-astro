@@ -1,0 +1,337 @@
+---
+/**
+ * Server-side Top 10 ETF Sections Component
+ * Renders Top 10 by TER, AUM, and 1Y Performance
+ */
+import type { ETFBasicInfo } from '../../lib/etf-data';
+
+interface Props {
+  etfs: ETFBasicInfo[];
+  currency?: 'EUR' | 'CZK' | 'USD';
+  categoryName?: string;
+}
+
+const { etfs, currency = 'EUR', categoryName = 'ETF' } = Astro.props;
+
+function formatNumber(num: number | null | undefined): string {
+  if (num === null || num === undefined) return 'N/A';
+  return new Intl.NumberFormat('cs-CZ').format(num);
+}
+
+function formatPercentage(num: number | null | undefined): string {
+  if (num === null || num === undefined) return 'N/A';
+  return (num > 0 ? '+' : '') + num.toFixed(2) + '%';
+}
+
+function getReturnValue(etf: ETFBasicInfo, curr: 'EUR' | 'CZK' | 'USD'): number | null {
+  switch (curr) {
+    case 'CZK':
+      return etf.return_1y_czk;
+    case 'USD':
+      return etf.return_1y_usd;
+    default:
+      return etf.return_1y;
+  }
+}
+
+function getYtdReturn(etf: ETFBasicInfo, curr: 'EUR' | 'CZK' | 'USD'): number | null {
+  switch (curr) {
+    case 'CZK':
+      return etf.return_ytd_czk;
+    case 'USD':
+      return etf.return_ytd_usd;
+    default:
+      return etf.return_ytd;
+  }
+}
+
+function get3yReturn(etf: ETFBasicInfo, curr: 'EUR' | 'CZK' | 'USD'): number | null {
+  switch (curr) {
+    case 'CZK':
+      return etf.return_3y_czk;
+    case 'USD':
+      return etf.return_3y_usd;
+    default:
+      return etf.return_3y;
+  }
+}
+
+// Top 10 by lowest TER (exclude 0% TER as these are data errors)
+const top10ByTER = [...etfs]
+  .filter(etf => etf.ter_numeric !== null && etf.ter_numeric > 0)
+  .sort((a, b) => (a.ter_numeric ?? 999) - (b.ter_numeric ?? 999))
+  .slice(0, 10);
+
+// Top 10 by largest AUM
+const top10ByAUM = [...etfs]
+  .filter(etf => etf.fund_size_numeric !== null)
+  .sort((a, b) => (b.fund_size_numeric ?? 0) - (a.fund_size_numeric ?? 0))
+  .slice(0, 10);
+
+// Top 10 by 1Y performance
+const top10ByPerformance = [...etfs]
+  .filter(etf => getReturnValue(etf, currency) !== null)
+  .sort((a, b) => (getReturnValue(b, currency) ?? -999) - (getReturnValue(a, currency) ?? -999))
+  .slice(0, 10);
+
+const showSection = etfs.length >= 5;
+---
+
+{showSection && (
+  <section id="top10" class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="space-y-8">
+
+        {/* Top 10 by TER */}
+        <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">Top 10 nejlevnějších</h3>
+              <p class="text-sm text-gray-600">Nejnižší TER poplatky</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">#</th>
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">Název ETF</th>
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">Poskytovatel</th>
+                  <th class="text-right py-3 px-2 font-semibold text-emerald-600">TER</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">AUM (mil. €)</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">YTD</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">1R výnos</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">3R výnos</th>
+                  <th class="text-center py-3 px-2 font-semibold text-gray-600">Typ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {top10ByTER.map((etf, index) => {
+                  const return1y = getReturnValue(etf, currency);
+                  const returnYtd = getYtdReturn(etf, currency);
+                  const return3y = get3yReturn(etf, currency);
+                  return (
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td class="py-3 px-2 text-gray-500 font-medium">{index + 1}</td>
+                      <td class="py-3 px-2">
+                        <a href={`/etf/${etf.isin}`} class="text-gray-900 hover:text-violet-600 font-medium transition-colors">
+                          {etf.name.length > 40 ? etf.name.substring(0, 40) + '...' : etf.name}
+                        </a>
+                        {etf.primary_ticker && (
+                          <span class="ml-2 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                            {etf.primary_ticker}
+                          </span>
+                        )}
+                      </td>
+                      <td class="py-3 px-2 text-gray-600 text-xs">
+                        {etf.fund_provider ? (etf.fund_provider.length > 12 ? etf.fund_provider.substring(0, 12) + '...' : etf.fund_provider) : '-'}
+                      </td>
+                      <td class="py-3 px-2 text-right font-bold text-emerald-600">
+                        {etf.ter_numeric !== null ? `${etf.ter_numeric.toFixed(2)}%` : 'N/A'}
+                      </td>
+                      <td class="py-3 px-2 text-right font-medium text-gray-700">
+                        {formatNumber(etf.fund_size_numeric)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${returnYtd !== null && returnYtd > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(returnYtd)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${return1y !== null && return1y > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(return1y)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${return3y !== null && return3y > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(return3y)}
+                      </td>
+                      <td class="py-3 px-2 text-center">
+                        <span class={`text-xs px-2 py-1 rounded-full ${
+                          etf.distribution_policy === 'Accumulating'
+                            ? 'bg-blue-100 text-blue-700'
+                            : etf.distribution_policy === 'Distributing'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {etf.distribution_policy === 'Accumulating' ? 'ACC' : etf.distribution_policy === 'Distributing' ? 'DIST' : '-'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Top 10 by AUM */}
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">Top 10 největších</h3>
+              <p class="text-sm text-gray-600">Největší objem AUM</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">#</th>
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">Název ETF</th>
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">Poskytovatel</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">TER</th>
+                  <th class="text-right py-3 px-2 font-semibold text-blue-600">AUM (mil. €)</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">YTD</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">1R výnos</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">3R výnos</th>
+                  <th class="text-center py-3 px-2 font-semibold text-gray-600">Typ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {top10ByAUM.map((etf, index) => {
+                  const return1y = getReturnValue(etf, currency);
+                  const returnYtd = getYtdReturn(etf, currency);
+                  const return3y = get3yReturn(etf, currency);
+                  return (
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td class="py-3 px-2 text-gray-500 font-medium">{index + 1}</td>
+                      <td class="py-3 px-2">
+                        <a href={`/etf/${etf.isin}`} class="text-gray-900 hover:text-violet-600 font-medium transition-colors">
+                          {etf.name.length > 40 ? etf.name.substring(0, 40) + '...' : etf.name}
+                        </a>
+                        {etf.primary_ticker && (
+                          <span class="ml-2 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                            {etf.primary_ticker}
+                          </span>
+                        )}
+                      </td>
+                      <td class="py-3 px-2 text-gray-600 text-xs">
+                        {etf.fund_provider ? (etf.fund_provider.length > 12 ? etf.fund_provider.substring(0, 12) + '...' : etf.fund_provider) : '-'}
+                      </td>
+                      <td class="py-3 px-2 text-right font-medium text-gray-700">
+                        {etf.ter_numeric !== null ? `${etf.ter_numeric.toFixed(2)}%` : 'N/A'}
+                      </td>
+                      <td class="py-3 px-2 text-right font-bold text-blue-600">
+                        {formatNumber(etf.fund_size_numeric)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${returnYtd !== null && returnYtd > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(returnYtd)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${return1y !== null && return1y > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(return1y)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${return3y !== null && return3y > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(return3y)}
+                      </td>
+                      <td class="py-3 px-2 text-center">
+                        <span class={`text-xs px-2 py-1 rounded-full ${
+                          etf.distribution_policy === 'Accumulating'
+                            ? 'bg-blue-100 text-blue-700'
+                            : etf.distribution_policy === 'Distributing'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {etf.distribution_policy === 'Accumulating' ? 'ACC' : etf.distribution_policy === 'Distributing' ? 'DIST' : '-'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Top 10 by Performance */}
+        <div class="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-6 border border-purple-200">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">Top 10 podle výkonnosti</h3>
+              <p class="text-sm text-gray-600">Nejlepší 1R výnos ({currency})</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">#</th>
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">Název ETF</th>
+                  <th class="text-left py-3 px-2 font-semibold text-gray-600">Poskytovatel</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">TER</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">AUM (mil. €)</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">YTD</th>
+                  <th class="text-right py-3 px-2 font-semibold text-purple-600">1R výnos</th>
+                  <th class="text-right py-3 px-2 font-semibold text-gray-600">3R výnos</th>
+                  <th class="text-center py-3 px-2 font-semibold text-gray-600">Typ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {top10ByPerformance.map((etf, index) => {
+                  const return1y = getReturnValue(etf, currency);
+                  const returnYtd = getYtdReturn(etf, currency);
+                  const return3y = get3yReturn(etf, currency);
+                  return (
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td class="py-3 px-2 text-gray-500 font-medium">{index + 1}</td>
+                      <td class="py-3 px-2">
+                        <a href={`/etf/${etf.isin}`} class="text-gray-900 hover:text-violet-600 font-medium transition-colors">
+                          {etf.name.length > 40 ? etf.name.substring(0, 40) + '...' : etf.name}
+                        </a>
+                        {etf.primary_ticker && (
+                          <span class="ml-2 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                            {etf.primary_ticker}
+                          </span>
+                        )}
+                      </td>
+                      <td class="py-3 px-2 text-gray-600 text-xs">
+                        {etf.fund_provider ? (etf.fund_provider.length > 12 ? etf.fund_provider.substring(0, 12) + '...' : etf.fund_provider) : '-'}
+                      </td>
+                      <td class="py-3 px-2 text-right font-medium text-gray-700">
+                        {etf.ter_numeric !== null ? `${etf.ter_numeric.toFixed(2)}%` : 'N/A'}
+                      </td>
+                      <td class="py-3 px-2 text-right font-medium text-gray-700">
+                        {formatNumber(etf.fund_size_numeric)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${returnYtd !== null && returnYtd > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(returnYtd)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-bold ${return1y !== null && return1y > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(return1y)}
+                      </td>
+                      <td class={`py-3 px-2 text-right font-medium ${return3y !== null && return3y > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPercentage(return3y)}
+                      </td>
+                      <td class="py-3 px-2 text-center">
+                        <span class={`text-xs px-2 py-1 rounded-full ${
+                          etf.distribution_policy === 'Accumulating'
+                            ? 'bg-blue-100 text-blue-700'
+                            : etf.distribution_policy === 'Distributing'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {etf.distribution_policy === 'Accumulating' ? 'ACC' : etf.distribution_policy === 'Distributing' ? 'DIST' : '-'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+)}

@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import MortgageCalculatorContent from '../../components/tools/MortgageCalculatorContent';
+
+const currentYear = new Date().getFullYear();
+---
+
+<Layout
+  title="Hypoteční kalkulačka 2026 - Výpočet splátek hypotéky"
+  description="Hypoteční kalkulačka 2026 - spočítejte si výši měsíční splátky hypotéky, celkové náklady a přeplatky. Aktuální úrokové sazby."
+  canonical="/kalkulacky/hypotecni-kalkulacka"
+  keywords="hypoteční kalkulačka, splátky hypotéky, RPSN, úroková sazba, měsíční splátka, výpočet hypotéky, přeplatek hypotéky"
+  ogImage="/og-hypotecni-kalkulacka.jpg"
+  ogTitle="Hypoteční kalkulačka 2026 - Výpočet splátek hypotéky | ETF průvodce"
+  ogDescription="Hypoteční kalkulačka 2026 - spočítejte si výši měsíční splátky hypotéky, celkové náklady a přeplatky."
+>
+  <MortgageCalculatorContent client:load />
+</Layout>

@@ -1,0 +1,445 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+import BrokerRatingGrid from '../components/broker/BrokerRatingGrid';
+
+const currentYear = new Date().getFullYear();
+
+const reviewSchema = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  "itemReviewed": {
+    "@type": "FinancialService",
+    "name": "Portu",
+    "description": "Česká automatizovaná investiční platforma založená v roce 2017",
+    "url": "https://www.portu.cz/",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Rohanské nábřeží 671/15",
+      "addressLocality": "Praha",
+      "postalCode": "186 00",
+      "addressCountry": "CZ"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "98",
+      "bestRating": "100",
+      "worstRating": "0",
+      "reviewCount": "734"
+    }
+  },
+  "reviewRating": {
+    "@type": "Rating",
+    "ratingValue": "98",
+    "bestRating": "100",
+    "worstRating": "0"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "datePublished": "2026-01-01",
+  "dateModified": "2026-01-24",
+  "reviewBody": "Portu získává hodnocení 98/100 bodů jako česká automatizovaná investiční platforma ideální pro začátečníky a pasivní investory. Nabízí uživatelsky přívětivé rozhraní s automatickou správou portfolia a nízkými poplatky od 0,47% ročně."
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kde koupit ETF",
+      "item": "https://www.etfpruvodce.cz/kde-koupit-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": `Portu recenze ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/portu-recenze"
+    }
+  ]
+};
+
+const pros = [
+  "Velmi uživatelský přístup pro začátečníky",
+  "Nízké poplatky (0,47-1% ročně)",
+  "Žádné minimální požadavky na investice (od 500 Kč)",
+  "Automatická správa portfolia a rebalancing",
+  "Česká společnost s ČNB regulací",
+  "Investiční rezerva jako alternativa k spořícím účtům",
+  "Dětské účty a krypto portfolia",
+  "Flexibilní investování s možností změn"
+];
+
+const cons = [
+  "Omezený výběr jednotlivých akcií",
+  "Nižší potenciální výnosy než u aktivního obchodování",
+  "Není ideální pro zkušené investory",
+  "Bez možnosti aktivního tradingu",
+  "Vyšší poplatky než u přímého ETF investování",
+  "Omezené analytické nástroje"
+];
+
+const categories = [
+  { name: 'Poplatky', score: 95, description: '0,47-1% ročně, all-inclusive' },
+  { name: 'Platforma', score: 100, description: 'Nejjednodušší a nejintuitivnější' },
+  { name: 'Nabídka', score: 100, description: 'ETF portfolia, automatizace' },
+  { name: 'Podpora', score: 95, description: 'Česká podpora, konzultace zdarma' },
+  { name: 'Důvěryhodnost', score: 100, description: 'ČNB regulace, WOOD & Company' },
+  { name: 'Vzdělání', score: 90, description: 'Robo-advisor přístup, automatizace' }
+];
+
+const relatedLinks = [
+  { title: "Kde koupit ETF - přehled brokerů", href: "/kde-koupit-etf#porovnani", description: "Zpět na kompletní přehled a srovnání všech brokerů" },
+  { title: "DEGIRO recenze", href: "/degiro-recenze", description: "Porovnání s evropským brokerem" },
+  { title: "XTB recenze", href: "/xtb-recenze", description: "Alternativa s nižšími poplatky" },
+  { title: "Návod pro začátečníky", href: "/co-jsou-etf/jak-zacit-investovat", description: "Jak začít s investováním do ETF" },
+  { title: "FIRE kalkulačka", href: "/kalkulacky/fire-kalkulacka", description: "Kdy dosáhnete finanční nezávislosti?" },
+  { title: "Investiční kalkulačka", href: "/kalkulacky/investicni-kalkulacka", description: "Spočítejte budoucí hodnotu investic" }
+];
+---
+
+<Layout
+  title={`Portu recenze ${currentYear} - Česká robo-advisor platforma`}
+  description={`Portu recenze ${currentYear} - hodnocení 98/100. Česká automatizovaná investiční platforma s robo-advisor a optimálním zdaněním.`}
+  canonical="/portu-recenze"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Hero -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+        Hodnocení: 98/100
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Portu recenze {currentYear}
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Kompletní hodnocení Portu - české automatizované investiční platformy.
+        Ideální řešení pro začátečníky a pasivní investory.
+      </p>
+    </div>
+
+    <!-- Rating Grid -->
+    <div class="mb-8">
+      <BrokerRatingGrid
+        client:load
+        overallRating={98}
+        overallDescription="Portu je vynikající volba pro začátečníky a pasivní investory"
+        categories={categories}
+      />
+    </div>
+
+    <!-- Pros/Cons -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-emerald-600 mb-4 flex items-center gap-2">
+          <span>✓</span> Výhody Portu
+        </h3>
+        <ul class="space-y-3">
+          {pros.map((pro) => (
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-500 mt-1">✓</span>
+              <span class="text-sm text-gray-700">{pro}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">
+          <span>✕</span> Nevýhody Portu
+        </h3>
+        <ul class="space-y-3">
+          {cons.map((con) => (
+            <li class="flex items-start gap-2">
+              <span class="text-red-500 mt-1">✕</span>
+              <span class="text-sm text-gray-700">{con}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Key Info -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Klíčové informace</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-2">Založení a regulace</h3>
+            <p class="text-gray-600 text-sm">
+              Založeno v roce 2017 skupinou WOOD & Company.
+              200 000+ klientů, 28 miliard Kč spravovaných aktiv.
+            </p>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-2">Historické výnosy</h3>
+            <p class="text-gray-600 text-sm">
+              Historické výnosy okolo 10,5% ročně.
+              Doporučený investicíní horizont 5-10 let.
+            </p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-2">Nabídka investic</h3>
+            <p class="text-gray-600 text-sm">
+              ETF portfolia, jednotlivé akcie, české akcie,
+              krypto portfolia a investiční rezerva.
+            </p>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-2">Ochrana investic</h3>
+            <p class="text-gray-600 text-sm">
+              Regulováno ČNB. Aktiva oddělena od majetku společnosti.
+              Garanční fond do 100 000 EUR.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poplatky tabulka -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Struktura poplatků</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-2 font-semibold">Typ poplatku</th>
+              <th class="text-left py-2 font-semibold">Sazba</th>
+              <th class="text-left py-2 font-semibold">Poznámka</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="py-2">Správcovský poplatek</td>
+              <td class="py-2">Max. 1% ročně</td>
+              <td class="py-2 text-gray-600">Slevy až na 0,24% dle částky</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Vstupní poplatek</td>
+              <td class="py-2"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded">0 Kč</span></td>
+              <td class="py-2 text-gray-600">Bez vstupních poplatků</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Výstupní poplatek</td>
+              <td class="py-2"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded">0 Kč</span></td>
+              <td class="py-2 text-gray-600">Bezplatný výběr</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Měnové konverze</td>
+              <td class="py-2"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded">Zahrnut</span></td>
+              <td class="py-2 text-gray-600">Bez dalších poplatků</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Rebalancing</td>
+              <td class="py-2"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded">Automaticky</span></td>
+              <td class="py-2 text-gray-600">Zahrnut v poplatku</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Investiční možnosti -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Investiční možnosti</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-3">Hlavní produkty</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span>
+              ETF portfolia podle rizikového profilu
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span>
+              Jednotlivé akcie
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span>
+              České akcie s optimálním zdaněním
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span>
+              Krypto portfolia
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-3">Speciální služby</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <span class="text-blue-500">✓</span>
+              Investiční rezerva (0,25% ročně)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-blue-500">✓</span>
+              Portu &lt;26 (50% sleva)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-blue-500">✓</span>
+              DIP - daňové výhody (0,5% ročně)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-blue-500">✓</span>
+              Portu Crypto (max. 1% ročně)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platformy -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Platformy a dostupnost</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-3">Dostupné platformy</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Webová aplikace
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Mobilní aplikace (Android)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Mobilní aplikace (iOS)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Kompletně v češtině
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-3">Zákaznická podpora</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Česká zákaznická podpora
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Pracovní doba 9:00-17:00
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Chat, e-mail, telefon
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Investiční konzultace zdarma
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Očekávané výnosy -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-8 mb-8 border border-green-200">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Minimální vklad a očekávané výnosy</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-3">Vstupní požadavky</h3>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span>
+              <strong>Minimální vklad: 500 Kč</strong>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Další vklady od 100 Kč
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-emerald-500">✓</span> Bezplatný výběr kdykoliv
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-gray-900 mb-3">Očekávané výnosy</h3>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex items-center gap-2">
+              <span class="text-blue-500">📈</span>
+              <strong>Historicky 10,5% ročně</strong>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-blue-500">📈</span> 28 miliard Kč spravovaných aktiv
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-blue-500">📈</span> 200 000+ spokojených klientů
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pro koho -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Pro koho je Portu vhodné?</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold text-emerald-700 mb-3">✅ Vhodné pro</h3>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• Úplné začátečníky v investování</li>
+            <li>• Pasivní investory (buy-and-hold)</li>
+            <li>• Ty, kdo preferují automatizaci</li>
+            <li>• Investory s menším kapitálem</li>
+            <li>• Rodiče investující pro děti</li>
+            <li>• Ty, kdo chtějí českou podporu</li>
+            <li>• Dlouhodobé spořitele (5-10 let)</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-red-700 mb-3">❌ Nevhodné pro</h3>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• Aktivní tradery</li>
+            <li>• Zkušené investory chtějící kontrolu</li>
+            <li>• Ty, kdo preferují nižší poplatky</li>
+            <li>• Investory chtějící široký výběr akcií</li>
+            <li>• Day tradery a spekulanty</li>
+            <li>• Ty, kdo chtějí pokročilé analytické nástroje</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Závěrečné hodnocení -->
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4">Závěrečné hodnocení</h2>
+      <p class="text-gray-700 leading-relaxed mb-4">
+        Portu je výborná volba pro začátečníky a pasivní investory díky velmi jednoduchému
+        ovládání a automatické správě portfolia. Česká regulace ČNB a lokální podpora
+        přidávají další plus pro domácí investory.
+      </p>
+      <p class="text-gray-700 leading-relaxed mb-6">
+        Poplatky 0,47-1% ročně jsou rozumné za all-inclusive službu, ale zkušení investoři
+        mohou dosáhnout nižších nákladů u přímého ETF investování. Pro začátečníky je však
+        pohodlí a automatizace často cennější než úspora na poplatcích.
+      </p>
+      <a
+        href="https://www.portu.cz/"
+        target="_blank"
+        rel="nofollow noopener noreferrer"
+        class="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+      >
+        Otevřít účet u Portu
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </a>
+    </div>
+
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

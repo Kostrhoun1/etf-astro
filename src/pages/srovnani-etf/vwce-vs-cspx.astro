@@ -1,0 +1,179 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const currentYear = new Date().getFullYear();
+
+const etf1 = {
+  ticker: 'VWCE',
+  name: 'Vanguard FTSE All-World UCITS ETF',
+  isin: 'IE00BK5BQT80',
+  ter: 0.22,
+  aum: '25.8 mld EUR',
+  coverage: 'Celosvětové - 3900+ akcií',
+  type: 'Akumulační',
+  index: 'FTSE All-World',
+  return1y: 12.5,
+  return3y: 28.4
+};
+
+const etf2 = {
+  ticker: 'CSPX',
+  name: 'iShares Core S&P 500 UCITS ETF',
+  isin: 'IE00B5BMR087',
+  ter: 0.07,
+  aum: '82.1 mld EUR',
+  coverage: 'USA - 500 akcií',
+  type: 'Akumulační',
+  index: 'S&P 500',
+  return1y: 15.2,
+  return3y: 32.1
+};
+---
+
+<Layout
+  title={`${etf1.ticker} vs ${etf2.ticker} - Srovnání ETF ${currentYear}`}
+  description={`Detailní srovnání ETF ${etf1.ticker} vs ${etf2.ticker}. Porovnání ${etf1.name} a ${etf2.name} - TER, výkonnost, riziko.`}
+  canonical={`/srovnani-etf/vwce-vs-cspx`}
+  keywords={`${etf1.ticker}, ${etf2.ticker}, srovnání ETF, VWCE vs CSPX, nejlepší ETF, akumulační ETF, globální ETF, S&P 500 ETF`}
+  ogImage="/og-etf-comparison.jpg"
+  ogTitle={`${etf1.ticker} vs ${etf2.ticker} - Srovnání ETF ${currentYear}`}
+  ogDescription={`Detailní srovnání ETF ${etf1.ticker} vs ${etf2.ticker}. Porovnání ${etf1.name} a ${etf2.name} - TER, výkonnost, riziko.`}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+        ETF Srovnání
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        {etf1.ticker} vs {etf2.ticker}
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Nejpopulárnější srovnání: Celosvětové ETF vs S&P 500
+      </p>
+    </div>
+
+    <!-- Quick comparison -->
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+      <div class="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
+        <h2 class="text-2xl font-bold text-blue-900 mb-4">{etf1.ticker}</h2>
+        <p class="text-gray-700 mb-4">{etf1.name}</p>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">TER</span>
+            <span class="font-semibold">{etf1.ter}%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Velikost</span>
+            <span class="font-semibold">{etf1.aum}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Pokrytí</span>
+            <span class="font-semibold">{etf1.coverage}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Index</span>
+            <span class="font-semibold">{etf1.index}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Výnos 1R</span>
+            <span class="font-semibold text-green-600">+{etf1.return1y}%</span>
+          </div>
+        </div>
+        <a href={`/etf/${etf1.isin}`} class="mt-4 inline-block w-full text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+          Detail ETF
+        </a>
+      </div>
+
+      <div class="bg-violet-50 rounded-xl p-6 border-2 border-violet-200">
+        <h2 class="text-2xl font-bold text-violet-900 mb-4">{etf2.ticker}</h2>
+        <p class="text-gray-700 mb-4">{etf2.name}</p>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">TER</span>
+            <span class="font-semibold">{etf2.ter}%</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Velikost</span>
+            <span class="font-semibold">{etf2.aum}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Pokrytí</span>
+            <span class="font-semibold">{etf2.coverage}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Index</span>
+            <span class="font-semibold">{etf2.index}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Výnos 1R</span>
+            <span class="font-semibold text-green-600">+{etf2.return1y}%</span>
+          </div>
+        </div>
+        <a href={`/etf/${etf2.isin}`} class="mt-4 inline-block w-full text-center bg-violet-600 text-white py-2 rounded-lg hover:bg-violet-700">
+          Detail ETF
+        </a>
+      </div>
+    </div>
+
+    <!-- Verdict -->
+    <div class="bg-gray-50 rounded-xl p-8 mb-12">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Který vybrat?</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold text-blue-700 mb-3">Vyberte {etf1.ticker} pokud:</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start gap-2">
+              <span class="text-green-500">&#10003;</span>
+              Chcete globální diverzifikaci (včetně rozvíjejících se trhů)
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500">&#10003;</span>
+              Preferujete nižší riziko skrze širší rozložení
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500">&#10003;</span>
+              Investujete dlouhodobě (20+ let)
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-violet-700 mb-3">Vyberte {etf2.ticker} pokud:</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start gap-2">
+              <span class="text-green-500">&#10003;</span>
+              Věříte v dlouhodobou dominanci USA ekonomiky
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500">&#10003;</span>
+              Chcete nejnižší poplatky (0.07% TER)
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-500">&#10003;</span>
+              Preferujete historicky vyšší výnosy
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related -->
+    <div class="bg-white rounded-xl border p-6">
+      <h3 class="font-semibold text-gray-900 mb-4">Další srovnání</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        <a href="/srovnani-etf/iwda-vs-cspx" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">IWDA vs CSPX</div>
+          <p class="text-sm text-gray-600">MSCI World vs S&P 500</p>
+        </a>
+        <a href="/srovnani-etf/vwce-vs-iwda" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">VWCE vs IWDA</div>
+          <p class="text-sm text-gray-600">All-World vs MSCI World</p>
+        </a>
+        <a href="/nejlepsi-etf" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">Nejlepší ETF</div>
+          <p class="text-sm text-gray-600">Všechna doporučení</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

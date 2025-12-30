@@ -1,0 +1,521 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import InternalLinking from '../components/SEO/InternalLinking';
+
+const currentYear = new Date().getFullYear();
+
+const brokers = [
+  {
+    name: "DEGIRO",
+    rating: 4.6,
+    badge: "🏆 Nejlepší celkově",
+    badgeColor: "bg-yellow-100 text-yellow-800",
+    pros: ["Nejnižší poplatky", "Největší výběr ETF", "Regulace EU", "Pokročilé funkce"],
+    cons: ["Složitější pro začátečníky", "Poplatky za spojení burz"],
+    bestFor: "Zkušení investoři, velké portfolio",
+    etfFee: "2 EUR/rok za ETF",
+    link: "/degiro-recenze",
+    color: "border-yellow-300 bg-yellow-50"
+  },
+  {
+    name: "XTB",
+    rating: 4.7,
+    badge: "🏆 Nejlepší pro české investory",
+    badgeColor: "bg-green-100 text-green-800",
+    pros: ["Investování bez komisí", "7000+ akcií, 1600+ ETF", "Česká podpora 24/7", "Transparentní broker"],
+    cons: ["Bez opcí/futures", "Vysoké zdanění CZ akcií", "Složitější pro nováčky"],
+    bestFor: "ETF investoři, začátečníci s českou podporou",
+    etfFee: "0 EUR",
+    link: "/xtb-recenze",
+    color: "border-green-300 bg-green-50"
+  },
+  {
+    name: "Trading 212",
+    rating: 4.3,
+    badge: "👶 Nejlepší pro začátečníky",
+    badgeColor: "bg-blue-100 text-blue-800",
+    pros: ["0% komise", "Velmi jednoduché", "AutoInvest", "Fractional shares"],
+    cons: ["Lending program", "Omezené analýzy", "Výpadky systému"],
+    bestFor: "Začátečníci, mobilní investování",
+    etfFee: "0 EUR",
+    link: "/trading212-recenze",
+    color: "border-blue-300 bg-blue-50"
+  },
+  {
+    name: "Interactive Brokers",
+    rating: 4.2,
+    badge: "🔬 Pro pokročilé",
+    badgeColor: "bg-purple-100 text-purple-800",
+    pros: ["Nejširší nabídka", "Nejnižší poplatky (velké obj.)", "86 trhů", "Profesionální nástroje"],
+    cons: ["Velmi složité", "Vysoký min. vklad", "Poplatky za data"],
+    bestFor: "Profíci, vysoký kapitál",
+    etfFee: "0.05% (min. 1.25 EUR)",
+    link: "/interactive-brokers-recenze",
+    color: "border-purple-300 bg-purple-50"
+  },
+  {
+    name: "Fio e-Broker",
+    rating: 3.8,
+    badge: "🇨🇿 Český broker",
+    badgeColor: "bg-red-100 text-red-800",
+    pros: ["Regulace ČNB", "Český jazyk", "Jednoduché daně", "Domácí podpora"],
+    cons: ["Velmi omezená nabídka ETF", "Vysoké poplatky", "Starší platforma"],
+    bestFor: "České akcie, konzervativní investoři",
+    etfFee: "0.25% (min. 10 EUR)",
+    link: "/fio-ebroker-recenze",
+    color: "border-red-300 bg-red-50"
+  }
+];
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": `Nejlepší brokeři ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/srovnani-brokeru"
+    }
+  ]
+};
+
+const comparisonSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": `Nejlepší brokeři ${currentYear} - Kompletní srovnání`,
+  "description": `Objektivní srovnání nejlepších brokerů pro ETF investice v roce ${currentYear}. XTB 4.7/5, DEGIRO, Interactive Brokers, Trading 212 a další.`,
+  "url": "https://www.etfpruvodce.cz/srovnani-brokeru",
+  "breadcrumb": breadcrumbSchema
+};
+---
+
+<Layout
+  title={`Nejlepší brokeři ${currentYear} - Kompletní srovnání ETF brokerů`}
+  description={`Objektivní srovnání nejlepších brokerů pro ETF investice v ${currentYear}. Portu 98/100, XTB 94/100, Trading 212, DEGIRO a další. Poplatky, funkce, hodnocení.`}
+  canonical="/srovnani-brokeru"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(comparisonSchema)} />
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Hero sekce -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 bg-violet-100 text-violet-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+        🏆 Aktualizováno pro rok {currentYear}
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+        Nejlepší brokeři {currentYear}
+      </h1>
+      <p class="text-xl text-gray-600 max-w-4xl mx-auto mb-8">
+        Objektivní srovnání top brokerů pro ETF investice. Detailní analýza poplatků,
+        funkcí a vhodnosti pro různé typy investorů. Najděte svého ideálního brokera.
+      </p>
+    </div>
+
+    <!-- Rychlé srovnání - tabulka -->
+    <div class="bg-white rounded-lg border shadow-sm mb-12">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-semibold flex items-center gap-2">
+          <span class="text-yellow-600">👑</span>
+          Rychlé srovnání top brokerů
+        </h2>
+        <p class="text-gray-500 text-sm mt-1">Klíčové parametry na jeden pohled</p>
+      </div>
+      <div class="p-6">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-3 font-semibold">Broker</th>
+                <th class="text-left py-3 font-semibold">Hodnocení</th>
+                <th class="text-left py-3 font-semibold">ETF poplatek</th>
+                <th class="text-left py-3 font-semibold">Min. vklad</th>
+                <th class="text-left py-3 font-semibold">Nejlepší pro</th>
+                <th class="text-left py-3 font-semibold">Akce</th>
+              </tr>
+            </thead>
+            <tbody>
+              {brokers.map((broker, index) => (
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="font-semibold">{broker.name}</div>
+                      <span class={`text-xs px-2 py-1 rounded ${broker.badgeColor}`}>{broker.badge}</span>
+                    </div>
+                  </td>
+                  <td class="py-4">
+                    <div class="flex items-center gap-2">
+                      <span class="text-yellow-600">&#9733;</span>
+                      <span class="font-semibold">{broker.rating}/5</span>
+                    </div>
+                  </td>
+                  <td class="py-4">
+                    <span class={broker.etfFee === "0 EUR" ? "text-green-600 font-semibold" : ""}>
+                      {broker.etfFee}
+                    </span>
+                  </td>
+                  <td class="py-4">
+                    {broker.name === "Interactive Brokers" ? "10 000 USD" : "Žádný"}
+                  </td>
+                  <td class="py-4 text-gray-600">{broker.bestFor}</td>
+                  <td class="py-4">
+                    <a href={broker.link} class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-gray-300 bg-white hover:bg-gray-50 h-9 px-3">
+                      Recenze
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailni srovnani brokeru -->
+    <div class="space-y-8 mb-12">
+      {brokers.map((broker, index) => (
+        <div class={`rounded-lg border-2 ${broker.color}`}>
+          <div class="p-6 border-b">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <div class="flex items-center gap-4">
+                <div class="text-2xl font-bold">{index + 1}.</div>
+                <div>
+                  <h3 class="text-xl font-semibold flex items-center gap-3">
+                    {broker.name}
+                    <span class={`text-xs px-2 py-1 rounded ${broker.badgeColor}`}>{broker.badge}</span>
+                  </h3>
+                  <div class="flex items-center gap-2 mt-2">
+                    {[1,2,3,4,5].map((star) => (
+                      <span class={star <= Math.floor(broker.rating) ? "text-yellow-500" : "text-gray-300"}>&#9733;</span>
+                    ))}
+                    <span class="ml-2 text-lg font-semibold">{broker.rating}/5</span>
+                  </div>
+                </div>
+              </div>
+              <a href={broker.link} class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4">
+                Detailní recenze →
+              </a>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold mb-3 text-green-600 flex items-center gap-2">
+                  ✓ Výhody
+                </h4>
+                <ul class="space-y-2">
+                  {broker.pros.map((pro) => (
+                    <li class="flex items-center gap-2 text-sm">
+                      <span class="text-green-500">&#10003;</span>
+                      {pro}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold mb-3 text-red-600 flex items-center gap-2">
+                  ✗ Nevýhody
+                </h4>
+                <ul class="space-y-2">
+                  {broker.cons.map((con) => (
+                    <li class="flex items-center gap-2 text-sm">
+                      <span class="text-red-500">&#10007;</span>
+                      {con}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4 pt-4 border-t">
+              <div class="flex items-center gap-6 text-sm flex-wrap">
+                <div>
+                  <span class="font-semibold">ETF poplatek:</span>
+                  <span class={`ml-2 ${broker.etfFee === "0 EUR" ? "text-green-600 font-semibold" : ""}`}>
+                    {broker.etfFee}
+                  </span>
+                </div>
+                <div>
+                  <span class="font-semibold">Nejlepsi pro:</span>
+                  <span class="ml-2 text-gray-600">{broker.bestFor}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Jak si vybrat brokera -->
+    <div class="bg-white rounded-lg border shadow-sm mb-12">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-semibold flex items-center gap-2">
+          <span class="text-blue-600">&#127942;</span>
+          Jak si vybrat správného brokera?
+        </h2>
+      </div>
+      <div class="p-6">
+        <div class="grid md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-green-600">Začátečníci</h3>
+            <div class="space-y-3">
+              <div class="p-4 bg-green-50 rounded-lg">
+                <div class="font-semibold text-green-800">1. Trading 212</div>
+                <p class="text-sm text-green-700">Nejjednodušší aplikace, 0% poplatky</p>
+              </div>
+              <div class="p-4 bg-blue-50 rounded-lg">
+                <div class="font-semibold text-blue-800">2. XTB</div>
+                <p class="text-sm text-blue-700">Česká podpora, jednoduché ETF investování</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-blue-600">Pokročilí</h3>
+            <div class="space-y-3">
+              <div class="p-4 bg-yellow-50 rounded-lg">
+                <div class="font-semibold text-yellow-800">1. DEGIRO</div>
+                <p class="text-sm text-yellow-700">Nejlepší poměr cena/funkce</p>
+              </div>
+              <div class="p-4 bg-green-50 rounded-lg">
+                <div class="font-semibold text-green-800">2. XTB</div>
+                <p class="text-sm text-green-700">Skvělá platforma, velká nabídka ETF</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-purple-600">Profíci</h3>
+            <div class="space-y-3">
+              <div class="p-4 bg-purple-50 rounded-lg">
+                <div class="font-semibold text-purple-800">1. Interactive Brokers</div>
+                <p class="text-sm text-purple-700">Nejširší nabídka, nejlepší nástroje</p>
+              </div>
+              <div class="p-4 bg-yellow-50 rounded-lg">
+                <div class="font-semibold text-yellow-800">2. DEGIRO</div>
+                <p class="text-sm text-yellow-700">Výborné pokročilé funkce</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Srovnani podle kriterii -->
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+      <div class="bg-white rounded-lg border shadow-sm">
+        <div class="p-6 border-b">
+          <h3 class="text-lg font-semibold flex items-center gap-2">
+            <span class="text-green-600">&#128200;</span>
+            Nejnižší poplatky
+          </h3>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                <span class="font-semibold">Trading 212</span>
+              </div>
+              <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-800">0% komise</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                <span class="font-semibold">XTB</span>
+              </div>
+              <span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800">0% ETF</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-yellow-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                <span class="font-semibold">DEGIRO</span>
+              </div>
+              <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-800">2 EUR/rok</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border shadow-sm">
+        <div class="p-6 border-b">
+          <h3 class="text-lg font-semibold flex items-center gap-2">
+            <span class="text-blue-600">&#128101;</span>
+            Nejlepší pro začátečníky
+          </h3>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                <span class="font-semibold">Trading 212</span>
+              </div>
+              <span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-800">Nejjednodušší</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                <span class="font-semibold">XTB</span>
+              </div>
+              <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-800">Česká podpora</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-yellow-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                <span class="font-semibold">DEGIRO</span>
+              </div>
+              <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-800">Více funkcí</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Casto kladene otazky -->
+    <div class="bg-white rounded-lg border shadow-sm mb-12">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-semibold flex items-center gap-2">
+          <span class="text-orange-600">&#9888;</span>
+          Často kladené otázky o výběru brokera
+        </h2>
+      </div>
+      <div class="p-6">
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-semibold mb-2">Který broker je nejbezpečnější?</h4>
+              <p class="text-sm text-gray-600">
+                Všichni brokeři jsou regulováni v EU. Portu má licenci ČNB (98/100), XTB má licenci ČNB (94/100),
+                DEGIRO je regulován BaFin/DNB (79/100), Trading 212 má CySEC licenci (87/100).
+              </p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-2">Mohu mít účty u více brokerů?</h4>
+              <p class="text-sm text-gray-600">
+                Ano, mnoho investorů kombinuje brokery. Například Portu pro automatizaci
+                a XTB pro aktivní obchodování, nebo Trading 212 pro začátek a DEGIRO později.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-2">Jak s daněmi v Česku?</h4>
+              <p class="text-sm text-gray-600">
+                Čeští brokeři (Portu, Fio) mají automatické daňové vykazování.
+                XTB a DEGIRO poskytují daňové přehledy. U všech zahraničních je potřeba hlásit zisky.
+              </p>
+            </div>
+          </div>
+          <div class="space-y-6">
+            <div>
+              <h4 class="font-semibold mb-2">Kolik peněz potřebuji na start?</h4>
+              <p class="text-sm text-gray-600">
+                Portu má minimum 500 Kč, Trading 212 jen 1 EUR, XTB a DEGIRO 0 EUR.
+                Interactive Brokers nevyžaduje minimální vklad. Doporučujeme začít s 1000+ EUR.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-2">Který broker má nejlepší aplikaci?</h4>
+              <p class="text-sm text-gray-600">
+                Portu má nejjednodušší automatizovanou aplikaci. Trading 212 má nejpřívětivější
+                rozhraní pro začátečníky. XTB má profesionální xStation 5.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-2">Jak rychle mohu začít investovat?</h4>
+              <p class="text-sm text-gray-600">
+                Čeští brokeři (Portu, Fio) mají nejrychlejší ověření. Trading 212 a XTB
+                trvají 1-3 dny. DEGIRO a IBKR mohou trvat déle kvůli ověření.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doporuceni podle profilu -->
+    <div class="bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg border shadow-sm mb-12">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-semibold flex items-center gap-2">
+          <span class="text-purple-600">&#128081;</span>
+          Naše finální doporučení {currentYear}
+        </h2>
+      </div>
+      <div class="p-6">
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="p-6 bg-white rounded-xl shadow-sm border-2 border-yellow-200">
+            <div class="text-center mb-4">
+              <span class="text-4xl">&#128081;</span>
+              <h3 class="text-xl font-bold">CELKOVÝ VÍTĚZ</h3>
+              <div class="text-2xl font-bold text-yellow-600 mt-2">DEGIRO</div>
+            </div>
+            <p class="text-sm text-center text-gray-600 mb-4">
+              Nejlepší poměr cena/funkce pro zkušené investory
+            </p>
+            <a href="/degiro-recenze" class="w-full inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4">
+              Přečíst recenzi
+            </a>
+          </div>
+
+          <div class="p-6 bg-white rounded-xl shadow-sm border-2 border-green-200">
+            <div class="text-center mb-4">
+              <span class="text-4xl">&#11088;</span>
+              <h3 class="text-xl font-bold">PRO ETF</h3>
+              <div class="text-2xl font-bold text-green-600 mt-2">XTB</div>
+            </div>
+            <p class="text-sm text-center text-gray-600 mb-4">
+              3000+ ETF bez poplatků + česká podpora
+            </p>
+            <a href="/xtb-recenze" class="w-full inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4">
+              Přečíst recenzi
+            </a>
+          </div>
+
+          <div class="p-6 bg-white rounded-xl shadow-sm border-2 border-blue-200">
+            <div class="text-center mb-4">
+              <span class="text-4xl">&#128118;</span>
+              <h3 class="text-xl font-bold">ZAČÁTEČNÍCI</h3>
+              <div class="text-2xl font-bold text-blue-600 mt-2">Trading 212</div>
+            </div>
+            <p class="text-sm text-center text-gray-600 mb-4">
+              Nejjednodušší aplikace s 0% komisemi
+            </p>
+            <a href="/trading212-recenze" class="w-full inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4">
+              Přečíst recenzi
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Souvisejici stranky -->
+    <div class="bg-white rounded-lg border shadow-sm p-6">
+      <h3 class="text-lg font-semibold mb-4">Související články</h3>
+      <div class="grid md:grid-cols-4 gap-4">
+        <a href="/kde-koupit-etf" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="font-semibold text-blue-600">Kde koupit ETF</div>
+          <p class="text-sm text-gray-600">Kompletní průvodce výběrem brokera</p>
+        </a>
+        <a href="/srovnani-etf" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="font-semibold text-blue-600">Srovnání ETF fondů</div>
+          <p class="text-sm text-gray-600">Najděte nejlepší ETF pro investice</p>
+        </a>
+        <a href="/kalkulacky" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="font-semibold text-blue-600">Finanční kalkulačky</div>
+          <p class="text-sm text-gray-600">Nástroje pro plánování investic</p>
+        </a>
+        <a href="/co-jsou-etf/jak-zacit-investovat" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="font-semibold text-blue-600">Návod pro začátečníky</div>
+          <p class="text-sm text-gray-600">Jak začít s investováním do ETF</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

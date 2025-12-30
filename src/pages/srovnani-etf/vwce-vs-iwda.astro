@@ -1,0 +1,90 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const currentYear = new Date().getFullYear();
+---
+
+<Layout
+  title={`VWCE vs IWDA - Srovnání ETF ${currentYear}`}
+  description="Detailní srovnání ETF VWCE vs IWDA. All-World vs MSCI World - TER, výkonnost, riziko."
+  canonical="/srovnani-etf/vwce-vs-iwda"
+  keywords="VWCE vs IWDA, srovnání ETF, All-World ETF, MSCI World ETF, Vanguard FTSE All-World, iShares MSCI World, ETF porovnání"
+  ogImage="/og-etf-comparison.jpg"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+        ETF Srovnání
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        VWCE vs IWDA
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        All-World vs MSCI World - Globální vs Rozvinuté trhy
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+      <div class="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
+        <h2 class="text-2xl font-bold text-blue-900 mb-4">VWCE</h2>
+        <p class="text-gray-700 mb-4">Vanguard FTSE All-World UCITS ETF</p>
+        <div class="space-y-3">
+          <div class="flex justify-between"><span class="text-gray-600">TER</span><span class="font-semibold">0.22%</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Pokrytí</span><span class="font-semibold">Celosvětově - 3900 akcií</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Emerging Markets</span><span class="font-semibold text-green-600">ANO (~11%)</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Index</span><span class="font-semibold">FTSE All-World</span></div>
+        </div>
+        <a href="/etf/IE00BK5BQT80" class="mt-4 inline-block w-full text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Detail ETF</a>
+      </div>
+
+      <div class="bg-violet-50 rounded-xl p-6 border-2 border-violet-200">
+        <h2 class="text-2xl font-bold text-violet-900 mb-4">IWDA</h2>
+        <p class="text-gray-700 mb-4">iShares Core MSCI World UCITS ETF</p>
+        <div class="space-y-3">
+          <div class="flex justify-between"><span class="text-gray-600">TER</span><span class="font-semibold">0.20%</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Pokrytí</span><span class="font-semibold">Rozvinuté trhy - 1600 akcií</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Emerging Markets</span><span class="font-semibold text-red-600">NE</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Index</span><span class="font-semibold">MSCI World</span></div>
+        </div>
+        <a href="/etf/IE00B4L5Y983" class="mt-4 inline-block w-full text-center bg-violet-600 text-white py-2 rounded-lg hover:bg-violet-700">Detail ETF</a>
+      </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-xl p-8 mb-12">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Který vybrat?</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold text-blue-700 mb-3">Vyberte VWCE pokud:</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Chcete opravdu globální diverzifikaci</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Chcete zahrnout rozvíjející se trhy</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Preferujete jeden ETF pro vše</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-violet-700 mb-3">Vyberte IWDA pokud:</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Preferujete pouze rozvinuté trhy</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Chcete mírně nižší TER</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Chcete přidat EM ETF samostatně</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border p-6">
+      <h3 class="font-semibold text-gray-900 mb-4">Další srovnání</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        <a href="/srovnani-etf/vwce-vs-cspx" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">VWCE vs CSPX</div>
+        </a>
+        <a href="/srovnani-etf/iwda-vs-cspx" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">IWDA vs CSPX</div>
+        </a>
+        <a href="/nejlepsi-etf" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">Nejlepší ETF</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

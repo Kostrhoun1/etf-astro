@@ -1,0 +1,463 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-esg-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const lastModified = new Date().toISOString().split('T')[0];
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší ESG ETF ${currentYear} - udržitelné investování a ESG faktory`,
+  "description": `Srovnání nejlepších ESG ETF ${currentYear}. Udržitelné investování, ESG screening, klimatické cíle - TER, velikost fondů.`,
+  "image": "https://www.etfpruvodce.cz/og-esg-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2025-01-15",
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-esg-etf"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší ESG ETF v roce ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší ESG ETF jsou: iShares MSCI USA ESG Enhanced CTB UCITS ETF (IE00BHZPJ890) největší ESG ETF s 11,4 mld. EUR a TER 0,07%, JPMorgan US Research Enhanced Index Equity (ESG) UCITS ETF (IE00BF4G7076) s 9,6 mld. EUR a TER 0,20%, a Xtrackers MSCI USA ESG UCITS ETF (IE00BFMNPS42) s 7,9 mld. EUR a TER 0,15%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co znamená ESG a jak funguje ESG investování?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ESG znamená Environmental (životní prostředí), Social (společenské faktory) a Governance (správa a řízení). ESG investování kombinuje finanční výnosy s pozitivním dopadem na společnost a planetu. ESG ETF vylučují kontroverzní sektory a upřednostňují společnosti s vysokým ESG skóre."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi ESG ETF a tradičními ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ESG ETF používají screening proces pro vyloučení společností z kontroverzních odvětví (zbraně, tabák, fosilní paliva) a upřednostňují firmy s lepšími ESG praktikami. Tradiční ETF se zaměřují pouze na finanční metriky bez ohledu na udržitelnost nebo společenský dopad."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou náklady na ESG ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER (celkové náklady) ESG ETF se pohybují od 0,07% do 0,20% ročně u našich TOP 3. Nejnižší má iShares MSCI USA ESG Enhanced (IE00BHZPJ890) s TER 0,07%, Xtrackers MSCI USA ESG (IE00BFMNPS42) má TER 0,15%, nejvyšší má JPMorgan US Research Enhanced ESG (IE00BF4G7076) s TER 0,20%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Dosahují ESG ETF horších výnosů než tradiční ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ESG ETF často dosahují srovnatelných nebo lepších výnosů než tradiční ETF. Studie ukazují, že společnosti s vysokým ESG skóre často vykazují lepší dlouhodobou finanční výkonnost a menší rizika. ESG screening může vést k vyloučení některých výnosných sektorů, ale také snižuje riziko regulačních a reputačních problémů."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit ESG ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ESG ETF koupíte u všech hlavních brokerů jako DEGIRO, XTB, Trading212 nebo Interactive Brokers. Naše TOP 3 ESG ETF: iShares MSCI USA ESG Enhanced (IE00BHZPJ890), JPMorgan US Research Enhanced ESG (IE00BF4G7076) a Xtrackers MSCI USA ESG (IE00BFMNPS42) jsou dostupné na evropských burzách."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší ESG ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-esg-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší S&P 500 ETF", href: "/nejlepsi-etf/nejlepsi-sp500-etf", description: "Průvodce americkými indexovými fondy", icon: "🇺🇸" },
+  { title: "Nejlepší Growth ETF", href: "/nejlepsi-etf/nejlepsi-growth-etf", description: "Růstové ETF pro long-term investory", icon: "📈" },
+  { title: "Nejlepší dividendové ETF", href: "/nejlepsi-etf/nejlepsi-dividendove-etf", description: "Passive income z dividend ETF", icon: "💰" }
+];
+---
+
+<Layout
+  title={config.title + ' ' + currentYear}
+  description={config.metaDescription}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-teal-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-green-200 to-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-emerald-200 to-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-teal-200 to-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-green-100 to-emerald-100 text-emerald-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-emerald-200/50">
+            🌱 Aktuální k {new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              ESG ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších ESG ETF pro udržitelné investování.
+            ESG screening, klimatické cíle a sustainable investing včetně praktických tipů.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md">
+              🌱 ESG kritéria
+            </a>
+          </div>
+        </div>
+
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl mb-3">
+                🌱
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">ESG investování v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro udržitelné investování</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-green-600">📈</span>
+                  <span class="text-xs text-gray-500 font-medium">RŮST ESG AKTIV</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">350%</div>
+                <div class="text-xs text-gray-600">za 5 let</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-emerald-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-emerald-600">🌍</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJVĚTŠÍ ESG ETF</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">11,4B</div>
+                <div class="text-xs text-gray-600">iShares USA ESG</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-green-600">🛡️</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,07%</div>
+                <div class="text-xs text-gray-600">iShares Enhanced</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-emerald-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-emerald-600">💚</span>
+                  <span class="text-xs text-gray-500 font-medium">CO2 REDUKCE</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">50%</div>
+                <div class="text-xs text-gray-600">vs benchmark</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section - Co jsou ESG ETF? -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-green-100 w-20 h-20 mx-auto mb-8 hover:bg-green-200 transition-colors">
+          <span class="text-4xl">🌱</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co jsou ESG ETF?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Investiční fondy zaměřené na společnosti s vysokými standardy v oblasti životního prostředí,
+          sociální odpovědnosti a správy společností
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-emerald-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🌿</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-emerald-800 transition-colors">Environmental (E)</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Klimatické změny, obnovitelné zdroje, odpadové hospodářství,
+            energetická efektivnost a ochrana biodiverzity.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">👥</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-emerald-800 transition-colors">Social (S)</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Pracovní podmínky, lidská práva, diverzita a inkluze,
+            bezpečnost produktů a vztahy s komunitou.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-teal-500 to-green-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🛡️</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-emerald-800 transition-colors">Governance (G)</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Správa společností, transparentnost, etické podnikání,
+            nezávislost dozorčí rady a protikorupční opatření.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 nejlepší ESG ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy ESG kritérií a velikosti fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections -->
+  <section id="srovnani" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Top10Sections etfs={etfs} currency="EUR" categoryName="ESG" />
+    </div>
+  </section>
+
+  <!-- Selection Guide -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-br from-white to-green-50 rounded-3xl p-8 border border-green-100 shadow-xl">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+          Jak vybrat to správné ESG ETF?
+        </h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+            <h4 class="font-bold text-green-800 mb-2">1. Pro začátečníky</h4>
+            <p class="text-green-700 text-sm">
+              Začněte s velkými, diverzifikovanými ESG ETF jako iShares MSCI USA ESG Enhanced. Nízké náklady a široká diverzifikace jsou ideální pro dlouhodobé investování.
+            </p>
+          </div>
+          <div class="bg-emerald-50 rounded-xl p-6 border border-emerald-200">
+            <h4 class="font-bold text-emerald-800 mb-2">2. Pro pokročilé</h4>
+            <p class="text-emerald-700 text-sm">
+              Porovnejte ESG metodologie - některé ETF využívají přísnější screening (vyloučení více sektorů) a jiné se zaměřují na Climate Transition Benchmark (CTB) nebo Paris-Aligned Benchmark (PAB).
+            </p>
+          </div>
+          <div class="bg-teal-50 rounded-xl p-6 border border-teal-200">
+            <h4 class="font-bold text-teal-800 mb-2">3. Pro impaktové investory</h4>
+            <p class="text-teal-700 text-sm">
+              Pokud chcete maximální dopad na klimatické cíle, zvolte Paris-Aligned ETF s CO2 redukcí 50%+ oproti benchmarku a postupným snižováním emisí 7% ročně.
+            </p>
+          </div>
+          <div class="bg-lime-50 rounded-xl p-6 border border-lime-200">
+            <h4 class="font-bold text-lime-800 mb-2">4. Pro diverzifikaci</h4>
+            <p class="text-lime-700 text-sm">
+              ESG ETF mohou nahradit tradiční indexové fondy ve vašem portfoliu. Zvažte kombinaci USA, Evropa a Emerging Markets ESG ETF pro globální pokrytí.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Často kladené otázky</h2>
+        <p class="text-xl text-gray-600">Odpovědi na nejčastější dotazy o ESG ETF</p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaké jsou nejlepší ESG ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší ESG ETF jsou: <strong>iShares MSCI USA ESG Enhanced CTB UCITS ETF</strong> (IE00BHZPJ890)
+            největší ESG ETF s 11,4 mld. EUR a TER 0,07%, <strong>JPMorgan US Research Enhanced Index Equity (ESG) UCITS ETF</strong> (IE00BF4G7076)
+            s 9,6 mld. EUR a TER 0,20%, a <strong>Xtrackers MSCI USA ESG UCITS ETF</strong>
+            (IE00BFMNPS42) s 7,9 mld. EUR a TER 0,15%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Co znamená ESG a jak funguje ESG investování?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>ESG</strong> znamená Environmental (životní prostředí), Social (společenské faktory) a Governance (správa a řízení).
+            ESG investování kombinuje finanční výnosy s pozitivním dopadem na společnost a planetu.
+            ESG ETF vylučují kontroverzní sektory a upřednostňují společnosti s vysokým ESG skóre.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaký je rozdíl mezi ESG ETF a tradičními ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>ESG ETF</strong> používají screening proces pro vyloučení společností z kontroverzních odvětví
+            (zbraně, tabák, fosilní paliva) a upřednostňují firmy s lepšími ESG praktikami.
+            <strong>Tradiční ETF</strong> se zaměřují pouze na finanční metriky bez ohledu na udržitelnost nebo společenský dopad.
+            ESG ETF se také nazývají <strong>SRI</strong> (Socially Responsible Investing), <strong>Sustainable</strong>,
+            <strong>Green</strong> nebo <strong>Climate</strong> ETF podle konkrétního zaměření.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaké jsou náklady na ESG ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>TER (celkové náklady) ESG ETF</strong> se pohybují od 0,07% do 0,20% ročně u našich TOP 3. Nejnižší má iShares MSCI USA ESG Enhanced (IE00BHZPJ890) s TER 0,07%, Xtrackers MSCI USA ESG (IE00BFMNPS42) má TER 0,15%, nejvyšší má JPMorgan US Research Enhanced ESG (IE00BF4G7076) s TER 0,20%. Počítejte také s transakčními poplatky u brokera.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Dosahují ESG ETF horších výnosů než tradiční ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>ESG ETF často dosahují srovnatelných nebo lepších výnosů</strong> než tradiční ETF. Studie ukazují, že společnosti s vysokým ESG skóre často vykazují lepší dlouhodobou finanční výkonnost a menší rizika. ESG screening může vést k vyloučení některých výnosných sektorů, ale také snižuje riziko regulačních a reputačních problémů.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Kde koupit ESG ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            ESG ETF koupíte u všech hlavních brokerů jako <strong>DEGIRO, XTB, Trading212 nebo Interactive Brokers</strong>. Naše TOP 3 ESG ETF: iShares MSCI USA ESG Enhanced (IE00BHZPJ890), JPMorgan US Research Enhanced ESG (IE00BF4G7076) a Xtrackers MSCI USA ESG (IE00BFMNPS42) jsou dostupné na evropských burzách. Porovnejte si poplatky a ESG kritéria před investicí.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-12 bg-gradient-to-br from-green-50 to-emerald-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Připraveni investovat udržitelně?</h2>
+      <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+        Najděte si ideálního brokera a začněte s investováním do nejlepších ESG ETF
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+          Najít brokera pro ETF
+        </a>
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center px-6 py-3 border-2 border-green-600 text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors">
+          Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

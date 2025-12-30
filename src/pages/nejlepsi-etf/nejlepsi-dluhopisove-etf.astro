@@ -1,0 +1,531 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-dluhopisove-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString();
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší dluhopisové ETF 2026 - státní a korporátní dluhopisy`,
+  "description": `Srovnání nejlepších dluhopisových ETF 2026. Státní a korporátní dluhopisy, EUR zajištění, výnosy - TER, velikost fondů.`,
+  "image": "https://www.etfpruvodce.cz/og-bond-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": `2026-01-15`,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-dluhopisove-etf"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší dluhopisové ETF v roce 2026?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Nejlepší dluhopisové ETF jsou: ${etfs[0]?.name || 'iShares Core Global Aggregate Bond UCITS ETF EUR Hedged'}, ${etfs[1]?.name || 'Xtrackers Global Government Bond UCITS ETF EUR Hedged'}, a ${etfs[2]?.name || 'Vanguard Global Aggregate Bond UCITS ETF EUR Hedged'}. Tyto ETF nabízejí optimální poměr nákladů, výkonnosti a rizika.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co jsou dluhopisové ETF a jak fungují?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dluhopisové ETF investují do státních a korporátních dluhopisů. Poskytují stabilní příjmy z úroků, nižší volatilitu než akcie a diverzifikaci portfolia. EUR zajištěné verze eliminují měnové riziko pro české investory."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč investovat do dluhopisových ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dluhopisové ETF poskytují stabilitu, pravidelné příjmy a ochranu kapitálu. Jsou ideální pro konzervativní investory, diverzifikaci portfolia a ochranu před volatilitou akciových trhů."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou náklady na dluhopisové ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER (celkové náklady) dluhopisových ETF se pohybují mezi 0,10% až 0,50% ročně. Naše TOP 3 má velmi konkurenční poplatky. Dluhopisové ETF mají obecně nižší poplatky než akciové."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaká jsou rizika dluhopisových ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hlavní rizika dluhopisových ETF zahrnují: úrokové riziko (rostoucí úroky snižují ceny dluhopisů), kreditní riziko (možnost nesplacení), inflační riziko (eroze reálné hodnoty) a měnové riziko u nehedgovaných ETF. Naše doporučené EUR hedged ETF eliminují měnové riziko pro české investory."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit naše doporučené dluhopisové ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Naše TOP 3 dluhopisové ETF můžete koupit u většiny českých brokerů. ${etfs[0]?.name || 'iShares Global Aggregate'}, ${etfs[1]?.name || 'Xtrackers Government Bond'} a ${etfs[2]?.name || 'Vanguard Global Aggregate'} najdete u Degiro, Interactive Brokers, XTB, Trading212, Portu nebo Fio e-Broker. Porovnejte si transakční poplatky.`
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Domů", "item": "https://www.etfpruvodce.cz" },
+    { "@type": "ListItem", "position": 2, "name": "Nejlepší ETF", "item": "https://www.etfpruvodce.cz/nejlepsi-etf" },
+    { "@type": "ListItem", "position": 3, "name": "Nejlepší dluhopisové ETF", "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-dluhopisove-etf" }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší ETF na americké akcie", href: "/nejlepsi-etf/nejlepsi-etf-na-americke-akcie", description: "S&P 500 a široký americký trh", icon: "🇺🇸" },
+  { title: "Nejlepší nemovitostní ETF", href: "/nejlepsi-etf/nejlepsi-nemovitostni-etf", description: "REIT fondy pro diverzifikaci", icon: "🏠" },
+  { title: "Nejlepší komoditní ETF", href: "/nejlepsi-etf/nejlepsi-komoditni-etf", description: "Zlato, ropa a další komodity", icon: "🥇" }
+];
+---
+
+<Layout
+  title={`Nejlepší Dluhopisové ETF 2026 | Srovnání a Doporučení`}
+  description={`Najděte nejlepší dluhopisové ETF pro rok 2026. Srovnání státních a korporátních bondů, EUR zajištění, výnosnosti a diverzifikace.`}
+  canonical="/nejlepsi-etf/nejlepsi-dluhopisove-etf"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-gray-50/30 to-green-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-gray-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-gray-200 to-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-green-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-blue-100 to-gray-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-blue-200/50">
+            💵 Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší
+            <span class="bg-gradient-to-r from-blue-600 via-gray-600 to-green-600 bg-clip-text text-transparent">
+              dluhopisové ETF
+            </span>
+          </h1>
+
+          <!-- Author byline -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">Tomáš Kostrhoun</a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date().toLocaleDateString('cs-CZ')}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších dluhopisových ETF.
+            Státní a korporátní dluhopisy pro stabilní příjmy a ochranu kapitálu.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-gray-600 hover:from-blue-700 hover:to-gray-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+              💵 Dluhopisy
+            </a>
+          </div>
+        </div>
+
+        <!-- Stats Box -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-3">
+                <span class="text-2xl">💵</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Dluhopisový trh v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro bond investice</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-blue-600">💵</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJVĚTŠÍ BOND ETF</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">25,8B</div>
+                <div class="text-xs text-gray-600">iShares Global Aggregate</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-green-600">💰</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,10%</div>
+                <div class="text-xs text-gray-600">Vanguard Global Aggregate</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-blue-600">🛡️</span>
+                  <span class="text-xs text-gray-500 font-medium">STABILITA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">AAA</div>
+                <div class="text-xs text-gray-600">rating státních dluhopisů</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-green-600">🐷</span>
+                  <span class="text-xs text-gray-500 font-medium">VÝNOSY</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">3-5%</div>
+                <div class="text-xs text-gray-600">roční výnosnost</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-blue-100 w-20 h-20 mx-auto mb-8 hover:bg-blue-200 transition-colors">
+          <span class="text-3xl">💵</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co jsou dluhopisové ETF?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Investiční fondy zaměřené na státní a korporátní dluhopisy
+          pro stabilní příjmy a ochranu kapitálu
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-gray-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🛡️</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-blue-800 transition-colors">Stabilita a bezpečnost</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Dluhopisy poskytují předvídatelné úrokové výnosy a návratnost jistiny.
+            Státní dluhopisy jsou považovány za nejbezpečnější investice.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-gray-500 to-green-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🐷</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">Pravidelné příjmy</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Dluhopisové ETF distribuují úrokové výnosy v pravidelných intervalech.
+            Ideální pro investory hledající stabilní cash flow.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-blue-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">📊</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-green-800 transition-colors">Diverzifikace portfolia</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Dluhopisy jsou negativně korelované s akciemi. Poskytují ochranu
+            během poklesu akciových trhů a snižují celkovou volatilitu.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 nejlepší dluhopisové ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} dluhopisových ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <section id="srovnani" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Top10Sections etfs={etfs} currency="EUR" categoryName="dluhopisové" />
+    </div>
+  </section>
+
+  <!-- Selection Guide Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div id="pruvodce" class="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-12 border border-blue-100 shadow-xl">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-100 to-gray-100 w-20 h-20 mx-auto mb-6">
+            <span class="text-3xl">🎯</span>
+          </div>
+          <h4 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            💰 Jak vybrat ten správný dluhopisový ETF?
+          </h4>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Praktický průvodce výběrem nejlepšího dluhopisového ETF podle vaší investiční strategie a rizikového profilu
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-blue-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-4">
+              <span class="text-xl">💵</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Typ dluhopisů</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Státní dluhopisy (nižší riziko) vs korporátní (vyšší výnos).
+              Global Aggregate kombinuje oba typy pro optimální diverzifikaci.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-green-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl mb-4">
+              <span class="text-xl">💰</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Měnové zajištění</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              EUR hedged verze eliminují měnové riziko. Vanguard má nejnižší TER 0,10%,
+              iShares největší likviditu 25,8 mld. EUR.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl mb-4">
+              <span class="text-xl">🛡️</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Duration a splatnost</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Dlouhodobé dluhopisy jsou citlivější na úrokové změny.
+              Kratší duration = nižší volatilita při růstu úroků.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-blue-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-4">
+              <span class="text-xl">🌍</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Geografická diverzifikace</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Globální dluhopisové ETF kombinují USA, Evropu, Japonsko a další vyspělé země.
+              Snižují riziko koncentrace na jeden region.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-green-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl mb-4">
+              <span class="text-xl">📈</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Úrokové prostředí</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Rostoucí úroky tlačí ceny dluhopisů dolů. Krátkodobé dluhopisy
+              jsou méně citlivé než dlouhodobé.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl mb-4">
+              <span class="text-xl">🏆</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Kreditní kvalita</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Investment grade dluhopisy (AAA-BBB) vs high yield.
+              Vyšší rating = nižší riziko selhání emitenta.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Často kladené otázky</h2>
+        <p class="text-xl text-gray-600">Odpovědi na nejčastější dotazy o dluhopisové ETF</p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaké jsou nejlepší dluhopisové ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší dluhopisové ETF jsou: <strong>{etfs[0]?.name || 'iShares Core Global Aggregate Bond UCITS ETF EUR Hedged'}</strong>,
+            <strong>{etfs[1]?.name || 'Xtrackers Global Government Bond UCITS ETF EUR Hedged'}</strong>,
+            a <strong>{etfs[2]?.name || 'Vanguard Global Aggregate Bond UCITS ETF EUR Hedged'}</strong>.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Co jsou dluhopisové ETF a jak fungují?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Dluhopisové ETF</strong> investují do státních a korporátních dluhopisů. Poskytují stabilní příjmy z úroků,
+            nižší volatilitu než akcie a diverzifikaci portfolia. EUR zajištěné verze eliminují měnové riziko pro české investory.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Proč investovat do dluhopisových ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Dluhopisové ETF poskytují stabilitu</strong>, pravidelné příjmy a ochranu kapitálu. Jsou ideální pro konzervativní investory,
+            diverzifikaci portfolia a ochranu před volatilitou akciových trhů.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaké jsou náklady na dluhopisové ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>TER (celkové náklady) dluhopisových ETF</strong> se pohybují mezi 0,10% až 0,50% ročně. Naše TOP 3 má velmi konkurenční poplatky.
+            Dluhopisové ETF mají obecně nižší poplatky než akciové.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaká jsou rizika dluhopisových ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Hlavní rizika dluhopisových ETF</strong> zahrnují: úrokové riziko (rostoucí úroky snižují ceny dluhopisů),
+            kreditní riziko (možnost nesplacení), inflační riziko (eroze reálné hodnoty) a měnové riziko u nehedgovaných ETF.
+            Naše doporučené EUR hedged ETF eliminují měnové riziko pro české investory.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Kde koupit naše doporučené dluhopisové ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Naše TOP 3 dluhopisové ETF můžete koupit u většiny českých brokerů. <strong>{etfs[0]?.name || 'iShares Global Aggregate'}</strong>,
+            <strong>{etfs[1]?.name || 'Xtrackers Government Bond'}</strong> a <strong>{etfs[2]?.name || 'Vanguard Global Aggregate'}</strong>
+            najdete u Degiro, Interactive Brokers, XTB, Trading212, Portu nebo Fio e-Broker. Porovnejte si transakční poplatky.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-br from-blue-50 to-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-3xl p-12 shadow-xl border border-blue-100">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-100 to-gray-100 w-20 h-20 mx-auto mb-6">
+            <span class="text-3xl">🚀</span>
+          </div>
+          <h3 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Připraveni stabilizovat své portfolio?
+          </h3>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Dluhopisy poskytují stabilitu a pravidelné příjmy v každém portfoliu.
+            Objevte nejlepší dluhopisové ETF a chraňte se před volatilitou trhů.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div class="text-center p-6 bg-blue-50 rounded-xl border border-blue-100">
+            <span class="text-2xl mb-3 block">💵</span>
+            <h4 class="font-bold text-gray-900 mb-2">Stabilní výnosy</h4>
+            <p class="text-sm text-gray-600">Předvídatelné úrokové příjmy</p>
+          </div>
+          <div class="text-center p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <span class="text-2xl mb-3 block">🛡️</span>
+            <h4 class="font-bold text-gray-900 mb-2">Ochrana kapitálu</h4>
+            <p class="text-sm text-gray-600">Nižší volatilita než akcie</p>
+          </div>
+          <div class="text-center p-6 bg-green-50 rounded-xl border border-green-100">
+            <span class="text-2xl mb-3 block">🐷</span>
+            <h4 class="font-bold text-gray-900 mb-2">Diverzifikace</h4>
+            <p class="text-sm text-gray-600">Doplnění akciového portfolia</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#top3" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-gray-600 hover:from-blue-700 hover:to-gray-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+            ⭐ Vybrat dluhopisový ETF
+          </a>
+          <a href="/srovnani-etf" class="inline-flex items-center justify-center gap-2 border-2 border-blue-300 text-blue-700 hover:bg-blue-50 px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+            📊 Porovnat všechny ETF
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

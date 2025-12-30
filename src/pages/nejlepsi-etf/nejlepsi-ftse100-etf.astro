@@ -1,0 +1,450 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ETFTable from '../../components/ETFTable.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-ftse100-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší FTSE ETF 2026 - VUKE vs ISF vs FTAL`,
+  "description": `Srovnání nejlepších FTSE ETF 2026. VUKE, ISF, FTAL - britské akcie, poplatky TER, výnosy.`,
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  }
+};
+
+// FAQ structured data for better search snippets
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jak jste vybrali TOP 3 FTSE ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Výběr je založen na kombinaci faktorů: nejnižší poplatky TER, velikost fondu, likvidita, tracking error a celková kvalita providera. Data čerpáme z naší databáze a aktualizujeme měsíčně."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co znamenají TOP 10 žebříčky na této stránce?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Žebříčky ukazují nejlepší FTSE ETF podle různých kritérií - nejnižší poplatky, největší velikost fondu a nejvyšší výnosy za poslední rok. Data jsou živá z naší databáze."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč se některé FTSE ETF neobjevují v seznamech?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Odfiltrováváme malé fondy (pod 100 mil EUR), pákové produkty, tematické a sektorové ETF. Zaměřujeme se pouze na kvalitní širokobritské ETF sledující hlavní FTSE indexy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi FTSE 100 a FTSE All Share?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "FTSE 100 pokrývá 100 největších britských společností, zatímco FTSE All Share zahrnuje prakticky celý britský trh. All Share nabízí širší diverzifikaci, ale FTSE 100 má větší likviditu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Který FTSE ETF má nejnižší náklady?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Podle aktuálních dat má nejnižší TER obvykle Vanguard ETF. Kompletní žebříček najdete v sekci 'Top 10 podle nejnižších poplatků' s živými daty z naší databáze."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou data na této stránce aktuální?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, všechna data o ETF (TER, velikost fondů, výnosy) se načítají živě z naší databáze a jsou aktualizována denně. Poslední aktualizace článku byla provedena na začátku tohoto měsíce."
+      }
+    }
+  ]
+};
+
+// Breadcrumb structured data
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší FTSE 100 ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-ftse100-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší evropské ETF", href: "/nejlepsi-etf/nejlepsi-evropske-etf", description: "Kompletní srovnání evropských ETF fondů", icon: "🇪🇺" },
+  { title: "Nejlepší DAX ETF", href: "/nejlepsi-etf/nejlepsi-dax-etf", description: "Německé blue chip ETF na DAX index", icon: "🇩🇪" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů pro investice do britských ETF", icon: "🏦" },
+  { title: "Portfolio strategie", href: "/portfolio-strategie", description: "Jak sestavit portfolio s britskými ETF", icon: "📊" }
+];
+---
+
+<Layout
+  title={`Nejlepší FTSE ETF 2026 - VUKE vs ISF vs FTAL`}
+  description={`✅ Srovnání nejlepších FTSE ETF 2026. VUKE, ISF, FTAL - britské akcie, poplatky TER, výnosy. Kompletní analýza FTSE 100 a UK All Share k ${currentDate}.`}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-red-50/50 via-orange-50/30 to-yellow-50/50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-red-100 to-orange-100 text-red-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-red-200/50">
+            🇬🇧 Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší <span class="bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">FTSE ETF</span>
+          </h1>
+
+          <!-- Author byline -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">Tomáš Kostrhoun</a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších ETF fondů na FTSE indexy. Analýza poplatků, výnosů a praktické tipy pro investice do britských akcií.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md">
+              📊 Srovnání všech
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Stats Box -->
+        <div class="relative">
+          <div class="relative bg-gradient-to-br from-white/80 to-gray-50/60 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+            <div class="text-center mb-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">🇬🇧 FTSE Stats</h3>
+              <p class="text-gray-600">Klíčové informace o britských indexech</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mb-6">
+              <div class="text-center p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border border-red-200">
+                <div class="text-3xl font-bold text-red-600 mb-1">100</div>
+                <div class="text-sm text-gray-600">Firem FTSE 100</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-200">
+                <div class="text-3xl font-bold text-orange-600 mb-1">~6%</div>
+                <div class="text-sm text-gray-600">Ročně za 20 let</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-yellow-200">
+                <div class="text-3xl font-bold text-yellow-600 mb-1">80%</div>
+                <div class="text-sm text-gray-600">UK tržní cap</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+                <div class="text-3xl font-bold text-amber-600 mb-1">{etfs.length}</div>
+                <div class="text-sm text-gray-600">ETF na výběr</div>
+              </div>
+            </div>
+
+            <div class="text-center pt-6 border-t border-gray-200/50">
+              <p class="text-sm text-gray-600 mb-3">Největší britské společnosti</p>
+              <a href="#pruvodce" class="inline-flex items-center justify-center border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-md text-sm font-medium">
+                Průvodce výběrem
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Co jsou FTSE indexy?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          FTSE indexy sledují britský akciový trh a zahrnují největší společnosti jako Shell, BP, AstraZeneca, ASML a další.
+          Představují klíčovou část evropské diverzifikace.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-orange-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform text-2xl">
+            👑
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            100 největších firem UK
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            FTSE 100 pokrývá největší britské společnosti z různých sektorů - od bank přes těžbu až po technologie.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-yellow-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform text-2xl">
+            📍
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            Globální britské firmy
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Mnoho společností v FTSE má globální působnost - Shell, BP, Vodafone, British American Tobacco.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-amber-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform text-2xl">
+            🏛️
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            80% britského trhu
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            FTSE 100 reprezentuje přibližně 80% celkové tržní kapitalizace britských akcií.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 ETF v této kategorii
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Database Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="FTSE 100" />
+
+  <!-- Selection Guide -->
+  <section id="pruvodce" class="py-20 bg-gradient-to-br from-red-50 to-orange-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-red-600 to-orange-600 rounded-full mb-6 text-4xl">
+          🎯
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          💡 Jak vybrat ten správný FTSE ETF?
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">1</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">Pro začátečníky</h3>
+          <p class="text-gray-700 leading-relaxed">
+            Začněte s největším FTSE 100 ETF od renomovaného providera. Preferujte akumulační verze s automatickou reinvesticí dividend.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 border border-blue-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">2</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">Pro pokročilé</h3>
+          <p class="text-gray-700 leading-relaxed">
+            Porovnejte FTSE 100 vs FTSE All Share podle vašich preferencí. All Share nabízí širší diverzifikaci, ale FTSE 100 má vyšší likviditu.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-50 border border-purple-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">3</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">Pro diverzifikaci</h3>
+          <p class="text-gray-700 leading-relaxed">
+            FTSE ETF jsou ideální doplněk k evropským nebo americkým ETF. Přidávají expozici k unikátním britským sektorům.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-50 border border-orange-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm">4</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">Pro minimalizaci nákladů</h3>
+          <p class="text-gray-700 leading-relaxed">
+            Vanguard obvykle nabízí nejnižší TER. Porovnejte také tracking error a spread podle objemu vašich investic.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          ❓ Často kladené otázky
+        </h2>
+      </div>
+
+      <div class="space-y-8">
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jak jste vybrali TOP 3 FTSE ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Výběr je založen na kombinaci faktorů: nejnižší poplatky TER, velikost fondu, likvidita, tracking error a celková kvalita providera. Data čerpáme z naší databáze a aktualizujeme měsíčně.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Co znamenají TOP 10 žebříčky na této stránce?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Žebříčky ukazují nejlepší FTSE ETF podle různých kritérií - nejnižší poplatky, největší velikost fondu a nejvyšší výnosy za poslední rok. Data jsou živá z naší databáze.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Proč se některé FTSE ETF neobjevují v seznamech?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Odfiltrováváme malé fondy (pod 100 mil EUR), pákové produkty, tematické a sektorové ETF. Zaměřujeme se pouze na kvalitní širokobritské ETF sledující hlavní FTSE indexy.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jaký je rozdíl mezi FTSE 100 a FTSE All Share?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            FTSE 100 pokrývá 100 největších britských společností, zatímco FTSE All Share zahrnuje prakticky celý britský trh. All Share nabízí širší diverzifikaci, ale FTSE 100 má větší likviditu.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Který FTSE ETF má nejnižší náklady?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Podle aktuálních dat má nejnižší TER obvykle Vanguard ETF. Kompletní žebříček najdete v sekci 'Top 10 podle nejnižších poplatků' s živými daty z naší databáze.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jsou data na této stránce aktuální?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Ano, všechna data o ETF (TER, velikost fondů, výnosy) se načítají živě z naší databáze a jsou aktualizována denně. Poslední aktualizace článku byla provedena na začátku tohoto měsíce.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-red-600 to-orange-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+        Připraveni investovat do FTSE ETF?
+      </h2>
+      <p class="text-xl text-red-100 mb-8 leading-relaxed">
+        Vyberte si brokera a začněte budovat své britské portfolio ještě dnes
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center bg-white text-red-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold rounded-md">
+          🛡️ Najít brokera pro ETF
+        </a>
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-red-600 px-8 py-4 text-lg font-semibold rounded-md">
+          📊 Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="📚 Související články" />
+  </div>
+</Layout>

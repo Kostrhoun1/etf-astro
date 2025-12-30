@@ -1,0 +1,442 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-biotechnologie-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const lastModified = new Date().toISOString().split('T')[0];
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší biotechnologie ETF ${currentYear} - biotech a farmaceutika`,
+  "description": config.metaDescription,
+  "image": "https://www.etfpruvodce.cz/og-biotechnology-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2025-01-15",
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-biotechnologie-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": "biotechnologie ETF, biotech, farmaceutika, genomika, lékařské inovace",
+  "wordCount": 2850,
+  "inLanguage": "cs-CZ"
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší biotechnologie ETF v roce ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší biotechnologie ETF jsou: iShares Healthcare Innovation UCITS ETF (IE00BYZK4776) největší healthcare innovation ETF s 807 mil. EUR a TER 0,40%, iShares Nasdaq US Biotechnology UCITS ETF (IE00BYXG2H39) s 488 mil. EUR a TER 0,35%, a Invesco Nasdaq Biotech UCITS ETF (IE00BQ70R696) s 287 mil. EUR a TER 0,40%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co jsou biotechnologie ETF a jaké firmy obsahují?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Biotechnologie ETF investují do společností vyvíjejících pokročilé lékařské technologie jako Gilead Sciences, Amgen, Moderna, BioNTech a další biotech firmy. Zaměřují se na genové terapie, imunoterapie, personalizovanou medicínu a průlomové léčebné postupy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč investovat do biotechnologie ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Biotechnologie představují budoucnost medicíny s obrovským inovačním potenciálem. Stárnutí populace zvyšuje poptávku po pokročilých terapiích. Biotechnologie ETF poskytují přístup k sektoru s vysokým růstovým potenciálem, ale i vyšší volatilitou než tradiční healthcare."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou náklady na biotechnologie ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER (celkové náklady) biotechnologie ETF se pohybují mezi 0,35% až 0,40% ročně. iShares Nasdaq US Biotechnology má nejnižší TER 0,35%, iShares Healthcare Innovation a Invesco Nasdaq Biotech mají TER 0,40%. Specializace na biotech sektor odůvodňuje mírně vyšší poplatky než broad market ETF."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou biotechnologie ETF rizikové investice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Biotechnologie ETF patří mezi vysoce rizikové investice kvůli volatilitě biotech sektoru a závislosti na úspěchu klinických studií. Neúspěch ve fázi III může způsobit propad akcií o 50-80%. Doporučujeme maximálně 5% alokace portfolia a dlouhodobou investiční strategii."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit biotechnologie ETF v Česku?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Biotechnologie ETF můžete koupit u českých brokerů jako Degiro, XTB, Trading212 nebo Interactive Brokers. Náš TOP 3 (iShares Healthcare Innovation IE00BYZK4776, iShares Nasdaq US Biotechnology IE00BYXG2H39, Invesco Nasdaq Biotech IE00BQ70R696) jsou dostupné na evropských burzách s rozumnými transakčními poplatky."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší biotechnologie ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-biotechnologie-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší healthcare ETF", href: "/nejlepsi-etf/nejlepsi-healthcare-etf", description: "Širší zdravotnický sektor", icon: "🏥" },
+  { title: "Nejlepší AI ETF", href: "/nejlepsi-etf/nejlepsi-ai-etf", description: "AI v medicíně a diagnostice", icon: "🤖" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů", icon: "🏦" }
+];
+---
+
+<Layout
+  title={config.title + ' ' + currentYear}
+  description={config.metaDescription}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-purple-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-blue-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            Aktuální k {new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              biotechnologie ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších biotechnologie ETF.
+            Genové terapie, imunoterapie a personalizovaná medicína včetně Moderna, Gilead a Amgen.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+              Biotech revoluce
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Stats Box -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-3">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Biotech sektor v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro biotech investice</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJVĚTŠÍ BIOTECH ETF</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">807M</div>
+                <div class="text-xs text-gray-600">iShares Healthcare Innovation</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-indigo-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,35%</div>
+                <div class="text-xs text-gray-600">NASDAQ Biotechnology</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">TOP HOLDING</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">6%</div>
+                <div class="text-xs text-gray-600">Gilead Sciences</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-indigo-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">MRNA ÚSPĚCH</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">2021</div>
+                <div class="text-xs text-gray-600">COVID vakcíny</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">🧬 Co jsou biotechnologie ETF?</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Investiční fondy zaměřené na společnosti vyvíjející pokročilé lékařské technologie a průlomové terapie pro budoucnost medicíny
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-4xl mb-4">🔬</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Genové terapie</h3>
+          <p class="text-gray-600">
+            CRISPR, CAR-T terapie a genové editace mění způsob léčby rakoviny a genetických onemocnění. Revoluce v personalizované medicíně.
+          </p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-4xl mb-4">💉</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">mRNA technologie</h3>
+          <p class="text-gray-600">
+            Úspěch COVID vakcín od Moderna a BioNTech otevřel nové možnosti mRNA terapií pro rakovinu, autoimunitní onemocnění a prevenci.
+          </p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-4xl mb-4">📈</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Vysoký růstový potenciál</h3>
+          <p class="text-gray-600">
+            Biotechnologie nabízejí extrémní růstový potenciál při úspěšném vývoji léků, ale i vyšší volatilitu a riziko neúspěchu klinických studií.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Section -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 ETF v této kategorii
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="biotechnologie" />
+
+  <!-- Selection Guide -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-8 border border-blue-100 shadow-xl">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+          💡 Jak vybrat ten správný biotechnologie ETF?
+        </h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+            <h4 class="font-bold text-green-800 mb-2">1️⃣ Pro začátečníky</h4>
+            <p class="text-green-700 text-sm">
+              Začněte s široce diverzifikovanými healthcare innovation ETF s nižším rizikem. Zaměřte se na established fondy s velkým AUM a stabilní poskytovatele.
+            </p>
+          </div>
+          <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+            <h4 class="font-bold text-blue-800 mb-2">2️⃣ Pro pokročilé</h4>
+            <p class="text-blue-700 text-sm">
+              Porovnejte zaměření na pure-play biotech vs. širší healthcare innovation. Některé ETF se specializují na specifické oblasti jako genomika nebo imunoterapie.
+            </p>
+          </div>
+          <div class="bg-purple-50 rounded-xl p-6 border border-purple-200">
+            <h4 class="font-bold text-purple-800 mb-2">3️⃣ Pro rizikové investory</h4>
+            <p class="text-purple-700 text-sm">
+              Pure-play biotechnologie ETF nabízejí nejvyšší růstový potenciál, ale i extrémní volatilitu. Ideální pro dlouhodobé investory s vysokou tolerancí rizika.
+            </p>
+          </div>
+          <div class="bg-orange-50 rounded-xl p-6 border border-orange-200">
+            <h4 class="font-bold text-orange-800 mb-2">4️⃣ Pro diverzifikaci</h4>
+            <p class="text-orange-700 text-sm">
+              Biotechnologie by měly tvořit maximálně 5% portfolia kvůli vysoké volatilitě. Kombinujte s širšími healthcare nebo technologickými ETF.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">❓ Často kladené otázky</h2>
+
+      <div class="space-y-4">
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaké jsou nejlepší biotechnologie ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší biotechnologie ETF jsou: <strong>iShares Healthcare Innovation UCITS ETF</strong> (IE00BYZK4776) největší healthcare innovation ETF s 807 mil. EUR a TER 0,40%, <strong>iShares Nasdaq US Biotechnology UCITS ETF</strong> (IE00BYXG2H39) s 488 mil. EUR a TER 0,35%, a <strong>Invesco Nasdaq Biotech UCITS ETF</strong> (IE00BQ70R696) s 287 mil. EUR a TER 0,40%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Co jsou biotechnologie ETF a jaké firmy obsahují?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Biotechnologie ETF</strong> investují do společností vyvíjejících pokročilé lékařské technologie jako Gilead Sciences, Amgen, Moderna, BioNTech a další biotech firmy. Zaměřují se na genové terapie, imunoterapie, personalizovanou medicínu a průlomové léčebné postupy.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Proč investovat do biotechnologie ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Biotechnologie představují budoucnost medicíny</strong> s obrovským inovačním potenciálem. Stárnutí populace zvyšuje poptávku po pokročilých terapiích. Biotechnologie ETF poskytují přístup k sektoru s vysokým růstovým potenciálem, ale i vyšší volatilitou než tradiční healthcare.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaké jsou náklady na biotechnologie ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>TER (celkové náklady) biotechnologie ETF</strong> se pohybují mezi 0,35% až 0,40% ročně. iShares Nasdaq US Biotechnology má nejnižší TER 0,35%, iShares Healthcare Innovation a Invesco Nasdaq Biotech mají TER 0,40%. Specializace na biotech sektor odůvodňuje mírně vyšší poplatky než broad market ETF.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jsou biotechnologie ETF rizikové investice?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Biotechnologie ETF patří mezi vysoce rizikové investice</strong> kvůli volatilitě biotech sektoru a závislosti na úspěchu klinických studií. Neúspěch ve fázi III může způsobit propad akcií o 50-80%. Doporučujeme maximálně 5% alokace portfolia a dlouhodobou investiční strategii.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Kde koupit biotechnologie ETF v Česku?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Biotechnologie ETF můžete koupit</strong> u českých brokerů jako Degiro, XTB, Trading212 nebo Interactive Brokers. Náš TOP 3 (iShares Healthcare Innovation IE00BYZK4776, iShares Nasdaq US Biotechnology IE00BYXG2H39, Invesco Nasdaq Biotech IE00BQ70R696) jsou dostupné na evropských burzách s rozumnými transakčními poplatky.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-12 bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">💊 Připraveni investovat do biotechnologií?</h2>
+      <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+        Najděte si ideálního brokera a začněte s investováním do nejlepších biotechnologie ETF
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
+          🏦 Najít brokera pro ETF
+        </a>
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center px-6 py-3 border-2 border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition-colors">
+          📊 Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

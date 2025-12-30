@@ -1,0 +1,601 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-robotika-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const lastModified = new Date().toISOString().split('T')[0];
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší robotika ETF ${currentYear} - robotics a automatizace`,
+  "description": "Srovnání nejlepších robotika ETF 2025. Robotics, automatizace, AI - TER, velikost fondů.",
+  "image": "https://www.etfpruvodce.cz/og-robotics-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2025-01-15",
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-robotika-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": "robotika ETF, robotics, automatizace, AI, průmyslové roboty",
+  "wordCount": 2800,
+  "inLanguage": "cs-CZ",
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Robotics ETF",
+      "description": "Exchange-traded funds focused on robotics and automation technology companies"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares Automation & Robotics UCITS ETF",
+      "identifier": "IE00BYZK4552"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "Amundi MSCI Robotics & AI UCITS ETF Acc",
+      "identifier": "LU1861132840"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "L&G ROBO Global Robotics and Automation UCITS ETF",
+      "identifier": "IE00BMW3QX54"
+    }
+  ],
+  "mentions": [
+    {
+      "@type": "Thing",
+      "name": "Robotics Industry",
+      "description": "Industry sector focused on developing robotic systems for manufacturing, logistics and services"
+    },
+    {
+      "@type": "Thing",
+      "name": "Industrial Automation",
+      "description": "Investment strategy focused on companies developing automated manufacturing and production systems"
+    }
+  ]
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nejlepší robotika ETF v roce 2025?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší robotika ETF jsou: iShares Automation & Robotics UCITS ETF (RBOT, IE00BYZK4552) největší robotika ETF s 2,9 mld. EUR a TER 0,40%, Amundi MSCI Robotics & AI UCITS ETF (ROAI, LU1861132840) s 997 mil. EUR a TER 0,40%, a L&G ROBO Global Robotics and Automation UCITS ETF (ROBO, IE00BMW3QX54) s 624 mil. EUR a TER 0,80%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co jsou robotika ETF a jaké firmy obsahují?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Robotika ETF investují do společností vyvíjejících robotické systémy jako ABB, KUKA, Fanuc, Boston Dynamics a další tech firmy. Zaměřují se na průmyslové roboty, autonomní vozidla, drony, coboty a automatizované výrobní systémy pro Industry 4.0."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč investovat do robotika ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Automatizace je klíčovým trendem 21. století řešícím nedostatek pracovníků a zvyšujícím produktivitu. Robotika ETF poskytují exposure k Industry 4.0 revoluci s dlouhodobým růstovým potenciálem napříč výrobou, logistikou i službami."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou největší holdingy v robotika ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Největší holdingy robotika ETF jsou: ABB Ltd (4-5%) švýcarský průmyslový gigant, KUKA AG německý robotika líder, Fanuc Corporation japonský výrobce robotů, Keyence Corporation automatizační senzory, Rockwell Automation americká průmyslová automatizace, a Boston Dynamics (Hyundai) pokročilé robotické systémy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou robotika ETF vhodné pro začátečníky?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Robotika ETF jsou specializované sektorové ETF s vyšší volatilitou a koncentračním rizikem. Vhodné pro pokročilejší investory s tolerancí k riziku. Začátečníci by měli začít s široce diverzifikovanými ETF a robotiku přidat jako menší část portfolia (5-10%)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaká jsou rizika investování do robotika ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hlavní rizika robotika ETF: koncentrace do tech sektoru, závislost na R&D investicích, konkurence z Asie (zejména Číny), regulační změny v automatizaci, cyklické výkyvy v průmyslu a vysoká korelace s tech akcemi. Diversifikace je klíčová."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší robotika ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-robotika-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší AI ETF", href: "/nejlepsi-etf/nejlepsi-ai-etf", description: "AI a strojové učení", icon: "🤖" },
+  { title: "Nejlepší technologické ETF", href: "/nejlepsi-etf/nejlepsi-technologicke-etf", description: "Širší tech sektor a inovace", icon: "💻" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů", icon: "🏦" }
+];
+---
+
+<Layout
+  title={config.title + ' ' + currentYear}
+  description={config.metaDescription}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 bg-gradient-to-br from-red-50/50 via-orange-50/30 to-yellow-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-red-200 to-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-yellow-200 to-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-red-100 to-orange-100 text-red-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-red-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            Aktuální k {new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
+              robotika ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších robotika ETF.
+            Průmyslové roboty, automatizace a AI včetně ABB, KUKA a Fanuc.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              Industry 4.0
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Stats Box -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-xl mb-3">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Robotika sektor v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro robotika investice</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-red-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJVĚTŠÍ ROBO ETF</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">2,9B</div>
+                <div class="text-xs text-gray-600">iShares Automation</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,40%</div>
+                <div class="text-xs text-gray-600">iShares & Amundi</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-red-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">TOP HOLDING</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">4%</div>
+                <div class="text-xs text-gray-600">ABB Ltd</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">INDUSTRY 4.0</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">+15%</div>
+                <div class="text-xs text-gray-600">roční růst</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-red-100 w-20 h-20 mx-auto mb-8 hover:bg-red-200 transition-colors">
+          <svg class="w-10 h-10 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co jsou robotika ETF?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Investiční fondy zaměřené na společnosti vyvíjející robotické systémy
+          a automatizované technologie pro budoucnost výroby
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-orange-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">Průmyslová automatizace</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Roboty převádějí výrobu, logistiku a služby. Zvyšují produktivitu,
+            snižují náklady a řeší nedostatek kvalifikovaných pracovníků.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-yellow-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-orange-800 transition-colors">Industry 4.0</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Čtvrtá průmyslová revoluce kombinuje roboty s AI, IoT a machine learning.
+            Smart factories s autonomními systémy a coboty pracující s lidmi.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-red-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-yellow-800 transition-colors">Megatrend automatizace</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Demografické změny a tlak na efektivitu pohánějí poptávku po robotice.
+            Dlouhodobý růstový trend s podporou vlád a investorů.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 ETF v této kategorii
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="robotika" />
+
+  <!-- Selection Guide Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div id="pruvodce" class="bg-gradient-to-br from-white to-red-50 rounded-3xl p-12 border border-red-100 shadow-xl">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-100 to-orange-100 w-20 h-20 mx-auto mb-6">
+            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <h4 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Jak vybrat ten správný robotika ETF?
+          </h4>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Praktický průvodce výběrem nejlepšího robotika ETF podle vaší investiční strategie a rizikového profilu
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-red-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-xl mb-4">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Velikost fondu a likvidita</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Vybírejte ETF s minimálně 500 mil. EUR pro zajištění dobré likvidity.
+              iShares Automation (2,9 mld.) a Amundi MSCI Robotics (997 mil.) jsou nejbezpečnější volby.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-orange-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
+              <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">TER a náklady</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Robotika ETF mají vyšší TER (0,40-0,80%) kvůli specializaci.
+              iShares a Amundi nabízejí nejnižší poplatky 0,40%, L&G má 0,80%.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-yellow-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-xl mb-4">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Specializace vs. diverzifikace</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Čisté robotika ETF (L&G ROBO) vs. širší automatizace (iShares).
+              Amundi kombinuje robotiku s AI pro komplexnější exposure.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-red-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-xl mb-4">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Geografická diverzifikace</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Všechny robotika ETF jsou globální s vysokým podílem USA (40-60%),
+              Japonska (15-25%) a Evropy (15-20%). Žádné čínské ETF.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-orange-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
+              <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Výkonnost a volatilita</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Robotika ETF jsou růstové s vyšší volatilitou než broad market.
+              Vhodné pro dlouhodobé investory s tolerancí k riziku.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-yellow-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-xl mb-4">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Kvalita holdingů</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Sledujte top holdingy jako ABB, KUKA, Fanuc, Keyence a Boston Dynamics.
+              Kvalitní robotika firmy s tržní kapitalizací nad 1 mld. USD.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Často kladené otázky</h2>
+        <p class="text-xl text-gray-600">Odpovědi na nejčastější dotazy o robotika ETF</p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">
+              Jaké jsou nejlepší robotika ETF v roce {currentYear}?
+            </span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší robotika ETF jsou: <strong>iShares Automation & Robotics UCITS ETF</strong> (RBOT, IE00BYZK4552)
+            největší robotika ETF s 2,9 mld. EUR a TER 0,40%, <strong>Amundi MSCI Robotics & AI UCITS ETF</strong> (ROAI, LU1861132840)
+            s 997 mil. EUR a TER 0,40%, a <strong>L&G ROBO Global Robotics and Automation UCITS ETF</strong>
+            (ROBO, IE00BMW3QX54) s 624 mil. EUR a TER 0,80%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">
+              Co jsou robotika ETF a jaké firmy obsahují?
+            </span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Robotika ETF</strong> investují do společností vyvíjejících robotické systémy jako ABB, KUKA,
+            Fanuc, Boston Dynamics a další tech firmy. Zaměřují se na průmyslové roboty, autonomní vozidla, drony,
+            coboty a automatizované výrobní systémy pro Industry 4.0.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">
+              Proč investovat do robotika ETF?
+            </span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Automatizace je klíčovým trendem 21. století</strong> řešícím nedostatek pracovníků a zvyšujícím
+            produktivitu. Robotika ETF poskytují exposure k Industry 4.0 revoluci s dlouhodobým růstovým potenciálem
+            napříč výrobou, logistikou i službami.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">
+              Jaké jsou největší holdingy v robotika ETF?
+            </span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Největší holdingy robotika ETF</strong> jsou: ABB Ltd (4-5%) švýcarský průmyslový gigant,
+            KUKA AG německý robotika líder, Fanuc Corporation japonský výrobce robotů, Keyence Corporation
+            automatizační senzory, Rockwell Automation americká průmyslová automatizace, a Boston Dynamics
+            (Hyundai) pokročilé robotické systémy.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">
+              Jsou robotika ETF vhodné pro začátečníky?
+            </span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Robotika ETF jsou specializované sektorové ETF</strong> s vyšší volatilitou a koncentračním rizikem.
+            Vhodné pro pokročilejší investory s tolerancí k riziku. Začátečníci by měli začít s široce diverzifikovanými
+            ETF a robotiku přidat jako menší část portfolia (5-10%).
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">
+              Jaká jsou rizika investování do robotika ETF?
+            </span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Hlavní rizika robotika ETF:</strong> koncentrace do tech sektoru, závislost na R&D investicích,
+            konkurence z Asie (zejména Číny), regulační změny v automatizaci, cyklické výkyvy v průmyslu
+            a vysoká korelace s tech akcemi. Diversifikace je klíčová.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-br from-red-50 to-orange-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-3xl p-12 shadow-xl border border-red-100">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-100 to-orange-100 w-20 h-20 mx-auto mb-6">
+            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Připraveni investovat do budoucnosti robotiky?
+          </h3>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Automatizace a Industry 4.0 revoluce právě začíná. Objevte nejlepší robotika ETF
+            a staňte se součástí technologické transformace výroby a služeb.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div class="text-center p-6 bg-red-50 rounded-xl border border-red-100">
+            <svg class="w-8 h-8 text-red-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <h4 class="font-bold text-gray-900 mb-2">Průmyslové roboty</h4>
+            <p class="text-sm text-gray-600">ABB, KUKA, Fanuc a další robotika giganty</p>
+          </div>
+          <div class="text-center p-6 bg-orange-50 rounded-xl border border-orange-100">
+            <svg class="w-8 h-8 text-orange-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <h4 class="font-bold text-gray-900 mb-2">Automatizace</h4>
+            <p class="text-sm text-gray-600">Smart factories a autonomní systémy</p>
+          </div>
+          <div class="text-center p-6 bg-yellow-50 rounded-xl border border-yellow-100">
+            <svg class="w-8 h-8 text-yellow-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <h4 class="font-bold text-gray-900 mb-2">Industry 4.0</h4>
+            <p class="text-sm text-gray-600">IoT, AI a coboty nové generace</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            Vybrat robotika ETF
+          </a>
+          <a href="/srovnani-etf" class="inline-flex items-center justify-center border-2 border-red-300 text-red-700 hover:bg-red-50 px-8 py-3 text-lg font-semibold rounded-md transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            Porovnat všechny ETF
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

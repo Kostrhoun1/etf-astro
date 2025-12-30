@@ -1,0 +1,63 @@
+# ETF Pruvodce - LLM Information
+
+> ETF pruvodce.cz is the largest Czech website about ETF funds, providing comprehensive analysis, comparison, and ratings of ETF funds for Czech investors.
+
+## About This Site
+
+ETF pruvodce.cz offers:
+- Database of 2000+ ETF funds with detailed analysis
+- ETF comparison tools and calculators
+- Broker reviews and comparisons
+- Educational content about ETF investing
+- Portfolio strategy guides
+
+## Main Sections
+
+- Homepage: https://www.etfpruvodce.cz/
+- ETF Comparison: https://www.etfpruvodce.cz/srovnani-etf
+- Best ETF 2025: https://www.etfpruvodce.cz/nejlepsi-etf
+- Where to Buy ETF: https://www.etfpruvodce.cz/kde-koupit-etf
+- Portfolio Strategies: https://www.etfpruvodce.cz/portfolio-strategie
+- Calculators: https://www.etfpruvodce.cz/kalkulacky
+- What are ETFs: https://www.etfpruvodce.cz/co-jsou-etf
+
+## ETF Detail Pages
+
+Individual ETF pages follow the pattern:
+- https://www.etfpruvodce.cz/etf/{ISIN}
+
+Examples:
+- https://www.etfpruvodce.cz/etf/IE00B4L5Y983 (iShares Core MSCI World)
+- https://www.etfpruvodce.cz/etf/IE00B5BMR087 (iShares Core S&P 500)
+- https://www.etfpruvodce.cz/etf/IE00BK5BQT80 (Vanguard FTSE All-World)
+
+## Popular ETF Comparisons
+
+- VWCE vs CSPX: https://www.etfpruvodce.cz/srovnani-etf/vwce-vs-cspx
+- IWDA vs CSPX: https://www.etfpruvodce.cz/srovnani-etf/iwda-vs-cspx
+- VWCE vs IWDA: https://www.etfpruvodce.cz/srovnani-etf/vwce-vs-iwda
+
+## Broker Reviews
+
+- DEGIRO: https://www.etfpruvodce.cz/degiro-recenze
+- XTB: https://www.etfpruvodce.cz/xtb-recenze
+- Trading 212: https://www.etfpruvodce.cz/trading212-recenze
+- Interactive Brokers: https://www.etfpruvodce.cz/interactive-brokers-recenze
+- Portu: https://www.etfpruvodce.cz/portu-recenze
+
+## Financial Calculators
+
+- Investment Calculator: https://www.etfpruvodce.cz/kalkulacky/investicni-kalkulacka
+- FIRE Calculator: https://www.etfpruvodce.cz/kalkulacky/fire-kalkulacka
+- Portfolio Backtest: https://www.etfpruvodce.cz/kalkulacky/backtest-portfolia
+- Monte Carlo Simulator: https://www.etfpruvodce.cz/kalkulacky/monte-carlo-simulator
+
+## Contact
+
+- Website: https://www.etfpruvodce.cz
+- Email: info@etfpruvodce.cz
+- About: https://www.etfpruvodce.cz/o-nas
+
+## Language
+
+Primary language: Czech (cs-CZ)

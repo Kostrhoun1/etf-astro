@@ -1,0 +1,476 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-clean-energy-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const lastModified = new Date().toISOString().split('T')[0];
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší clean energy ETF ${currentYear} - čistá energie a obnovitelné zdroje`,
+  "description": config.metaDescription,
+  "image": "https://www.etfpruvodce.cz/og-clean-energy-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2025-01-15",
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-clean-energy-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": "clean energy ETF, čistá energie, obnovitelné zdroje, solární energie, větrná energie",
+  "wordCount": 2900,
+  "inLanguage": "cs-CZ",
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Clean Energy ETF",
+      "description": "Exchange-traded funds focused on renewable energy and clean technology companies"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares Global Clean Energy Transition UCITS ETF USD (Dist)",
+      "identifier": "IE00B1XNHC34"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares Global Water UCITS ETF",
+      "identifier": "IE00B1TXK627"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "L&G Clean Water UCITS ETF",
+      "identifier": "IE00BK5BC891"
+    }
+  ],
+  "mentions": [
+    {
+      "@type": "Thing",
+      "name": "Clean Energy Transition",
+      "description": "Global shift from fossil fuels to renewable energy sources like solar, wind and hydro"
+    },
+    {
+      "@type": "Thing",
+      "name": "Renewable Energy Investment",
+      "description": "Investment strategy focused on companies developing sustainable energy solutions"
+    }
+  ]
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší clean energy ETF v roce ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší clean energy ETF jsou: iShares Global Clean Energy Transition UCITS ETF (IE00B1XNHC34) největší čistá energie ETF s 2,0 mld. EUR a TER 0,65%, iShares Global Water UCITS ETF (IE00B1TXK627) s 1,96 mld. EUR a TER 0,65%, a L&G Clean Water UCITS ETF (IE00BK5BC891) s 513 mil. EUR a TER 0,49%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co jsou clean energy ETF a jaké firmy obsahují?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Clean energy ETF investují do společností vyvíjejících obnovitelné zdroje energie jako solární panely, větrné turbíny, vodní elektrárny a úložiště energie. Obsahují firmy jako NextEra Energy, Tesla, Vestas Wind Systems a další lídry v zelené energetice."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč investovat do clean energy ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Energetická transformace je největší investiční trend 21. století. Vlády investují biliony do Green Dealu a dekarbonizace. Clean energy ETF poskytují exposure k tomuto megatrendu s dlouhodobým růstovým potenciálem při přechodu na udržitelnou energetiku."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou náklady na clean energy ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER clean energy ETF se pohybuje od 0,49% do 0,65% ročně. Nejnižší poplatky má L&G Clean Water ETF (0,49%), iShares clean energy ETF mají TER 0,65%. Kromě TER počítejte s transakčními poplatky u brokera."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaká jsou rizika clean energy ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Clean energy ETF jsou vysoce volatilní a citlivé na vládní politiku, změny dotací a regulací. Rizika zahrnují technologickou obsolescenci, konkurenci z fosilních paliv a ekonomické cykly. Doporučuje se jako menší část portfolia (5-15%)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit clean energy ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Clean energy ETF můžete koupit u všech hlavních brokerů: XTB, Interactive Brokers, Trading 212, Degiro. Naše TOP 3 doporučené ETF - iShares Clean Energy (IE00B1XNHC34), iShares Water (IE00B1TXK627) a L&G Clean Water (IE00BK5BC891) - jsou dostupné na všech platformách."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší clean energy ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-clean-energy-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší ESG ETF", href: "/nejlepsi-etf/nejlepsi-esg-etf", description: "Udržitelné investice a ESG", icon: "🌱" },
+  { title: "Nejlepší energetické ETF", href: "/nejlepsi-etf/nejlepsi-energeticke-etf", description: "Tradiční energie vs. obnovitelné", icon: "⚡" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů", icon: "🏦" }
+];
+---
+
+<Layout
+  title={config.title + ' ' + currentYear}
+  description={config.metaDescription}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-teal-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-green-200 to-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-emerald-200 to-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-teal-200 to-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-green-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+            Aktuální k {new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              clean energy ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších clean energy ETF.
+            Solární, větrná a vodní energie včetně NextEra Energy, Tesla a Vestas.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+              Green Deal
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Stats Box -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl mb-3">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Clean energy v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro zelené investice</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJVĚTŠÍ CLEAN ETF</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">2,0B</div>
+                <div class="text-xs text-gray-600">iShares Clean Energy</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-emerald-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,49%</div>
+                <div class="text-xs text-gray-600">L&G Clean Water</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">TOP HOLDING</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">5%</div>
+                <div class="text-xs text-gray-600">NextEra Energy</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-emerald-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">GREEN DEAL EU</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">1T€</div>
+                <div class="text-xs text-gray-600">investice do 2030</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">🌿 Co jsou clean energy ETF?</h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+          Investiční fondy zaměřené na společnosti vyvíjející obnovitelné zdroje energie a technologie pro udržitelnou budoucnost
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-4xl mb-4">☀️</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Energetická transformace</h3>
+          <p class="text-gray-600">
+            Globální přechod od fosilních paliv k obnovitelným zdrojům energie. Největší investiční příležitost 21. století s vládní podporou.
+          </p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-4xl mb-4">💨</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Technologické inovace</h3>
+          <p class="text-gray-600">
+            Pokroky v solárních panelech, větrných turbínách a bateriích dramaticky snižují náklady zelené energie pod úroveň uhlí a plynu.
+          </p>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="text-4xl mb-4">🌱</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">ESG mandáty</h3>
+          <p class="text-gray-600">
+            Institucionální investoři s ESG mandáty přesouvají biliony dolarů do udržitelných investic, čímž pohánějí růst clean energy sektoru.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Section -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 ETF v této kategorii
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="clean energy" />
+
+  <!-- Selection Guide -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-br from-white to-green-50 rounded-3xl p-8 border border-green-100 shadow-xl">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+          💡 Jak vybrat ten správný clean energy ETF?
+        </h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+            <h4 class="font-bold text-blue-800 mb-2">1️⃣ Pro začátečníky</h4>
+            <p class="text-blue-700 text-sm">
+              Začněte s velkými, diverzifikovanými clean energy ETF s nižším rizikem. Zaměřte se na stabilní poskytovatele jako iShares a fondy s velikostí nad 1 mld. EUR.
+            </p>
+          </div>
+          <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+            <h4 class="font-bold text-green-800 mb-2">2️⃣ Pro pokročilé</h4>
+            <p class="text-green-700 text-sm">
+              Porovnejte zaměření ETF - některé se specializují na solární energii, jiné na větrnou energii nebo vodní hospodářství. Zvažte geografické exposure.
+            </p>
+          </div>
+          <div class="bg-purple-50 rounded-xl p-6 border border-purple-200">
+            <h4 class="font-bold text-purple-800 mb-2">3️⃣ Pro rizikové investory</h4>
+            <p class="text-purple-700 text-sm">
+              Specializované clean energy ETF nabízejí vyšší potenciál růstu, ale i větší volatilitu. Ideální pro investory s dlouhodobým horizontem.
+            </p>
+          </div>
+          <div class="bg-orange-50 rounded-xl p-6 border border-orange-200">
+            <h4 class="font-bold text-orange-800 mb-2">4️⃣ Pro ESG investory</h4>
+            <p class="text-orange-700 text-sm">
+              Clean energy ETF jsou přirozeně ESG kompatibilní. Kombinujte s širšími ESG ETF pro kompletní udržitelné portfolio.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">❓ Často kladené otázky</h2>
+
+      <div class="space-y-4">
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaké jsou nejlepší clean energy ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší clean energy ETF jsou: <strong>iShares Global Clean Energy Transition UCITS ETF</strong> (IE00B1XNHC34) největší čistá energie ETF s 2,0 mld. EUR a TER 0,65%, <strong>iShares Global Water UCITS ETF</strong> (IE00B1TXK627) s 1,96 mld. EUR a TER 0,65%, a <strong>L&G Clean Water UCITS ETF</strong> (IE00BK5BC891) s 513 mil. EUR a TER 0,49%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Co jsou clean energy ETF a jaké firmy obsahují?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Clean energy ETF</strong> investují do společností vyvíjejících obnovitelné zdroje energie jako solární panely, větrné turbíny, vodní elektrárny a úložiště energie. Obsahují firmy jako NextEra Energy, Tesla, Vestas Wind Systems a další lídry v zelené energetice.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Proč investovat do clean energy ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Energetická transformace</strong> je největší investiční trend 21. století. Vlády investují biliony do Green Dealu a dekarbonizace. Clean energy ETF poskytují exposure k tomuto megatrendu s dlouhodobým růstovým potenciálem při přechodu na udržitelnou energetiku.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaké jsou náklady na clean energy ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>TER clean energy ETF</strong> se pohybuje od 0,49% do 0,65% ročně. Nejnižší poplatky má <strong>L&G Clean Water ETF</strong> (IE00BK5BC891) s 0,49%, <strong>iShares clean energy ETF</strong> (IE00B1XNHC34, IE00B1TXK627) mají TER 0,65%. Kromě TER počítejte s transakčními poplatky u brokera.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaká jsou rizika clean energy ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Clean energy ETF jsou vysoce volatilní</strong> a citlivé na vládní politiku, změny dotací a regulací. Rizika zahrnují technologickou obsolescenci, konkurenci z fosilních paliv a ekonomické cykly. Doporučuje se jako menší část portfolia (5-15%) pro diverzifikaci.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Kde koupit clean energy ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Clean energy ETF můžete koupit u všech hlavních brokerů: <strong>XTB</strong>, <strong>Interactive Brokers</strong>, <strong>Trading 212</strong>, <strong>Degiro</strong>. Naše TOP 3 doporučené ETF - iShares Clean Energy (IE00B1XNHC34), iShares Water (IE00B1TXK627) a L&G Clean Water (IE00BK5BC891) - jsou dostupné na všech platformách.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-12 bg-gradient-to-br from-green-50 to-emerald-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">⚡ Připraveni investovat do čisté energie?</h2>
+      <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+        Najděte si ideálního brokera a začněte s investováním do nejlepších clean energy ETF
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+          🏦 Najít brokera pro ETF
+        </a>
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center px-6 py-3 border-2 border-green-600 text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors">
+          📊 Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

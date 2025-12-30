@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InvestmentCalculatorContent from '../../components/tools/InvestmentCalculatorContent';
+
+const currentYear = new Date().getFullYear();
+---
+
+<Layout
+  title="Investiční kalkulačka 2026 - Pravidelné investování"
+  description="Bezplatná investiční kalkulačka pro pravidelné investování. Spočítejte si výnosy z měsíčního investování do ETF fondů. Včetně daní, inflace a složeného úročení."
+  canonical="/kalkulacky/investicni-kalkulacka"
+  keywords="investiční kalkulačka, ETF kalkulačka, složené úročení, pravidelné investování, kalkulačka výnosů, měsíční investování, výpočet investic"
+  ogImage="/og-investicni-kalkulacka.jpg"
+  ogTitle="Investiční kalkulačka 2026 - Pravidelné investování | ETF průvodce"
+  ogDescription="Bezplatná investiční kalkulačka pro pravidelné investování. Spočítejte si výnosy z měsíčního investování do ETF fondů."
+>
+  <InvestmentCalculatorContent client:load />
+</Layout>

@@ -1,0 +1,483 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ETFTable from '../../components/ETFTable.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-japonske-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const lastModified = new Date().toISOString().split('T')[0];
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší japonské ETF ${currentYear} - MSCI Japan vs Nikkei 225`,
+  "description": `Srovnání nejlepších japonských ETF ${currentYear}. MSCI Japan, Nikkei 225 - poplatky TER, výnosy, velikost fondů.`,
+  "image": "https://www.etfpruvodce.cz/og-japanese-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2025-01-15",
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-japonske-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": "japonské ETF, MSCI Japan, Nikkei 225, investování, indexové fondy",
+  "wordCount": 2500,
+  "inLanguage": "cs-CZ",
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Japonské ETF",
+      "description": "Exchange-traded funds tracking Japanese stock market indices"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares Core MSCI Japan IMI UCITS ETF",
+      "identifier": "IE00B4L5YX21"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "Amundi Core MSCI Japan UCITS ETF",
+      "identifier": "LU1781541252"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "UBS MSCI Japan Climate Paris Aligned UCITS ETF",
+      "identifier": "IE000JHYO4T6"
+    }
+  ],
+  "mentions": [
+    {
+      "@type": "Thing",
+      "name": "MSCI Japan Index",
+      "description": "Stock market index tracking largest Japanese companies"
+    },
+    {
+      "@type": "Thing",
+      "name": "Nikkei 225",
+      "description": "Price-weighted stock market index of 225 Japanese companies"
+    }
+  ]
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší japonské ETF v roce ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší japonské ETF jsou: iShares Core MSCI Japan IMI UCITS ETF (JPNA, IE00B4L5YX21) s TER 0,12% a velikostí 5,7 mld EUR, Amundi Core MSCI Japan UCITS ETF (AMJP, LU1781541252) s TER 0,12% a velikostí 4,2 mld EUR, a UBS MSCI Japan Climate Paris Aligned UCITS ETF (UBSJ, IE000JHYO4T6) s TER 0,15%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi MSCI Japan a Nikkei 225?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MSCI Japan obsahuje přibližně 230 největších japonských společností a pokrývá asi 85% japonského akciového trhu. Nikkei 225 sleduje pouze 225 vybraných společností a je cenově vážený index. MSCI Japan poskytuje širší diverzifikaci."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč investovat do japonských ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Japonské ETF nabízejí expozici k třetí největší ekonomice světa s inovativními technologickými společnostmi. Japonsko má stabilní finanční systém, silnou manufakturu a atraktivní valuace oproti americkému a evropskému trhu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou poplatky za japonské ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER poplatky u nejlepších japonských ETF jsou velmi konkurenceschopné. iShares Core MSCI Japan IMI ETF (JPNA, IE00B4L5YX21) i Amundi Core MSCI Japan ETF (AMJP, LU1781541252) mají TER pouze 0,12%, zatímco UBS MSCI Japan Climate ETF (UBSJ, IE000JHYO4T6) má TER 0,15%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaká jsou rizika japonských ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hlavní rizika zahrnují měnové riziko při změnách kurzu JPY/EUR, demografické výzvy stárnoucí populace a ekonomickou stagnaci. Závislost na exportu činí japonské společnosti citlivé na globální růst. Naše TOP 3 ETF tato rizika diverzifikují investicí do širokého spektra japonských firem."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jak vybrat mezi různými japonskými ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Klíčové faktory jsou sledovaný index (MSCI Japan IMI vs standard), velikost fondu a TER poplatky. Pro širokou expozici doporučujeme iShares Core MSCI Japan IMI (JPNA, IE00B4L5YX21) s nejširším pokrytiem 1000+ společností. Pro ESG investing volte UBS MSCI Japan Climate (UBSJ, IE000JHYO4T6)."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší japonské ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-japonske-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší S&P 500 ETF", href: "/nejlepsi-etf/nejlepsi-sp500-etf", description: "Kompletní průvodce americkými S&P 500 ETF", icon: "🇺🇸" },
+  { title: "Nejlepší evropské ETF", href: "/nejlepsi-etf/nejlepsi-evropske-etf", description: "Srovnání nejlepších evropských ETF fondů", icon: "🇪🇺" },
+  { title: "Srovnání ETF", href: "/srovnani-etf", description: "Porovnejte si ETF podle různých kritérií", icon: "📊" }
+];
+---
+
+<Layout
+  title={`Nejlepší japonské ETF ${currentYear} - MSCI Japan vs Nikkei 225`}
+  description={`Srovnání nejlepších japonských ETF ${currentYear}. MSCI Japan, Nikkei 225 - poplatky TER, výnosy, velikost fondů. Aktuální data k ${currentDate}.`}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-red-50/50 via-orange-50/30 to-red-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-red-200 to-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-orange-200 to-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-red-200 to-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-red-100 to-orange-100 text-red-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-red-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
+            Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší <span class="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent">japonské ETF</span>
+          </h1>
+
+          <!-- Author byline -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">Tomáš Kostrhoun</a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších japonských ETF fondů dostupných pro evropské investory.
+            Analýza MSCI Japan vs Nikkei 225 a praktické tipy pro výběr.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+              Srovnání ETF
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Market Stats -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-xl mb-3">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">
+                Japonský trh v číslech
+              </h3>
+              <p class="text-sm text-gray-600">Klíčová fakta o japonských investicích</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-red-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">EKONOMIKA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">3.</div>
+                <div class="text-xs text-gray-600">největší na světě</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">HDP</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">4,2B</div>
+                <div class="text-xs text-gray-600">USD ročně</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-red-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">MSCI JAPAN</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">230</div>
+                <div class="text-xs text-gray-600">největších firem</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                  <span class="text-xs text-gray-500 font-medium">DIVERZIFIKACE</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">{etfs.length}+</div>
+                <div class="text-xs text-gray-600">ETF k dispozici</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-red-100 w-20 h-20 mx-auto mb-8 hover:bg-red-200 transition-colors">
+          <svg class="w-10 h-10 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co je japonský akciový trh?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Třetí největší akciový trh světa s inovativními technologickými společnostmi a stabilitou
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-orange-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            Třetí největší ekonomika
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Japonsko je třetí největší ekonomika světa s HDP přes 4,2 bilionu USD a stabilním finančním systémem.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-red-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            Technologické inovace
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Japonské společnosti vedou v robotice, elektromobilitě, AI a polovodičových technologiích.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-pink-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            Světové korporace
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Domov Toyota, Sony, SoftBank, Nintendo a dalších globálně uznávaných značek.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 nejlepší japonské ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} japonských ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Database Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="japonské" />
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Nejčastější otázky
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          Odpovědi na časté dotazy ohledně japonských ETF
+        </p>
+      </div>
+
+      <div class="space-y-8">
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jaké jsou nejlepší japonské ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší japonské ETF jsou: <strong>iShares Core MSCI Japan IMI UCITS ETF</strong> (JPNA, IE00B4L5YX21)
+            s TER 0,12% a velikostí 5,7 mld EUR, <strong>Amundi Core MSCI Japan UCITS ETF</strong> (AMJP, LU1781541252)
+            s TER 0,12% a velikostí 4,2 mld EUR, a <strong>UBS MSCI Japan Climate Paris Aligned UCITS ETF</strong>
+            (UBSJ, IE000JHYO4T6) s TER 0,15%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jaký je rozdíl mezi MSCI Japan a Nikkei 225?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>MSCI Japan</strong> obsahuje přibližně 230 největších japonských společností a pokrývá asi 85%
+            japonského akciového trhu. <strong>Nikkei 225</strong> sleduje pouze 225 vybraných společností a je
+            cenově vážený index. MSCI Japan poskytuje širší diverzifikaci a je častěji používán v ETF.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Proč investovat do japonských ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Japonské ETF nabízejí expozici k <strong>třetí největší ekonomice světa</strong> s inovativními
+            technologickými společnostmi. Japonsko má stabilní finanční systém, silnou manufakturu a zajímavé
+            valuace. ETF poskytují diverzifikovaný přístup k japonskému trhu s nízkými poplatky.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jaké jsou poplatky za japonské ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>TER poplatky</strong> u nejlepších japonských ETF jsou velmi konkurenceschopné.
+            <strong>iShares Core MSCI Japan IMI ETF</strong> (JPNA, IE00B4L5YX21) i <strong>Amundi Core MSCI Japan ETF</strong> (AMJP, LU1781541252)
+            mají TER pouze 0,12%, zatímco <strong>UBS MSCI Japan Climate ETF</strong> (UBSJ, IE000JHYO4T6) má TER 0,15%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jaká jsou rizika japonských ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Hlavní rizika zahrnují <strong>měnové riziko</strong> při změnách kurzu JPY/EUR,
+            <strong>demografické výzvy</strong> stárnoucí populace a <strong>ekonomickou stagnaci</strong>.
+            <strong>Závislost na exportu</strong> činí japonské společnosti citlivé na globální růst.
+            Naše TOP 3 ETF tato rizika diverzifikují investicí do širokého spektra japonských firem.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">Jak vybrat mezi různými japonskými ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Klíčové faktory jsou <strong>sledovaný index</strong> (MSCI Japan IMI vs standard), <strong>velikost fondu</strong> a <strong>TER poplatky</strong>.
+            Pro širokou expozici doporučujeme <strong>iShares Core MSCI Japan IMI</strong> (JPNA, IE00B4L5YX21)
+            s nejširším pokrytím 1000+ společností. Pro ESG investing volte <strong>UBS MSCI Japan Climate</strong> (UBSJ, IE000JHYO4T6).
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-12 bg-gradient-to-br from-red-50 to-orange-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Připraveni investovat do japonských ETF?</h2>
+      <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+        Najděte si ideálního brokera a začněte s investováním do nejlepších japonských ETF
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors">
+          Najít brokera pro ETF
+        </a>
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center px-6 py-3 border-2 border-red-600 text-red-600 font-semibold rounded-lg hover:bg-red-50 transition-colors">
+          Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

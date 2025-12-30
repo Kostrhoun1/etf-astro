@@ -1,0 +1,567 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+import { getLastModifiedDate } from '../../utils/getLastModifiedDate';
+
+const config = categoryConfigs['nejlepsi-evropske-etf'];
+const [etfs, lastModified] = await Promise.all([
+  getTopETFsForCategory(config),
+  getLastModifiedDate(),
+]);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+// SEO optimalizované datum
+const lastModifiedISO = new Date(new Date().getMonth(), 1).toISOString();
+const publishedDate = `2026-01-22`;
+
+// Enhanced structured data with FAQs and more products
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší evropské ETF 2026 - LYP6 vs SMEA vs VERX`,
+  "description": `Srovnání nejlepších evropských ETF 2026. LYP6, SMEA, VERX - STOXX 600 vs MSCI Europe vs FTSE, poplatky TER, výnosy.`,
+  "image": "https://www.etfpruvodce.cz/og-evropske-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": publishedDate,
+  "dateModified": lastModifiedISO,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-evropske-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": `nejlepší evropské ETF 2026, LYP6 ETF recenze, SMEA ETF analýza, VERX ETF porovnání, STOXX Europe 600 ETF`,
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Evropské ETF",
+      "description": "Exchange-traded funds tracking European stock market indices"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "Amundi Core Stoxx Europe 600 UCITS ETF",
+      "identifier": "LU0908500753"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares Core MSCI Europe UCITS ETF",
+      "identifier": "IE00B4K48X80"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "Vanguard FTSE Developed Europe UCITS ETF",
+      "identifier": "IE00B945VV12"
+    }
+  ]
+};
+
+// FAQ structured data for better search snippets
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi STOXX 600 a MSCI Europe?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "STOXX Europe 600 pokrývá 600 společností ze 17 evropských zemí včetně UK. MSCI Europe má ~430 společností z 15 zemí bez UK. STOXX je širší a zahrnuje více small-cap akcií."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Který evropský ETF má nejnižší poplatky?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Amundi Core STOXX Europe 600 (LYP6) má nejnižší TER pouze 0,07%. Následují Vanguard FTSE Developed Europe s 0,10% a iShares Core MSCI Europe s 0,12%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Zahrnují evropské ETF britské akcie?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "STOXX Europe 600 zahrnuje britské akcie (~20%). MSCI Europe a FTSE Developed Europe britské akcie nevyžadují kvůli Brexitu. Záleží na konkrétním indexu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nejlepší evropské ETF v roce 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší evropské ETF jsou: Amundi Core Stoxx Europe 600 UCITS ETF (LYP6, LU0908500753) s rekordně nízkým TER 0,07%, iShares Core MSCI Europe UCITS ETF (SMEA, IE00B4K48X80) s velikostí přes 12 mld. EUR, a Vanguard FTSE Developed Europe UCITS ETF (VERX, IE00B945VV12) s TER 0,10%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou evropské ETF vhodné pro české investory?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, evropské ETF jsou ideální pro české investory. Poskytují expozici k vyspělým evropským trhům s měnovou stabilitou a často EUR denominací, což snižuje měnové riziko. Zároveň nabízejí geografickou diverzifikaci mimo americký trh."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit evropské ETF v Česku?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Evropské ETF jako LYP6, SMEA a VERX můžete koupit u většiny českých brokerů včetně Degiro, Interactive Brokers, XTB, Trading212, Portu nebo Fio e-Broker. Porovnejte si transakční poplatky a dostupnost konkrétních ETF u jednotlivých brokerů."
+      }
+    }
+  ]
+};
+
+// Breadcrumb structured data
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ETF průvodce.cz",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší evropské ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-evropske-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  {
+    title: "Nejlepší světové ETF",
+    description: "Globální ETF zahrnující i evropské trhy",
+    href: "/nejlepsi-etf/nejlepsi-celosvetove-etf",
+    category: "Regionální ETF"
+  },
+  {
+    title: "Nejlepší S&P 500 ETF",
+    description: "Americké blue chip ETF pro porovnání",
+    href: "/nejlepsi-etf/nejlepsi-sp500-etf",
+    category: "Regionální ETF"
+  },
+  {
+    title: "Kde koupit evropské ETF",
+    description: "Srovnání brokerů pro evropské investice",
+    href: "/kde-koupit-etf",
+    category: "Praktické tipy"
+  },
+  {
+    title: "Portfolio strategie s evropskými ETF",
+    description: "Jak začlenit Evropu do portfolia",
+    href: "/portfolio-strategie",
+    category: "Investiční strategie"
+  }
+];
+
+const faqItems = [
+  {
+    question: "Jaké jsou nejlepší evropské ETF v roce 2026?",
+    answer: "Naše TOP 3 doporučení: Amundi Core Stoxx Europe 600 UCITS ETF (LYP6, LU0908500753) s rekordně nízkým TER 0,07% a velikostí 13+ mld. EUR, iShares Core MSCI Europe UCITS ETF (SMEA, IE00B4K48X80) s 12+ mld. EUR a TER 0,12%, a Vanguard FTSE Developed Europe UCITS ETF (VERX, IE00B945VV12) s TER 0,10% a distribucí dividend."
+  },
+  {
+    question: "Jaký je rozdíl mezi STOXX Europe 600 a MSCI Europe?",
+    answer: "STOXX Europe 600 pokrývá 600 společností ze 17 evropských zemí včetně Británie (~20% podíl). MSCI Europe má ~430 společností z 15 zemí bez Británie. STOXX je širší a zahrnuje více small-cap akcií."
+  },
+  {
+    question: "Který evropský ETF má nejnižší poplatky?",
+    answer: "Amundi Core STOXX Europe 600 (LYP6, LU0908500753) má nejnižší TER pouze 0,07%. Následuje Vanguard FTSE Developed Europe (VERX, IE00B945VV12) s 0,10% a iShares Core MSCI Europe (SMEA, IE00B4K48X80) s 0,12%. Všechny naše TOP 3 ETF mají velmi kompetitivní poplatky."
+  },
+  {
+    question: "Zahrnují evropské ETF britské akcie?",
+    answer: "Záleží na indexu. STOXX Europe 600 zahrnuje britské akcie (~20% podíl). MSCI Europe a FTSE Developed Europe většinou britské akcie nevyžadují kvůli Brexitu. Vždy zkontrolujte složení indexu."
+  },
+  {
+    question: "Jsou evropské ETF vhodné pro české investory?",
+    answer: "Ano, evropské ETF jsou ideální pro české investory. Poskytují expozici k vyspělým evropským trhům s měnovou stabilitou a často EUR denominací, což snižuje měnové riziko."
+  },
+  {
+    question: "Jaké jsou historické výnosy evropských ETF?",
+    answer: "Evropské akcie dosáhly průměrného ročního výnosu ~8% za posledních 20 let. Konkrétní aktuální výnosy najdete v našem žebříčku 'Top 10 podle výkonu 1Y'."
+  },
+  {
+    question: "Jsou data o evropských ETF aktuální?",
+    answer: "Ano, všechna data o evropských ETF se načítají živě z naší databáze a jsou aktualizována denně. Žebříčky TOP 10 podle TER, velikosti a výkonu ukazují nejčerstvější informace."
+  }
+];
+---
+
+<Layout
+  title={`Nejlepší evropské ETF 2026 - LYP6 vs SMEA vs VERX`}
+  description={`Srovnání nejlepších evropských ETF 2026. LYP6, SMEA, VERX - STOXX 600 vs MSCI Europe vs FTSE, poplatky TER, výnosy. Aktuální data k ${currentDate}.`}
+  canonical="/nejlepsi-etf/nejlepsi-evropske-etf"
+>
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-purple-50 to-indigo-50 overflow-hidden">
+    <!-- Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-indigo-50/30 to-blue-50/50"></div>
+
+    <!-- Animated blobs -->
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-purple-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-indigo-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <!-- Left Column - Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-purple-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
+            Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">
+              evropské ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a
+              href="/o-nas"
+              class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+            >
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>
+              Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších evropských ETF fondů. STOXX 600 vs MSCI Europe analýza, poplatky, výnosy a praktické tipy pro investice do Evropy.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-purple-300 text-purple-700 hover:bg-purple-50 px-8 py-4 text-lg font-semibold rounded-xl transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+              Srovnání všech
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column - Stats Box -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/60 to-purple-50/60 backdrop-blur-sm rounded-3xl shadow-2xl"></div>
+
+          <div class="relative bg-gradient-to-br from-white/80 to-purple-50/60 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+            <!-- Header -->
+            <div class="text-center mb-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">🇪🇺 Evropské ETF Stats</h3>
+              <p class="text-gray-600">Klíčové informace o evropských indexech</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-6 mb-6">
+              <div class="text-center p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                <div class="text-3xl font-bold text-purple-600 mb-1">600</div>
+                <div class="text-sm text-gray-600">Firem STOXX 600</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-200">
+                <div class="text-3xl font-bold text-indigo-600 mb-1">17</div>
+                <div class="text-sm text-gray-600">Evropských zemí</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+                <div class="text-3xl font-bold text-blue-600 mb-1">~8%</div>
+                <div class="text-sm text-gray-600">Ročně za 20 let</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-purple-50 to-purple-50 rounded-xl border border-purple-200">
+                <div class="text-3xl font-bold text-purple-600 mb-1">20%</div>
+                <div class="text-sm text-gray-600">Podíl Británie</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center pt-6 border-t border-purple-200/50">
+              <p class="text-sm text-gray-600 mb-3">Stabilní vyspělé trhy</p>
+              <a href="#pruvodce" class="inline-flex items-center justify-center border border-purple-200 text-purple-600 hover:bg-purple-50 px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+                Průvodce výběrem
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Co jsou evropské ETF?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          Evropské ETF sledují akciové indexy vyspělých evropských trhů jako STOXX Europe 600, MSCI Europe nebo FTSE Developed Europe.
+          Poskytují expozici k etablovaným evropským společnostem.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.2s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Vyspělé evropské trhy
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Evropské ETF pokrývají stabilní vyspělé ekonomiky včetně Německa, Francie, Nizozemska, Švýcarska a dalších evropských zemí.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.3s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Tři hlavní indexy
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            STOXX Europe 600 (600 firem, 17 zemí), MSCI Europe (~430 firem, 15 zemí) a FTSE Developed Europe s různým pokrytiem.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.4s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Stabilní dividendy
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Evropské společnosti jsou známé pravidelným vyplácením dividend. Mnoho evropských ETF nabízí distribuční varianty.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          🏆 Top 3 nejlepší evropské ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy všech dostupných evropských ETF
+        </p>
+      </div>
+
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections - by TER, AUM, Performance -->
+  <section id="srovnani" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Top10Sections etfs={etfs} currency="EUR" categoryName="evropske" />
+    </div>
+  </section>
+
+  <!-- Selection Guide -->
+  <section id="pruvodce" class="py-20 bg-gradient-to-br from-purple-50 to-indigo-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full mb-6">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          💡 Jak vybrat správný evropský ETF?
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-50 border border-purple-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+            1
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            STOXX 600 vs MSCI Europe
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            STOXX Europe 600 = širší pokrytí (600 firem ze 17 zemí včetně UK). MSCI Europe = ~430 firem z 15 zemí bez UK. Pro začátečníky STOXX 600.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-50 border border-indigo-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+            2
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Sledujte TER a velikost
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            Ideální TER 0,07-0,20%. Velikost fondu min. 3 mld. EUR. Amundi má nejnižší TER 0,07%, iShares největší velikost fondů.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 border border-blue-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+            3
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Accumulating vs Distributing
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            ACC = reinvestuje dividendy. DIST = vyplácí dividendy (evropské firmy mají stabilní dividendy). Pro spoření ACC, pro příjem DIST.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+            4
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Měnové zajištění EUR
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            Standardní evropské ETF jsou v EUR nebo USD. EUR verze eliminují měnové riziko pro české investory. USD verze mají vyšší likviditu.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          ❓ Často kladené otázky
+        </h2>
+      </div>
+
+      <div class="space-y-8">
+        {faqItems.map((faq, index) => (
+          <details class="group border border-gray-200 rounded-lg hover:border-purple-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-purple-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-purple-800">{faq.question}</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-purple-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-purple-600 to-indigo-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+        Připraveni investovat do evropských ETF?
+      </h2>
+      <p class="text-xl text-purple-100 mb-8 leading-relaxed">
+        Vyberte si brokera a začněte budovat své evropské portfolio ještě dnes
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold rounded-xl transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          Najít brokera pro ETF
+        </a>
+
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-purple-600 px-8 py-4 text-lg font-semibold rounded-xl transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="bg-purple-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <InternalLinking links={relatedLinks} title="Související články" />
+    </div>
+  </div>
+</Layout>
+
+<style>
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+</style>

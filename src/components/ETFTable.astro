@@ -1,0 +1,95 @@
+---
+import type { ETFBasicInfo } from '../lib/etf-data';
+
+interface Props {
+  etfs: ETFBasicInfo[];
+  title?: string;
+}
+
+const { etfs, title = "Top ETF fondy" } = Astro.props;
+
+function formatNumber(num: number | null, decimals = 2): string {
+  if (num === null || num === undefined) return '-';
+  return num.toFixed(decimals).replace('.', ',');
+}
+
+function formatSize(size: number | null): string {
+  if (size === null || size === undefined) return '-';
+  if (size >= 1000) return (size / 1000).toFixed(1) + ' mld €';
+  return Math.round(size) + ' mil €';
+}
+
+function getRatingStars(rating: number | null): string {
+  if (rating === null) return '-';
+  const stars = Math.round(rating);
+  return '★'.repeat(stars) + '☆'.repeat(5 - stars);
+}
+---
+
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+  <div class="p-6 border-b border-gray-200">
+    <h2 class="text-2xl font-bold text-gray-900">{title}</h2>
+    <p class="text-gray-600 mt-1">{etfs.length} ETF fondů</p>
+  </div>
+  
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="bg-gray-50 text-left text-sm font-medium text-gray-500">
+          <th class="py-4 px-6">#</th>
+          <th class="py-4 px-6">Název</th>
+          <th class="py-4 px-6 text-right">TER</th>
+          <th class="py-4 px-6 text-right">Velikost</th>
+          <th class="py-4 px-6 text-right">1R výnos</th>
+          <th class="py-4 px-6 text-center">Rating</th>
+          <th class="py-4 px-6"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {etfs.slice(0, 20).map((etf, index) => (
+          <tr class="hover:bg-blue-50 transition-colors">
+            <td class="py-4 px-6 text-gray-500 font-medium">{index + 1}</td>
+            <td class="py-4 px-6">
+              <div>
+                <div class="font-medium text-gray-900 line-clamp-1">{etf.name}</div>
+                <div class="text-sm text-gray-500">{etf.primary_ticker || etf.isin}</div>
+              </div>
+            </td>
+            <td class="py-4 px-6 text-right">
+              <span class:list={["font-medium", etf.ter_numeric && etf.ter_numeric <= 0.2 ? 'text-emerald-600' : 'text-gray-900']}>
+                {formatNumber(etf.ter_numeric)}%
+              </span>
+            </td>
+            <td class="py-4 px-6 text-right text-gray-900">
+              {formatSize(etf.fund_size_numeric)}
+            </td>
+            <td class="py-4 px-6 text-right">
+              <span class:list={["font-medium", etf.return_1y && etf.return_1y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                {etf.return_1y ? formatNumber(etf.return_1y) + '%' : '-'}
+              </span>
+            </td>
+            <td class="py-4 px-6 text-center text-yellow-500">
+              {getRatingStars(etf.rating)}
+            </td>
+            <td class="py-4 px-6">
+              <a 
+                href={'/etf/' + etf.isin}
+                class="text-blue-600 hover:text-blue-800 font-medium text-sm"
+              >
+                Detail →
+              </a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  
+  {etfs.length > 20 && (
+    <div class="p-4 bg-gray-50 text-center">
+      <span class="text-gray-600 text-sm">
+        Zobrazeno 20 z {etfs.length} ETF fondů
+      </span>
+    </div>
+  )}
+</div>

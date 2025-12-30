@@ -1,0 +1,452 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import InternalLinking from '../../components/InternalLinking.astro';
+import PortfolioAllocationChart from '../../components/portfolio/PortfolioAllocationChart';
+import PermanentniPortfolioHero from '../../components/portfolio/PermanentniPortfolioHero';
+import PermanentniPortfolioPerformanceWrapper from '../../components/portfolio/PermanentniPortfolioPerformanceWrapper';
+import { getETFLink } from '../../data/etf-mappings';
+
+const portfolioSchema = {
+  "@context": "https://schema.org",
+  "@type": "FinancialProduct",
+  "name": "Permanentní Portfolio",
+  "description": "Kompletní průvodce Permanentní Portfolio strategií Harryho Browna. 25% akcie + 25% dluhopisy + 25% nemovitosti + 25% komodity s očekávaným výnosem 4% ročně.",
+  "category": "Investment Strategy",
+  "provider": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "url": "https://www.etfpruvodce.cz"
+  },
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Conservative Investors"
+  },
+  "feesAndCommissionsSpecification": "TER 0.15-0.60% ročně",
+  "interestRate": "4% očekávaný výnos ročně",
+  "riskRating": "Konzervativní",
+  "creator": {
+    "@type": "Person",
+    "name": "Harry Browne"
+  }
+};
+
+const allocationData = [
+  {
+    name: "Akcie",
+    value: 25,
+    color: "#3b82f6",
+    description: "Globální akciový trh",
+    etf: "Vanguard FTSE All-World",
+    link: "/etf/IE00BK5BQT80"
+  },
+  {
+    name: "Dluhopisy",
+    value: 25,
+    color: "#10b981",
+    description: "Globální agregované dluhopisy EUR Hedged",
+    etf: "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged (Acc)",
+    link: "/etf/IE00BDBRDM35"
+  },
+  {
+    name: "Nemovitosti",
+    value: 25,
+    color: "#f59e0b",
+    description: "Evropské nemovitostní investice",
+    etf: "iShares European Property Yield UCITS ETF",
+    link: "/etf/IE00B0M63284"
+  },
+  {
+    name: "Komodity",
+    value: 25,
+    color: "#6b7280",
+    description: "Široký komoditní košík",
+    etf: "Invesco Bloomberg Commodity UCITS ETF Acc",
+    link: "/etf/IE00BD6FTQ80"
+  }
+];
+
+const faqItems = [
+  {
+    question: "Proč má Permanentní Portfolio jen 4% očekávaný výnos?",
+    answer: "Permanentní Portfolio je navrženo pro maximální bezpečnost, ne výnos. 4% je reálný očekávaný výnos po inflaci s minimálním rizikem. Strategie nikdy neztratila více než 15% v žádné krizi za posledních 50 let, což je výjimečné. Je to cena za stabilitu a klid na investicích."
+  },
+  {
+    question: "Jak často musím rebalancovat Permanentní Portfolio?",
+    answer: "Doporučujeme rebalancing jednou ročně nebo když některá alokace vybočí o více než 5% (např. místo 25% máte 30% nebo 20%). Častější rebalancing není nutný a zvyšuje transakční náklady. Harry Browne původně doporučoval rebalancing jen při odchylce větší než 35%."
+  },
+  {
+    question: "Mohu použít jiné ETF než ty doporučené?",
+    answer: "Ano, ale držte se principů. Pro akcie použijte široký světový index (VWCE, CSPX), pro dlouhodobé dluhopisy 15+ let (IGLT, VGLT), pro nemovitosti REITs (IPRP, EPRA), pro komodity široký košík (EXXY, CMCX). Klíčové je dodržet 25% alokaci každé třídy aktiv."
+  },
+  {
+    question: "Je Permanentní Portfolio vhodné pro mladé investory?",
+    answer: "Spíše ne. Pro investory pod 40 let je příliš konzervativní. Mladí lidé mohou tolerovat větší volatilitu výměnou za vyšší výnosy. Lepší volbou je Nobel Portfolio (6%) nebo Akciové portfolio (7-8%). Permanentní Portfolio je ideální pro investory 50+ nebo velmi konzervativní investory."
+  },
+  {
+    question: "Jak Permanentní Portfolio reaguje na inflaci?",
+    answer: "Velmi dobře. Portfolio má zabudovanou ochranu proti inflaci prostřednictvím komodit (růst cen surovin), nemovitostí (růst nájmů) a akcií (dlouhodobá ochrana). Pouze dlouhodobé dluhopisy trpí, ale ostatní složky to kompenzují. To je síla této strategie."
+  },
+  {
+    question: "Potřebuji velký kapitál na začátek?",
+    answer: "Doporučujeme alespoň 100 000 Kč pro efektivní diverzifikaci do 4 ETF. S menším kapitálem začněte s jedním širokým ETF (VWCE) a postupně přidávejte další složky. Minimální investice je obvykle 50-100 Kč za podíl, ale efektivní rebalancing vyžaduje větší částky."
+  },
+  {
+    question: "Může Permanentní Portfolio ztratit více než 15%?",
+    answer: "Teoreticky ano, ale historicky se to nestalo. Za posledních 50 let byl největší propad -13% během finanční krize 2008. Portfolio je navrženo tak, aby různé třídy aktiv reagovaly opačně na ekonomické šoky, což minimalizuje celkové ztráty."
+  },
+  {
+    question: "Jak se liší od Ray Dalio All-Weather strategie?",
+    answer: "Obě jsou 'všepogodní', ale liší se složitostí. Permanentní Portfolio je jednodušší (4 aktiva po 25%), All-Weather složitější (5 aktiv v různých poměrech). Permanentní má nižší očekávaný výnos (4% vs 5-8%), ale jednodušší správu. All-Weather vyžaduje častější rebalancing."
+  }
+];
+
+const relatedLinks = [
+  {
+    title: "Backtest portfolia",
+    href: "/kalkulacky/backtest-portfolia",
+    description: "Otestujte historickou výkonnost Permanentního Portfolia"
+  },
+  {
+    title: "Monte Carlo simulátor",
+    href: "/kalkulacky/monte-carlo-simulator",
+    description: "Prognóza budoucnosti s tisíci scénářů"
+  },
+  {
+    title: "Portfolio strategie přehled",
+    href: "/portfolio-strategie",
+    description: "Porovnejte všech 5 investičních strategií"
+  },
+  {
+    title: "Nobel Portfolio",
+    href: "/portfolio-strategie/nobel-portfolio",
+    description: "Vědecky podložená strategie s 6% očekávaným výnosem"
+  },
+  {
+    title: "Ray Dalio All-Weather",
+    href: "/portfolio-strategie/ray-dalio-all-weather",
+    description: "Pokročilejší všepogodní strategie"
+  }
+];
+---
+
+<Layout
+  title="Permanentní Portfolio Strategie 2026 | 4% bezpečně s ETF"
+  description="Kompletní průvodce Permanentní Portfolio strategií Harryho Browna. Očekávaný výnos 4% ročně s minimálním rizikem a ochranou proti všem ekonomickým cyklům pomocí čtyř tříd aktiv."
+  canonical="/portfolio-strategie/permanentni-portfolio"
+  keywords="Permanentní portfolio, Harry Browne, konzervativní investování, čtyřsložkové portfolio, ekonomické cykly, ochrana kapitálu, ETF strategie, nízké riziko"
+  ogImage="/og-permanentni-portfolio.jpg"
+  ogTitle="Permanentní Portfolio Strategie 2026 | 4% bezpečně s ETF"
+  ogDescription="Kompletní průvodce Permanentní Portfolio strategií Harryho Browna. Očekávaný výnos 4% ročně s minimálním rizikem a ochranou proti všem ekonomickým cyklům."
+>
+  <div class="bg-white">
+    <PermanentniPortfolioHero client:load />
+
+    <script type="application/ld+json" set:html={JSON.stringify(portfolioSchema)} />
+
+    <div class="max-w-6xl mx-auto px-4 py-12">
+
+      <!-- Portfolio Slozeni -->
+      <div id="allocation">
+        <PortfolioAllocationChart
+          client:load
+          title="Složení Permanentního Portfolia"
+          className="mb-12"
+          data={allocationData}
+        />
+      </div>
+
+      <!-- O strategii -->
+      <Card className="mb-12">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            O strategii
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+            <h4 class="font-bold text-lg text-blue-900 mb-3">Harry Browne a ekonomické cykly</h4>
+            <p class="text-blue-800 leading-relaxed">
+              <strong>S tímto portfoliem přišel poprvé Harry Browne v roce 1981.</strong> Je to pravděpodobně první portfolio
+              založené na analýze ekonomického cyklu. Stojí na principu, že ekonomika se v každém okamžiku nachází
+              v jedné ze čtyř fází: <strong>prosperita/růst</strong>, <strong>inflace</strong>, <strong>deflace</strong> a <strong>recese</strong>.
+            </p>
+            <p class="text-blue-700 mt-3">
+              Cílem této strategie není snaha předpovídat, kdy která fáze cyklu nastane nebo jak dlouho bude trvat.
+              Záměrem je držet čtyři rovnocenné třídy aktiv, kdy v každé fázi ekonomického cyklu se bude více dařit jedné z nich.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Filozofie a principy -->
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Čtyři ekonomické fáze
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">🌱 Prosperita (akcie 25%)</h4>
+              <p class="text-sm">Výnos během ekonomického růstu a prosperity</p>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">🔥 Inflace (nemovitosti 25%)</h4>
+              <p class="text-sm">Ochrana před inflací a stabilní výnosy z realit</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">❄️ Deflace (dluhopisy 25%)</h4>
+              <p class="text-sm">Ochrana během deflace a zajištění likvidity</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">📉 Recese (komodity 25%)</h4>
+              <p class="text-sm">Hedge proti ekonomické nestabilitě a krizím</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+              Výhody strategie
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Funguje ve všech ekonomických cyklech</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Nejnižší volatilita ze všech strategií</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Nevyžaduje predikci trhu</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Jednoduchá implementace</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Ochrana před inflací i deflací</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Realna vykonnost -->
+      <div id="performance">
+        <PermanentniPortfolioPerformanceWrapper client:load />
+      </div>
+
+      <!-- Implementace -->
+      <Card className="mb-12">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Jak implementovat Permanentní Portfolio
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 class="font-semibold mb-4">📋 Doporučené UCITS ETF</h4>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span>Akcie (25%):</span>
+                  <span class="font-semibold"><a href={getETFLink('VWCE')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">VWCE</a></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Dluhopisy (25%):</span>
+                  <span class="font-semibold"><a href={getETFLink('AGGH')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">AGGH</a></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Nemovitosti (25%):</span>
+                  <span class="font-semibold"><a href={getETFLink('IPRP')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">IPRP</a></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Komodity (25%):</span>
+                  <span class="font-semibold"><a href={getETFLink('COMM')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">COMM</a></span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-semibold mb-4">⚖️ Rebalancing pravidla</h4>
+              <ul class="space-y-2 text-sm">
+                <li>&#8226; <strong>Frekvence:</strong> Jednou ročně</li>
+                <li>&#8226; <strong>Trigger:</strong> Při odchylce &gt;5%</li>
+                <li>&#8226; <strong>Cíl:</strong> Návrat na 25/25/25/25</li>
+                <li>&#8226; <strong>Metoda:</strong> Prodej nejsilnější, nákup nejslabší</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+            <h4 class="font-semibold mb-2">💡 Tip pro začátečníky</h4>
+            <p class="text-sm text-blue-800">
+              Začněte s jednodušší verzí: 50% <a href={getETFLink('VWCE')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">VWCE</a> + 50% <a href={getETFLink('AGGH')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">AGGH</a>.
+              Nemovitosti a komodity přidejte později, když získáte zkušenosti s investováním.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Rizika a nevyhody -->
+      <Card className="mb-12 border-orange-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-orange-700">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            Rizika a nevýhody
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="bg-orange-50 p-6 rounded-lg">
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span><strong>Nízký výnos:</strong> Nejnižší očekávaný výnos ze všech strategií</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span><strong>Komplexnost:</strong> Nutnost držet 4 různé třídy aktiv</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span><strong>Náklady na rebalancing:</strong> Častější transakce = vyšší poplatky</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <span><strong>Opportunity cost:</strong> V bull marketu zaostává za akciovými portfolii</span>
+              </li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Pro koho je vhodne -->
+      <Card className="mb-12">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            Pro koho je Permanentní Portfolio vhodné?
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 class="font-semibold text-green-600 mb-4">✅ Vhodné pro:</h4>
+              <ul class="space-y-2 text-sm">
+                <li>&#8226; Konzervativní investory</li>
+                <li>&#8226; Lidi blízko nebo v důchodu</li>
+                <li>&#8226; Ty, kdo se bojí volatility</li>
+                <li>&#8226; Investory preferující jednoduchost</li>
+                <li>&#8226; Ty, kdo chtějí "fire and forget" strategii</li>
+                <li>&#8226; Investory s nízkou tolerancí k riziku</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 class="font-semibold text-red-600 mb-4">❌ Méně vhodné pro:</h4>
+              <ul class="space-y-2 text-sm">
+                <li>&#8226; Mladé investory (pod 40 let)</li>
+                <li>&#8226; Ty, kdo hledají vysoké výnosy</li>
+                <li>&#8226; Aktivní investory</li>
+                <li>&#8226; Investory s malým kapitálem (pod 50k Kč)</li>
+                <li>&#8226; Ty, kdo preferují jednoduché portfolio</li>
+                <li>&#8226; Investory s vysokou tolerancí k riziku</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- FAQ Section -->
+      <section class="max-w-4xl mx-auto px-4 py-16">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Často kladené otázky o Permanentním Portfoliu
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Odpovědi na nejčastější dotazy o implementaci a správě této konzervativní strategie
+          </p>
+        </div>
+        <div class="space-y-6">
+          {faqItems.map((faq, index) => (
+            <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+              <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+                <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">{faq.question}</span>
+                <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+                {faq.answer}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <div class="text-center bg-gradient-to-r from-green-600 to-emerald-600 text-white p-8 rounded-2xl">
+        <h2 class="text-2xl font-bold mb-4">Chcete začít s Permanentním Portfoliem?</h2>
+        <p class="text-lg mb-6 opacity-90">
+          Naučte se implementovat tuto konzervativní strategii krok za krokem.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/srovnani-etf" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Najít vhodné ETF
+          </a>
+          <a href="/kalkulacky/investicni-kalkulacka" class="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-400 transition-colors">
+            Spočítat výnos
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Links -->
+    <div class="mt-16">
+      <InternalLinking links={relatedLinks} title="Související strategie a nástroje" />
+    </div>
+  </div>
+</Layout>

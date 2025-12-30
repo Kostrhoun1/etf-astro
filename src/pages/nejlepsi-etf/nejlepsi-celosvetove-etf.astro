@@ -1,0 +1,500 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-celosvetove-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString().split('T')[0];
+
+// Enhanced structured data with actual ETF data
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší světové ETF 2026 - IWDA vs XMWO vs VWCE`,
+  "description": `Kompletní srovnání nejlepších světových ETF 2026. MSCI World vs FTSE All-World analýza.`,
+  "image": "https://www.etfpruvodce.cz/og-world-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": `2026-01-15`,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-celosvetove-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": `nejlepší světové ETF 2026, IWDA, XMWO, VWCE, MSCI World`,
+  "wordCount": 2800,
+  "inLanguage": "cs-CZ"
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi MSCI World a FTSE All-World?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MSCI World pokrývá pouze vyspělé trhy (1600+ akcií z 23 zemí), zatímco FTSE All-World zahrnuje i rozvíjející se trhy (3900+ akcií). FTSE All-World je širší, ale může být volatilnější kvůli emerging markets."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Který světový ETF má nejnižší poplatky?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Xtrackers MSCI World ETF (XMWO, IE00BJ0KDQ92) má nejnižší TER pouze 0,12% mezi našimi TOP 3 doporučeními. iShares Core MSCI World (IWDA, IE00B4L5Y983) má TER 0,20% a Vanguard FTSE All-World (VWCE, IE00BK5BQT80) má TER 0,22%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Zahrnují světové ETF americké akcie?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, USA tvoří 60-70% světových indexů kvůli velikosti amerického akciového trhu. Světové ETF tedy poskytují značnou expozici k americkým akciím, ale i k Evropě, Japonsku a dalším trhům."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Je lepší jeden světový ETF nebo kombinace regionálních?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pro začátečníky je lepší jeden světový ETF - jednodušší správa a automatické rebalancování. Pokročilí investoři mohou kombinovat regionální ETF pro přesnější kontrolu nad alokací."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou historické výnosy světových ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Světové akcie dosáhly průměrného ročního výnosu ~10% za posledních 30 let. Konkrétní výnosy najdete v našich žebříčcích 'Top 10 podle výkonu 1Y' s aktuálními daty."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou data o ETF na této stránce aktuální?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, všechna data (TER, velikost fondů, výnosy) se načítají živě z naší databáze a jsou aktualizována denně. Žebříčky TOP 10 ukazují nejčerstvější informace."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ETF průvodce.cz",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší světové ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-celosvetove-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  {
+    title: "Nejlepší S&P 500 ETF",
+    description: "Americké blue chip ETF na S&P 500 index",
+    href: "/nejlepsi-etf/nejlepsi-sp500-etf",
+    category: "Regionální ETF"
+  },
+  {
+    title: "Nejlepší evropské ETF",
+    description: "Evropské ETF na STOXX 600 a další indexy",
+    href: "/nejlepsi-etf/nejlepsi-evropske-etf",
+    category: "Regionální ETF"
+  },
+  {
+    title: "Kde koupit světové ETF",
+    description: "Srovnání brokerů pro světové investice",
+    href: "/kde-koupit-etf",
+    category: "Praktické tipy"
+  },
+  {
+    title: "Portfolio strategie se světovými ETF",
+    description: "Jak sestavit globální portfolio",
+    href: "/portfolio-strategie",
+    category: "Investiční strategie"
+  }
+];
+
+const faqItems = [
+  {
+    question: "Jaký je rozdíl mezi MSCI World a FTSE All-World?",
+    answer: "MSCI World pokrývá pouze vyspělé trhy (1600+ akcií z 23 zemí), zatímco FTSE All-World zahrnuje i rozvíjející se trhy (3900+ akcií). FTSE All-World je širší, ale může být volatilnější kvůli emerging markets."
+  },
+  {
+    question: "Který světový ETF má nejnižší poplatky?",
+    answer: "Xtrackers MSCI World ETF (XMWO, IE00BJ0KDQ92) má nejnižší TER pouze 0,12% mezi našimi TOP 3 doporučeními. iShares Core MSCI World (IWDA, IE00B4L5Y983) má TER 0,20% a Vanguard FTSE All-World (VWCE, IE00BK5BQT80) má TER 0,22%."
+  },
+  {
+    question: "Zahrnují světové ETF americké akcie?",
+    answer: "Ano, USA tvoří 60-70% světových indexů kvůli velikosti amerického akciového trhu. Světové ETF tedy poskytují značnou expozici k americkým akciím, ale i k Evropě, Japonsku a dalším trhům."
+  },
+  {
+    question: "Je lepší jeden světový ETF nebo kombinace regionálních?",
+    answer: "Pro začátečníky je lepší jeden světový ETF - jednodušší správa a automatické rebalancování. Pokročilí investoři mohou kombinovat regionální ETF pro přesnější kontrolu nad alokací."
+  },
+  {
+    question: "Jaké jsou historické výnosy světových ETF?",
+    answer: "Světové akcie dosáhly průměrného ročního výnosu ~10% za posledních 30 let. Konkrétní výnosy najdete v našich žebříčcích 'Top 10 podle výkonu 1Y' s aktuálními daty."
+  },
+  {
+    question: "Jsou data o ETF na této stránce aktuální?",
+    answer: "Ano, všechna data (TER, velikost fondů, výnosy) se načítají živě z naší databáze a jsou aktualizována denně. Žebříčky TOP 10 ukazují nejčerstvější informace."
+  }
+];
+---
+
+<Layout
+  title={`Nejlepší světové ETF 2026 - IWDA vs XMWO vs VWCE`}
+  description={`Srovnání nejlepších světových ETF 2026. IWDA, XMWO, VWCE - MSCI World vs FTSE All-World, poplatky TER, výnosy. Aktuální data k ${currentDate}.`}
+  canonical="/nejlepsi-etf/nejlepsi-celosvetove-etf"
+>
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-blue-50 to-indigo-50 overflow-hidden">
+    <!-- Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50"></div>
+
+    <!-- Animated blobs -->
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <!-- Left Column - Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-blue-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              světové ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a
+              href="/o-nas"
+              class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+            >
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>
+              Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších světových ETF fondů. MSCI World vs FTSE All-World analýza, poplatky, výnosy a praktické tipy pro globální diverzifikaci.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-xl">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-blue-300 text-blue-700 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+              Srovnání všech
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column - Stats Box -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/60 to-blue-50/60 backdrop-blur-sm rounded-3xl shadow-2xl"></div>
+
+          <div class="relative bg-gradient-to-br from-white/80 to-blue-50/60 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+            <!-- Header -->
+            <div class="text-center mb-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">🌍 Světové ETF Stats</h3>
+              <p class="text-gray-600">Klíčové informace o globálních indexech</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-6 mb-6">
+              <div class="text-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <div class="text-3xl font-bold text-blue-600 mb-1">23</div>
+                <div class="text-sm text-gray-600">Vyspělých zemí</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+                <div class="text-3xl font-bold text-indigo-600 mb-1">~10%</div>
+                <div class="text-sm text-gray-600">Ročně za 30 let</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+                <div class="text-3xl font-bold text-purple-600 mb-1">1600+</div>
+                <div class="text-sm text-gray-600">Akcií (MSCI World)</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-pink-50 to-blue-50 rounded-xl border border-pink-200">
+                <div class="text-3xl font-bold text-pink-600 mb-1">60%</div>
+                <div class="text-sm text-gray-600">USA podíl</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center pt-6 border-t border-blue-200/50">
+              <p class="text-sm text-gray-600 mb-3">Maximální diverzifikace</p>
+              <a href="#pruvodce" class="inline-flex items-center justify-center border border-blue-200 text-blue-600 hover:bg-blue-50 px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+                Průvodce výběrem
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Co jsou světové ETF?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          Světové ETF sledují globální akciové indexy pokrývající tisíce společností napříč vyspělými trhy.
+          Poskytují maximální diverzifikaci v jednom fondu.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Globální diverzifikace
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Světové ETF pokrývají 23 vyspělých zemí včetně USA, Evropy, Japonska, Kanady a Austrálie pro maximální rozložení rizika.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Dva hlavní indexy
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            MSCI World (1600+ akcií, pouze vyspělé trhy) vs FTSE All-World (3900+ akcií, včetně emerging markets).
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Historicky 10% ročně
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Světové akcie dosáhly průměrného ročního výnosu ~10% za posledních 30 let při rozumné volatilitě.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          🏆 Top 3 nejlepší světové ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy všech dostupných světových ETF
+        </p>
+      </div>
+
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections - by TER, AUM, Performance -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="celosvětové" />
+
+  <!-- Selection Guide -->
+  <section id="pruvodce" class="py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mb-6">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          💡 Jak vybrat ten správný světový ETF?
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 border border-blue-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+            1
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            MSCI World vs FTSE All-World
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            MSCI World = pouze vyspělé trhy (1600 akcií). FTSE All-World = vyspělé + emerging markets (3900 akcií). Začátečníci volí MSCI World, pokročilí FTSE All-World.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-50 border border-indigo-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+            2
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Sledujte TER a velikost
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            Ideální TER je 0,12-0,22%. Velikost fondu min. 1 mld. EUR pro dobrou likviditu. Xtrackers MSCI World má nejnižší TER 0,12%.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-50 border border-purple-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+            3
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Accumulating vs Distributing
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            ACC = reinvestuje dividendy automaticky. DIST = vyplácí dividendy. Pro dlouhodobé spoření volte ACC, pro pravidelný příjem DIST.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-pink-50 to-pink-50 border border-pink-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-pink-400 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+            4
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Provider a tracking error
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            iShares, Vanguard, Xtrackers jsou top provideři. Sledujte tracking difference - odchylku výnosu ETF od indexu. Ideálně pod 0,2% ročně.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          ❓ Často kladené otázky
+        </h2>
+      </div>
+
+      <div class="space-y-8">
+        {faqItems.map((faq) => (
+          <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">{faq.question}</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-blue-600 to-indigo-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+        Připraveni investovat do světových ETF?
+      </h2>
+      <p class="text-xl text-blue-100 mb-8 leading-relaxed">
+        Vyberte si brokera a začněte budovat své globální portfolio ještě dnes
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold rounded-xl transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          Najít brokera pro ETF
+        </a>
+
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold rounded-xl transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <InternalLinking
+    links={relatedLinks}
+    class="bg-blue-50"
+  />
+</Layout>

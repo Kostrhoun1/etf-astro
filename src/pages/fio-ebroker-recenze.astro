@@ -1,0 +1,449 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+import BrokerRatingGrid from '../components/broker/BrokerRatingGrid';
+
+const currentYear = new Date().getFullYear();
+
+const reviewSchema = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  "itemReviewed": {
+    "@type": "FinancialService",
+    "name": "Fio e-Broker",
+    "description": "Český online broker pro obchodování s ETF, akciemi a dluhopisy",
+    "url": "https://www.fio.cz/e-broker",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "V Celnici 1028/10",
+      "addressLocality": "Praha",
+      "postalCode": "117 21",
+      "addressCountry": "CZ"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "75",
+      "bestRating": "100",
+      "worstRating": "0",
+      "reviewCount": "1"
+    }
+  },
+  "reviewRating": {
+    "@type": "Rating",
+    "ratingValue": "75",
+    "bestRating": "100",
+    "worstRating": "0"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "datePublished": "2026-09-26",
+  "dateModified": "2026-09-26",
+  "reviewBody": "Fio e-Broker získává hodnocení 75/100 bodů jako český broker s výhodou domácí regulace ČNB a podpory v češtině. Nabízí základní investiční instrumenty s rozumnými poplatky, ale omezenou nabídkou ETF fondů."
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kde koupit ETF",
+      "item": "https://www.etfpruvodce.cz/kde-koupit-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": `Fio e-Broker recenze ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/fio-ebroker-recenze"
+    }
+  ]
+};
+
+const pros = [
+  "Český broker s domácí regulací (ČNB)",
+  "Podpora v českém jazyce",
+  "Rozumné poplatky na českém trhu",
+  "Dostupnost českých dluhopisů",
+  "Správné zdanění CZ dividend (15%)",
+  "Konverze měn zdarma",
+  "Jednoduché daňové přiznání",
+  "Tradiční bankovní instituce"
+];
+
+const cons = [
+  "Omezená nabídka ETF fondů",
+  "Starší obchodní platforma",
+  "Vysoké poplatky za zahraniční akcie",
+  "Žádný přístup k USA trhům",
+  "Omezené analytické nástroje",
+  "Poplatky za správu účtu",
+  "Nižší likvidita na českém trhu"
+];
+
+const categories = [
+  { name: 'Poplatky', score: 60, description: 'Vyšší než zahraniční konkurence' },
+  { name: 'Platforma', score: 70, description: 'Starší design, ale funkční' },
+  { name: 'Nabídka', score: 65, description: 'Omezené ETF, pouze EU trhy' },
+  { name: 'Podpora', score: 85, description: 'Česká podpora, bankovní zázemí' },
+  { name: 'Důvěryhodnost', score: 90, description: 'ČNB regulace, tradiční banka' },
+  { name: 'Vzdělání', score: 55, description: 'Základní materiály a návody' }
+];
+
+const relatedLinks = [
+  { title: "Kde koupit ETF - přehled brokerů", href: "/kde-koupit-etf#porovnani", description: "Zpět na kompletní přehled a srovnání všech brokerů" },
+  { title: "DEGIRO recenze", href: "/degiro-recenze", description: "Lepší volba pro ETF investice" },
+  { title: "XTB recenze", href: "/xtb-recenze", description: "Další vhodná alternativa pro ETF" },
+  { title: "Srovnání ETF fondů", href: "/srovnani-etf", description: "Najděte nejlepší ETF pro investice" },
+  { title: "Hypoteční kalkulačka", href: "/kalkulacky/hypotecni-kalkulacka", description: "Spočítejte si splátky hypotéky" },
+  { title: "Čistý plat 2026", href: "/kalkulacky/cisty-plat-2026", description: "Výpočet čisté mzdy" }
+];
+---
+
+<Layout
+  title={`Fio e-Broker recenze ${currentYear} - Test českého brokera`}
+  description={`Fio e-Broker recenze ${currentYear} - hodnocení 75/100. Český broker s lokální podporou a optimálním zdaněním českých dividend (15%).`}
+  canonical="/fio-ebroker-recenze"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Hero sekce -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Fio e-Broker recenze {currentYear}
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+        Komplexní hodnocení českého brokera Fio e-Broker. Výhody domácí regulace
+        a podpory, ale omezená nabídka ETF. Vhodný pro konzervativní české investory.
+      </p>
+    </div>
+
+    <!-- Detailed Rating -->
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+      <h2 class="text-center text-2xl font-bold text-gray-900 mb-2">Detailní hodnocení</h2>
+      <p class="text-center text-gray-600 mb-6">
+        Náš verdikt založený na důkladné analýze všech aspektů brokera
+      </p>
+      <BrokerRatingGrid
+        client:load
+        overallRating={75}
+        overallDescription="Komplexní hodnocení brokera"
+        categories={categories}
+      />
+    </div>
+
+    <!-- Rychlý přehled -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-green-600 mb-4 flex items-center gap-2">
+          <span class="text-green-600">✓</span>
+          Výhody Fio e-Broker
+        </h3>
+        <ul class="space-y-2">
+          {pros.map((pro) => (
+            <li class="flex items-center gap-2">
+              <span class="text-green-600 flex-shrink-0">✓</span>
+              <span class="text-sm">{pro}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">
+          <span class="text-red-500">✕</span>
+          Nevýhody Fio e-Broker
+        </h3>
+        <ul class="space-y-2">
+          {cons.map((con) => (
+            <li class="flex items-center gap-2">
+              <span class="text-red-500 flex-shrink-0">✕</span>
+              <span class="text-sm">{con}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Klíčové informace -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">👥</span>
+        Klíčové informace o Fio e-Broker
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2">Založení a regulace</h4>
+            <p class="text-sm text-gray-600">
+              Fio banka založena v roce 1993. Regulace Českou národní bankou (ČNB),
+              pojištění vkladů do 100 000 EUR.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-2">Pozice na trhu</h4>
+            <p class="text-sm text-gray-600">
+              Jedna z největších českých bank. Významný hráč na českém
+              retailovém bankovním trhu.
+            </p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2">Nabídka instrumentů</h4>
+            <p class="text-sm text-gray-600">
+              Omezená nabídka ETF, české akcie (BCPP), evropské akcie,
+              dluhopisy. Žádný přístup k USA trhům.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-2">Ochrana klientů</h4>
+            <p class="text-sm text-gray-600">
+              Pojištění vkladů do 100 000 EUR přes Fond pojištění vkladů.
+              Regulace ČNB.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poplatky -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        <span class="text-orange-600">📈</span>
+        Struktura poplatků
+      </h2>
+      <p class="text-gray-600 mb-6">Poplatky jsou vyšší než u zahraničních brokerů</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-2 font-semibold">Typ transakce</th>
+              <th class="text-left py-2 font-semibold">Poplatek</th>
+              <th class="text-left py-2 font-semibold">Poznámka</th>
+            </tr>
+          </thead>
+          <tbody class="space-y-2">
+            <tr class="border-b">
+              <td class="py-2">České akcie/ETF (BCPP)</td>
+              <td class="py-2">0.35%</td>
+              <td class="py-2 text-gray-600">Min. 40 Kč (RM-S EasyClick 0.29%)</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Evropské akcie/ETF</td>
+              <td class="py-2">
+                <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">0.79%</span>
+              </td>
+              <td class="py-2 text-gray-600">Min. 7,95 EUR</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Zahraniční akcie</td>
+              <td class="py-2">0.6%</td>
+              <td class="py-2 text-gray-600">Min. 10 EUR, max. 260 EUR</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Správa účtu</td>
+              <td class="py-2">79 CZK/měsíc</td>
+              <td class="py-2 text-gray-600">Při obratu pod 25 000 CZK</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Měnová konverze</td>
+              <td class="py-2">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Zdarma</span>
+              </td>
+              <td class="py-2 text-gray-600">Kurz deviza střed Fio banky</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Nabídka ETF -->
+    <div class="bg-red-50 border border-red-200 rounded-xl p-8 mb-8">
+      <h2 class="text-2xl font-bold text-red-700 mb-6 flex items-center gap-2">
+        <span>✕</span>
+        Omezená nabídka ETF
+      </h2>
+      <p class="text-gray-600 mb-4">Hlavní nevýhoda pro ETF investory</p>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3">Dostupné trhy</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Burza cenných papírů Praha (BCPP)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Některé evropské burzy (omezené)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-red-500">✕</span>
+              Žádný přístup k USA trhům
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-red-500">✕</span>
+              Velmi omezená nabídka ETF
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">Doporučení</h4>
+          <p class="text-sm text-gray-600 mb-3">
+            Pro diverzifikované ETF portfolio doporučujeme kombinaci:
+          </p>
+          <ul class="space-y-2 text-sm">
+            <li>• <strong>DEGIRO nebo XTB</strong> - pro ETF investice</li>
+            <li>• <strong>Fio e-Broker</strong> - pro české akcie a dluhopisy</li>
+            <li>• Rozdělení podle typu instrumentů</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platforma -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">🛡</span>
+        Obchodní platforma
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3">Vlastní e-Broker platforma</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Plně v českém jazyce
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Jednoduché ovládání
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Základní analýzy a grafy
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-amber-600">⚠</span>
+              Starší design a funkcionalita
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">Mobilní aplikace</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              iOS a Android aplikace
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Základní obchodní funkce
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-amber-600">⚠</span>
+              Omezené pokročilé funkce
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-amber-600">⚠</span>
+              Starší uživatelský zážitek
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pro koho je vhodný -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Pro koho je Fio e-Broker vhodný?</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3 text-green-600">✅ Vhodné pro</h4>
+          <ul class="space-y-2 text-sm">
+            <li>• Investory preferující český broker</li>
+            <li>• Ty, kdo chtějí českou podporu a jazyk</li>
+            <li>• Konzervativní investory (české akcie, dluhopisy)</li>
+            <li>• Investory s jednoduchou daňovou situací</li>
+            <li>• Ty, kdo obchodují českou korunu</li>
+            <li>• Klienty Fio banky (integrace služeb)</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3 text-red-600">❌ Nevhodné pro</h4>
+          <ul class="space-y-2 text-sm">
+            <li>• ETF investory hledající diverzifikaci</li>
+            <li>• Ty, kdo chtějí přístup k USA trhům</li>
+            <li>• Investory hledající nízké poplatky</li>
+            <li>• Pokročilé tradery</li>
+            <li>• Ty, kdo preferují moderní platformy</li>
+            <li>• Aktivní obchodníky</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upozornění o omezenosti -->
+    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-8 mb-8">
+      <h2 class="text-xl font-bold text-amber-700 mb-4 flex items-center gap-2">
+        <span>⚠</span>
+        Omezená nabídka pro ETF investory
+      </h2>
+      <p class="text-amber-800">
+        Fio e-Broker má velmi omezenou nabídku ETF fondů a neumožňuje přístup
+        k USA trhům. Pro diverzifikované ETF investice doporučujeme zahraniční brokery
+        jako DEGIRO nebo XTB.
+      </p>
+    </div>
+
+    <!-- Závěr -->
+    <div class="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Závěrečné hodnocení</h2>
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 bg-sky-100 text-sky-800 px-6 py-3 rounded-full text-lg font-semibold">
+          <span>🏆</span>
+          75/100 bodů - DOBRÁ
+        </div>
+      </div>
+
+      <p class="text-gray-700 leading-relaxed mb-4 max-w-4xl mx-auto">
+        Fio e-Broker je solidní český broker s výhodou domácí regulace a podpory v češtině.
+        Je vhodný pro konzervativní investory zaměřené na český trh, ale jeho hlavní nevýhodou
+        je velmi omezená nabídka ETF fondů.
+      </p>
+      <p class="text-gray-700 leading-relaxed mb-6 max-w-4xl mx-auto">
+        Pro ETF investory doporučujeme kombinovat Fio e-Broker (české akcie, dluhopisy)
+        se zahraničním brokerem jako DEGIRO či XTB (pro ETF a zahraniční akcie).
+        Toto řešení poskytne nejlepší kombinaci přístupu k trhům a domácí podpory.
+      </p>
+
+      <div class="text-center">
+        <a
+          href="https://www.fio.cz/e-broker"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Otevřít účet u Fio
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

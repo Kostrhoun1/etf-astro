@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import FeeCalculatorContent from '../../components/tools/FeeCalculatorContent';
+---
+
+<Layout
+  title="Kalkulačka poplatků ETF - TER a celkové náklady"
+  description="Kalkulačka poplatků ETF - analyzujte dopad TER a dalších poplatků na dlouhodobé výnosy. Porovnání nákladů různých ETF fondů."
+  canonical="/kalkulacky/kalkulacka-poplatku-etf"
+  keywords="poplatky ETF, TER, celkové náklady, nákladovost ETF, expense ratio, porovnání poplatků, dlouhodobé investování"
+  ogImage="/og-kalkulacka-poplatku-etf.jpg"
+  ogTitle="Kalkulačka poplatků ETF - TER a celkové náklady | ETF průvodce"
+  ogDescription="Kalkulačka poplatků ETF - analyzujte dopad TER a dalších poplatků na dlouhodobé výnosy."
+>
+  <FeeCalculatorContent client:load />
+</Layout>

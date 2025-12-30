@@ -1,0 +1,419 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ETFTable from '../../components/ETFTable.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-cinske-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší čínské ETF 2026 - MSCI China vs CSI 300`,
+  "description": `Srovnání nejlepších čínských ETF 2026. MSCI China, CSI 300, A-akcie - poplatky TER, výnosy, velikost fondů.`,
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  }
+};
+
+// FAQ structured data for better search snippets
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší čínské ETF v roce ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší čínské ETF jsou: iShares MSCI China UCITS ETF (IE00BJ5JPG56) s TER 0,28% a velikostí 3,5 mld EUR, Franklin FTSE China UCITS ETF (IE00BHZRR147) s TER 0,19% a velikostí 1,8 mld EUR, a iShares MSCI China A UCITS ETF (IE00BQT3WG13) s TER 0,40% a velikostí 1,9 mld EUR."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi MSCI China a CSI 300?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MSCI China zahrnuje čínské společnosti obchodované v Hong Kongu (H-akcie, red chips, P-chips) a pokrývá offshore čínský trh. CSI 300 sleduje 300 největších čínských společností obchodovaných přímo na burzách v Šanghaji a Shenzhenu (A-akcie) a poskytuje expozici k onshore čínskému trhu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč investovat do čínských ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Čínské ETF nabízejí expozici k druhé největší ekonomice světa s rychlým růstem a inovativními technologickými společnostmi. Čína má obrovský domácí trh, silnou digitální ekonomiku a zajímavé valuace. ETF poskytují diverzifikovaný přístup k čínskému trhu s rozumnými poplatky."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou náklady na čínské ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER čínských ETF se pohybuje od 0,19% do 0,65% ročně. Nejnižší TER má Franklin FTSE China ETF (IE00BHZRR147) s 0,19%, iShares MSCI China (IE00BJ5JPG56) má TER 0,28% a iShares China A (IE00BQT3WG13) má TER 0,40%. Kromě TER počítejte s transakčními poplatky u brokera."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaká jsou rizika čínských ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Rizika čínských ETF zahrnují politickou volatilitu, měnové riziko CNY/USD, regulační změny čínské vlády, geopolitické napětí USA-Čína a nižší likviditu než u vyspělých trhů. Doporučuje se čínské ETF jako menší část portfolia (5-10%) pro diverzifikaci."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit čínské ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Čínské ETF můžete koupit u všech hlavních brokerů: Degiro (iShares MSCI China IE00BJ5JPG56 zdarma), XTB, Interactive Brokers, Trading 212. Naše TOP 3 doporučené ETF - iShares MSCI China, Franklin FTSE China a iShares China A - jsou dostupné na všech platformách."
+      }
+    }
+  ]
+};
+
+// Breadcrumb structured data
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší čínské ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-cinske-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší S&P 500 ETF", href: "/nejlepsi-etf/nejlepsi-sp500-etf", description: "Kompletní průvodce americkými S&P 500 ETF", icon: "🇺🇸" },
+  { title: "Nejlepší japonské ETF", href: "/nejlepsi-etf/nejlepsi-japonske-etf", description: "Srovnání nejlepších japonských ETF fondů", icon: "🇯🇵" },
+  { title: "Srovnání ETF", href: "/srovnani-etf", description: "Porovnejte si ETF podle různých kritérií", icon: "📊" }
+];
+---
+
+<Layout
+  title={`Nejlepší čínské ETF 2026 - MSCI China vs CSI 300`}
+  description={`✅ Srovnání nejlepších čínských ETF 2026. MSCI China, CSI 300, A-akcie - poplatky TER, výnosy, velikost fondů. Aktuální data k ${currentDate}.`}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-yellow-50/50 via-red-50/30 to-yellow-50/50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-yellow-100 to-red-100 text-red-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-red-200/50">
+            🇨🇳 Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší <span class="bg-gradient-to-r from-yellow-600 via-red-600 to-yellow-600 bg-clip-text text-transparent">čínské ETF</span>
+          </h1>
+
+          <!-- Author byline -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">Tomáš Kostrhoun</a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších čínských ETF fondů dostupných pro evropské investory.
+            Analýza MSCI China vs CSI 300 a praktické tipy pro výběr.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-700 hover:to-red-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md">
+              📊 Srovnání ETF
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Market Stats -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-xl mb-3">
+                📈
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">
+                Čínský trh v číslech
+              </h3>
+              <p class="text-sm text-gray-600">Klíčová fakta o čínských investicích</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-yellow-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xs text-gray-500 font-medium">🏢 EKONOMIKA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">2.</div>
+                <div class="text-xs text-gray-600">největší na světě</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-red-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xs text-gray-500 font-medium">📊 HDP</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">17,7B</div>
+                <div class="text-xs text-gray-600">USD ročně</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-yellow-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xs text-gray-500 font-medium">🌐 MSCI CHINA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">700+</div>
+                <div class="text-xs text-gray-600">čínských firem</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-red-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-xs text-gray-500 font-medium">🛡️ DIVERZIFIKACE</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">{etfs.length}+</div>
+                <div class="text-xs text-gray-600">ETF k dispozici</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-yellow-100 w-20 h-20 mx-auto mb-8 hover:bg-yellow-200 transition-colors">
+          🏢
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co je čínský akciový trh?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Druhá největší ekonomika světa s obrovským domácím trhem a rychle rostoucími technologickými společnostmi
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-red-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform text-2xl">
+            🏢
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            Druhá největší ekonomika
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Čína je druhá největší ekonomika světa s HDP přes 17,7 bilionu USD a rychlým růstem domácího trhu.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-yellow-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform text-2xl">
+            ⚡
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            Digitální revoluce
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Čínské společnosti vedou v e-commerce, fintech, AI a elektromobilitě s obrovským domácím trhem.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-orange-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform text-2xl">
+            🏆
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-red-800 transition-colors">
+            Globální lídři
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Domov Alibaba, Tencent, BYD, CATL a dalších světově uznávaných technologických gigantů.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 ETF v této kategorii
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="čínské" />
+
+  <!-- ETF Table Section -->
+  <section id="srovnani" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ETFTable etfs={etfs} title={`TOP ${config.title}`} />
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          ❓ Nejčastější otázky
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          Odpovědi na časté dotazy ohledně čínských ETF
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group border border-gray-200 rounded-lg hover:border-yellow-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-yellow-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-yellow-800">Jaké jsou nejlepší čínské ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-yellow-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší čínské ETF jsou: <strong>iShares MSCI China UCITS ETF</strong> (IE00BJ5JPG56)
+            s TER 0,28% a velikostí 3,5 mld EUR, <strong>Franklin FTSE China UCITS ETF</strong> (IE00BHZRR147)
+            s TER 0,19% a velikostí 1,8 mld EUR, a <strong>iShares MSCI China A UCITS ETF</strong>
+            (IE00BQT3WG13) s TER 0,40% a velikostí 1,9 mld EUR.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-yellow-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-yellow-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-yellow-800">Jaký je rozdíl mezi MSCI China a CSI 300?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-yellow-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>MSCI China</strong> zahrnuje čínské společnosti obchodované v Hong Kongu (H-akcie, red chips, P-chips)
+            a pokrývá offshore čínský trh. <strong>CSI 300</strong> sleduje 300 největších čínských společností
+            obchodovaných přímo na burzách v Šanghaji a Shenzhenu (A-akcie) a poskytuje expozici k onshore čínskému trhu.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-yellow-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-yellow-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-yellow-800">Proč investovat do čínských ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-yellow-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Čínské ETF nabízejí expozici k <strong>druhé největší ekonomice světa</strong> s rychlým růstem
+            a inovativními technologickými společnostmi. Čína má obrovský domácí trh, silnou digitální ekonomiku
+            a zajímavé valuace. ETF poskytují diverzifikovaný přístup k čínskému trhu s rozumnými poplatky.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-yellow-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-yellow-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-yellow-800">Jaké jsou náklady na čínské ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-yellow-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>TER čínských ETF</strong> se pohybuje od 0,19% do 0,65% ročně. Nejnižší TER má
+            <strong>Franklin FTSE China ETF</strong> (IE00BHZRR147) s 0,19%, <strong>iShares MSCI China</strong>
+            (IE00BJ5JPG56) má TER 0,28% a <strong>iShares China A</strong> (IE00BQT3WG13) má TER 0,40%.
+            Kromě TER počítejte s transakčními poplatky u brokera.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-yellow-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-yellow-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-yellow-800">Jaká jsou rizika čínských ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-yellow-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Rizika čínských ETF</strong> zahrnují politickou volatilitu, měnové riziko CNY/USD,
+            regulační změny čínské vlády, geopolitické napětí USA-Čína a nižší likviditu než u vyspělých trhů.
+            Doporučuje se čínské ETF jako menší část portfolia (5-10%) pro diverzifikaci.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-yellow-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-yellow-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-yellow-800">Kde koupit čínské ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-yellow-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Čínské ETF můžete koupit u všech hlavních brokerů: <strong>Degiro</strong> (iShares MSCI China
+            IE00BJ5JPG56 zdarma), <strong>XTB</strong>, <strong>Interactive Brokers</strong>, <strong>Trading 212</strong>.
+            Naše TOP 3 doporučené ETF - iShares MSCI China, Franklin FTSE China a iShares China A -
+            jsou dostupné na všech platformách.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="📚 Související články" />
+  </div>
+</Layout>

@@ -1,0 +1,436 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import InternalLinking from '../../components/InternalLinking.astro';
+import DividendPortfolioPerformanceWrapper from '../../components/portfolio/DividendPortfolioPerformanceWrapper';
+import { getETFLink } from '../../data/etf-mappings';
+
+const portfolioSchema = {
+  "@context": "https://schema.org",
+  "@type": "FinancialProduct",
+  "name": "Dividendové Portfolio",
+  "description": "Kompletní průvodce dividendovým portfoliem s Dividend Aristocrats. 95% dividendové akcie + 5% REITs s očekávaným dividendovým výnosem 4% ročně.",
+  "category": "Investment Strategy",
+  "provider": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "url": "https://www.etfpruvodce.cz"
+  },
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Conservative Investors"
+  },
+  "feesAndCommissionsSpecification": "TER 0.20-0.50% ročně",
+  "interestRate": "4% dividendový výnos + růst kurzu"
+};
+
+const faqItems = [
+  {
+    question: "Jak fungují Dividend Aristocrats a proč jsou výjimeční?",
+    answer: "Dividend Aristocrats jsou společnosti, které zvyšovaly dividendy nejméně 25 let v řadě. To dokazuje jejich schopnost generovat stabilní zisky i během ekonomických krizí. Pouze nejkvalitnější společnosti s konzervativním managementem a silnou tržní pozicí dokážou tento rekord udržet."
+  },
+  {
+    question: "Jaký je skutečný dividendový výnos tohoto portfolia?",
+    answer: "ZPRG má aktuální dividendový výnos kolem 2-2.5%, REITs kolem 3-4%. Vážený průměr portfolia je cca 2.3%. Ale klíčové je, že tyto dividendy každoročně rostou! Historicky Dividend Aristocrats zvyšovali dividendy o 6-8% ročně, takže výnos se postupně zvyšuje."
+  },
+  {
+    question: "Jak se dividendové portfolio chová během krizí?",
+    answer: "Dividend Aristocrats jsou obecně defenzivnější než celkový trh. Během krize 2008 klesli méně než S&P 500 a rychleji se zotavili. Navíc většina z nich pokračovala ve zvyšování dividend i během krize. Jsou to 'blue chip' společnosti s stabilními obchodními modely."
+  },
+  {
+    question: "Proč pouze 5% REITs a ne více?",
+    answer: "REITs mají vysoký dividendový výnos (3-5%), ale jsou volatilnější a citlivější na úrokové sazby. 5% zajišťuje diverzifikaci a dodatečný příjem, aniž by zvýšilo riziko portfolia. Pokud chcete vyšší dividendový výnos, můžete zvýšit podíl REITs na 10-15%."
+  },
+  {
+    question: "Jak se vypořádat s daněmi z dividend v České republice?",
+    answer: "Dividendy z ETF podléhají 15% srážkové dani (díky smlouvě o zamezení dvojího zdanění s Irskem). Daň se strhává automaticky u brokera. Dividendy také musíte uvést v daňovém přiznání jako příjem z kapitálového majetku. Zvažte držení v DIP pro daňové výhody."
+  },
+  {
+    question: "Je toto portfolio vhodné pro mladé investory?",
+    answer: "Pro mladé investory (20-35 let) je obvykle lepší růstová strategie s vyšším podílem technologických akcií. Dividendové portfolio je ideální pro investory 40+, kteří chtějí kombinovat růst s příjmem, nebo pro kohokoli, kdo preferuje pravidelný cash flow z investic."
+  },
+  {
+    question: "Mohu reinvestovat dividendy automaticky?",
+    answer: "Závisí na brokerovi. Někteří brokeři nabízejí automatickou reinvestici dividend (DRIP). Pokud ne, můžete dividendy reinvestovat manuálně čtvrtletně. Reinvestice dividend je klíčová pro dosažení kompoundingového efektu dlouhodobého růstu."
+  },
+  {
+    question: "Jak toto portfolio srovnat s klasickým 60/40?",
+    answer: "Dividendové portfolio má podobnou volatilitu jako 60/40, ale poskytuje vyšší current yield (aktuální výnos). Má také lepší ochranu proti inflaci díky růstu dividend. Na druhou stranu může zaostávat za 60/40 během bull marketu růstových akcií."
+  }
+];
+
+const relatedLinks = [
+  {
+    title: "Backtest portfolia",
+    href: "/kalkulacky/backtest-portfolia",
+    description: "Otestujte historickou výkonnost Dividendového Portfolia"
+  },
+  {
+    title: "Monte Carlo simulátor",
+    href: "/kalkulacky/monte-carlo-simulator",
+    description: "Prognóza budoucnosti s tisíci scénářů"
+  },
+  {
+    title: "Portfolio strategie přehled",
+    href: "/portfolio-strategie",
+    description: "Porovnejte všech 5 investičních strategií"
+  },
+  {
+    title: "Nobel Portfolio",
+    href: "/portfolio-strategie/nobel-portfolio",
+    description: "Vyvážené portfolio s 6% očekávaným výnosem"
+  },
+  {
+    title: "Akciové Portfolio",
+    href: "/portfolio-strategie/akciove-portfolio",
+    description: "Agresivní růstová strategie s 7-8% výnosem"
+  }
+];
+---
+
+<Layout
+  title="Dividendové Portfolio 2026 | 4% dividendy + růst"
+  description="Kompletní průvodce dividendovým portfoliem s Dividend Aristocrats. Očekávaný dividendový výnos 4% ročně + růst kurzu. Zaměření na kvalitní společnosti s dlouholetou tradicí růstu dividend."
+  canonical="/portfolio-strategie/dividendove-portfolio"
+  keywords="dividendové portfolio, Dividend Aristocrats, pasivní příjem, dividendové akcie, ETF dividendy, ZPRG, REITs, růst dividend"
+  ogImage="/og-dividendove-portfolio.jpg"
+  ogTitle="Dividendové Portfolio 2026 | 4% dividendy + růst"
+  ogDescription="Kompletní průvodce dividendovým portfoliem s Dividend Aristocrats. Očekávaný dividendový výnos 4% ročně + růst kurzu. Kvalitní společnosti s tradicí růstu dividend."
+>
+  <div class="bg-white">
+    <!-- Modern Hero Section -->
+    <section class="relative py-16 md:py-24 bg-gradient-to-br from-violet-50 to-white overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-violet-50/50 via-purple-50/30 to-violet-50/50"></div>
+      <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-violet-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+      <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-purple-200 to-violet-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-violet-300 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+          <!-- Left Content -->
+          <div class="space-y-8">
+            <div class="inline-flex items-center bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-violet-200/50">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Dividendové Portfolio
+            </div>
+
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+              Dividendové{' '}
+              <span class="bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 bg-clip-text text-transparent">
+                Portfolio
+              </span>
+            </h1>
+
+            <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+              Zaměření na kvalitní společnosti s dlouholetou tradicí růstu dividend. <strong>4% ročních dividend</strong> + růst kurzu pro pasivní příjem.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4">
+              <a
+                href="#allocation"
+                class="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2 h-12"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Zobrazit složení
+              </a>
+              <a
+                href="#vykonnost"
+                class="bg-white/80 backdrop-blur-sm border-2 border-violet-300 text-violet-700 hover:bg-violet-50 px-8 py-3 text-lg font-semibold rounded-lg transition-all hover:shadow-lg flex items-center justify-center gap-2 h-12"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Aktuální výnos
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Content - Visual Element -->
+          <div class="relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-violet-400/20 to-purple-400/20 rounded-3xl transform rotate-3"></div>
+            <div class="relative bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-violet-200/50 shadow-xl">
+              <h3 class="text-2xl font-bold text-gray-900 mb-6">Klíčové údaje</h3>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Dividendový výnos</span>
+                  <span class="text-2xl font-bold text-violet-600">4%</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Složení</span>
+                  <span class="font-semibold text-gray-900">95/5</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Riziko</span>
+                  <span class="font-semibold text-violet-600">Umírněné</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Rebalancing</span>
+                  <span class="font-semibold text-gray-900">Ročně</span>
+                </div>
+              </div>
+              <div class="mt-6 p-4 bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg border border-violet-200">
+                <p class="text-sm font-semibold text-violet-800">
+                  💰 Pro milovníky pasivního příjmu
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(portfolioSchema)} />
+
+    <div class="max-w-6xl mx-auto px-4 py-12">
+
+      <!-- Portfolio Slozeni -->
+      <div id="allocation">
+        <Card className="mb-12">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              Složení Dividendového Portfolia
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold">Dividendové akcie (Dividend Aristocrats)</span>
+                  <span class="text-lg font-bold">95%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                  <div class="bg-violet-600 h-3 rounded-full" style="width: 95%"></div>
+                </div>
+                <p class="text-sm text-gray-600"><a href={getETFLink('ZPRG')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">ZPRG</a> - SPDR S&P Global Dividend Aristocrats UCITS ETF</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold">Nemovitostní investice (REITs)</span>
+                  <span class="text-lg font-bold">5%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                  <div class="bg-orange-600 h-3 rounded-full" style="width: 5%"></div>
+                </div>
+                <p class="text-sm text-gray-600"><a href={getETFLink('IWDP')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">IWDP</a> - iShares Developed Markets Property Yield UCITS ETF</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Realna vykonnost -->
+      <div id="performance">
+        <DividendPortfolioPerformanceWrapper client:load />
+      </div>
+
+      <!-- Co jsou Dividend Aristocrats -->
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+              Co jsou Dividend Aristocrats?
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div class="bg-violet-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">👑 Kritéria výběru</h4>
+              <p class="text-sm">Společnosti, které zvyšovaly dividendy nejméně 25 let v řadě</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">💪 Kvalita a stabilita</h4>
+              <p class="text-sm">Pouze nejkvalitnější společnosti s dlouhodobě rostoucími zisky</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">🌍 Globální diverzifikace</h4>
+              <p class="text-sm">Akcie z vyspělých trhů po celém světě</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">📊 Pravidelný růst</h4>
+              <p class="text-sm">Konzistentní růst dividend i v krizových obdobích</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Výhody strategie
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Pravidelný pasivní příjem z dividend</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Dlouhodobý růst hodnoty dividend</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Investice do nejkvalitnějších společností</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Částečná ochrana proti inflaci</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Jednoduchá implementace s 2 ETF</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Vhodné pro konzervativní investory</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Implementace -->
+      <Card className="mb-12">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3">
+            <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Jak investovat do Dividendového Portfolia
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 class="font-semibold mb-4">📋 Doporučené UCITS ETF</h4>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span>Dividend Aristocrats (95%):</span>
+                  <span class="font-semibold"><a href={getETFLink('ZPRG')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">ZPRG</a></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>REITs (5%):</span>
+                  <span class="font-semibold"><a href={getETFLink('IWDP')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">IWDP</a></span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-semibold mb-4">⚖️ Rebalancing strategie</h4>
+              <div class="space-y-2 text-sm">
+                <div>&#8226; <strong>Kdy:</strong> Jednou ročně nebo při odchylce 5%+</div>
+                <div>&#8226; <strong>Jak:</strong> Prodej převážené, nákup podvážené části</div>
+                <div>&#8226; <strong>Tip:</strong> Využijte nové investice k rebalancingu</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 bg-violet-50 p-4 rounded-lg">
+            <h4 class="font-semibold mb-2">💡 Tip pro začátečníky</h4>
+            <p class="text-sm text-violet-800">
+              Začněte pouze s <a href={getETFLink('ZPRG')} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">ZPRG</a> (100%).
+              REITs přidejte později, když získáte zkušenosti s dividendovým investováním.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Varovani a rizika -->
+      <Card className="mb-12 border-amber-200 bg-amber-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-amber-800">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Důležitá upozornění
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-amber-800">
+          <ul class="space-y-2 text-sm">
+            <li>&#8226; <strong>Daně z dividend:</strong> V ČR podléhají dani z příjmu (15% srážková daň)</li>
+            <li>&#8226; <strong>Měnové riziko:</strong> ETF je denominován v USD, kurz může ovlivnit výnosy</li>
+            <li>&#8226; <strong>Koncentrace:</strong> Zaměření hlavně na velké stabilní společnosti</li>
+            <li>&#8226; <strong>Nižší růst:</strong> Dividend aristocrats rostou pomaleji než technologické akcie</li>
+            <li>&#8226; <strong>Sektorové riziko:</strong> Převaha tradičních sektorů (utilities, spotřeba)</li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      <!-- FAQ sekce -->
+      <Card className="mb-12">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3">
+            <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            Časté otázky o Dividendovém Portfoliu
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="space-y-4">
+            {faqItems.map((faq, index) => (
+              <details class="group border border-gray-200 rounded-xl hover:border-violet-300 transition-all duration-300 bg-white hover:shadow-lg">
+                <summary class="flex justify-between items-center w-full px-8 py-6 text-left cursor-pointer group-hover:bg-gradient-to-r group-hover:from-violet-50 group-hover:to-purple-50 rounded-xl group-open:rounded-b-none transition-all">
+                  <span class="font-semibold text-lg text-gray-900 group-hover:text-violet-800 pr-4">{faq.question}</span>
+                  <div class="flex-shrink-0 w-8 h-8 bg-violet-100 group-hover:bg-violet-200 rounded-full flex items-center justify-center group-open:rotate-180 transition-transform duration-300">
+                    <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </summary>
+                <div class="px-8 pb-6 pt-2">
+                  <p class="text-gray-700 leading-relaxed">{faq.answer}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- CTA Section -->
+      <div class="text-center bg-gradient-to-r from-violet-600 to-purple-600 text-white p-8 rounded-2xl">
+        <h2 class="text-2xl font-bold mb-4">Začněte budovat dividendové portfolio</h2>
+        <p class="text-lg mb-6 opacity-90">
+          Objevte nejlepší dividendová ETF a spočítejte si očekávaný pasivní příjem.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/srovnani-etf" class="bg-white text-violet-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Najít vhodné ETF
+          </a>
+          <a href="/kalkulacky" class="bg-violet-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-violet-400 transition-colors">
+            Kalkulačky
+          </a>
+        </div>
+      </div>
+
+      <InternalLinking links={relatedLinks} title="Související strategie a nástroje" className="mt-16" />
+    </div>
+  </div>
+</Layout>

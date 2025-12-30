@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "period": "mtd",
+    "generated_at": "2025-10-02T13:26:44.492499",
+    "data_source": "Yahoo Finance"
+  },
+  "sectors": {},
+  "regions": {},
+  "asset_classes": {
+    "Bitcoin": {
+      "symbol": "BTC-USD",
+      "performance": 0.08,
+      "current_price": 118742.84,
+      "currency": "USD",
+      "name": "Bitcoin USD",
+      "last_updated": "2025-10-02T13:26:47.787757"
+    }
+  },
+  "summary_stats": {
+    "best_performers": {
+      "asset_classes": [
+        "Bitcoin",
+        0.08
+      ]
+    },
+    "worst_performers": {
+      "asset_classes": [
+        "Bitcoin",
+        0.08
+      ]
+    },
+    "category_averages": {
+      "asset_classes": 0.08
+    }
+  }
+}

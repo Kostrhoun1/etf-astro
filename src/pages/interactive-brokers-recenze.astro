@@ -1,0 +1,406 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+import BrokerRatingGrid from '../components/broker/BrokerRatingGrid';
+
+const currentYear = new Date().getFullYear();
+
+const reviewSchema = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  "itemReviewed": {
+    "@type": "FinancialService",
+    "name": "Interactive Brokers",
+    "description": "Americký online broker pro profesionální a pokročilé investory",
+    "url": "https://www.interactivebrokers.com/",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "One Pickwick Plaza",
+      "addressLocality": "Greenwich",
+      "addressRegion": "CT",
+      "postalCode": "06830",
+      "addressCountry": "US"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "85",
+      "bestRating": "100",
+      "worstRating": "0",
+      "reviewCount": "1"
+    }
+  },
+  "reviewRating": {
+    "@type": "Rating",
+    "ratingValue": "85",
+    "bestRating": "100",
+    "worstRating": "0"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "datePublished": "2026-09-26",
+  "dateModified": "2026-09-26",
+  "reviewBody": "Interactive Brokers získává hodnocení 85/100 bodů za rozsáhlý globální přístup k trhům a nízké obchodní náklady. Ideální pro profesionální a zkušené investory s kapitálem nad 20 000 USD."
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kde koupit ETF",
+      "item": "https://www.etfpruvodce.cz/kde-koupit-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": `Interactive Brokers recenze ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/interactive-brokers-recenze"
+    }
+  ]
+};
+
+const pros = [
+  "Rozsáhlý globální přístup k trhům (86 burz)",
+  "Nízké obchodní náklady ($0.0005-0.0035/akcie)",
+  "14 000+ akcií a ETF k obchodování",
+  "Frakční obchodování s akciemi",
+  "Žádný minimální vklad",
+  "Žádné poplatky za neaktivitu",
+  "Úroky z neinvestovaných prostředků",
+  "Profesionální platformy (TWS, IBKR Desktop)"
+];
+
+const cons = [
+  "Komplexní rozhraní pro začátečníky",
+  "Žádná podpora MetaTrader platformy",
+  "Bez české jazykové podpory",
+  "Vhodné především pro zkušené investory",
+  "Složitější proces registrace",
+  "Profesionální nástroje mohou působit zastrašující"
+];
+
+const categories = [
+  { name: 'Poplatky', score: 98, description: 'Nejnižší pro velké objemy' },
+  { name: 'Platforma', score: 85, description: 'Pokročilé TWS, složité pro začátečníky' },
+  { name: 'Nabídka', score: 100, description: '150+ milionů instrumentů' },
+  { name: 'Podpora', score: 65, description: 'Pouze angličtina, složité' },
+  { name: 'Důvěryhodnost', score: 100, description: 'SEC/FINRA regulace, kótován Nasdaq' },
+  { name: 'Vzdělání', score: 75, description: 'Rozsáhlé, ale komplexní materiály' }
+];
+
+const relatedLinks = [
+  { title: "Kde koupit ETF - přehled brokerů", href: "/kde-koupit-etf#porovnani", description: "Zpět na kompletní přehled a srovnání všech brokerů" },
+  { title: "DEGIRO recenze", href: "/degiro-recenze", description: "Jednodušší alternativa pro začátečníky" },
+  { title: "XTB recenze", href: "/xtb-recenze", description: "Další broker vhodný pro ETF investice" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Porovnání všech brokerů pro ETF" },
+  { title: "Návod pro začátečníky", href: "/co-jsou-etf/jak-zacit-investovat", description: "Začněte s investováním do ETF" },
+  { title: "Kurzový dopad ETF", href: "/kalkulacky/kurzovy-dopad-etf", description: "Analýza měnového rizika u ETF" },
+  { title: "ETF poplatky", href: "/kalkulacky/kalkulacka-poplatku-etf", description: "Dopad TER na dlouhodobé výnosy" }
+];
+---
+
+<Layout
+  title={`Interactive Brokers recenze ${currentYear} - Test IBKR`}
+  description={`Interactive Brokers recenze ${currentYear} - hodnocení 85/100. Americká brokerská společnost s globálním přístupem na 86 burz.`}
+  canonical="/interactive-brokers-recenze"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Hero sekce -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Interactive Brokers recenze {currentYear}
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+        Kompletní hodnocení Interactive Brokers - americké brokerské společnosti založené v 1978.
+        Více než 1,5 milionu účtů, kótovaná na Nasdaq. Ideální pro zkušené investory.
+      </p>
+    </div>
+
+    <!-- Detailed Rating -->
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+      <h2 class="text-center text-2xl font-bold text-gray-900 mb-2">Detailní hodnocení</h2>
+      <p class="text-center text-gray-600 mb-6">
+        Náš verdikt založený na důkladné analýze všech aspektů brokera
+      </p>
+      <BrokerRatingGrid
+        client:load
+        overallRating={85}
+        overallDescription="Komplexní hodnocení brokera"
+        categories={categories}
+      />
+    </div>
+
+    <!-- Rychlý přehled -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-green-600 mb-4 flex items-center gap-2">
+          <span class="text-green-600">✓</span>
+          Výhody IBKR
+        </h3>
+        <ul class="space-y-2">
+          {pros.map((pro) => (
+            <li class="flex items-center gap-2">
+              <span class="text-green-600 flex-shrink-0">✓</span>
+              <span class="text-sm">{pro}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">
+          <span class="text-red-500">✕</span>
+          Nevýhody IBKR
+        </h3>
+        <ul class="space-y-2">
+          {cons.map((con) => (
+            <li class="flex items-center gap-2">
+              <span class="text-red-500 flex-shrink-0">✕</span>
+              <span class="text-sm">{con}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Klíčové informace -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">👥</span>
+        Klíčové informace o Interactive Brokers
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2">Založení a regulace</h4>
+            <p class="text-sm text-gray-600">
+              Založeno v roce 1978 v USA. Pro české klienty Interactive Brokers Ireland Ltd.
+              regulované irskou CBI (Central Bank of Ireland). Mateřská firma regulovaná SEC/FINRA v USA.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-2">Velikost a dosah</h4>
+            <p class="text-sm text-gray-600">
+              Více než 1,5 milionu účtů, přes 400 miliard USD v aktivech klientů.
+              Jeden z největších světových brokerů s přístupem na 86 burz ve 33 zemích.
+            </p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2">Nabídka instrumentů</h4>
+            <p class="text-sm text-gray-600">
+              Více než 150 milionů obchodovatelných instrumentů včetně akcií, ETF, opcí,
+              futures, forex, dluhopisů a komodit na 86 trzích ve 33 zemích.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-2">Ochrana klientů</h4>
+            <p class="text-sm text-gray-600">
+              SIPC pojištění do 500 000 USD (hotovost 250 000 USD), dodatečné pojištění až 30 mil. USD.
+              Segregované účty, kompenzační fond ICF do 20 000 EUR pro evropské klienty.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poplatky -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        <span class="text-green-600">📈</span>
+        Struktura poplatků (IBKR Pro)
+      </h2>
+      <p class="text-gray-600 mb-6">Poplatky se liší podle typu účtu a objemu obchodování</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-2 font-semibold">Typ transakce</th>
+              <th class="text-left py-2 font-semibold">Poplatek</th>
+              <th class="text-left py-2 font-semibold">Poznámka</th>
+            </tr>
+          </thead>
+          <tbody class="space-y-2">
+            <tr class="border-b">
+              <td class="py-2">USA akcie/ETF</td>
+              <td class="py-2">0.005 USD/akcie</td>
+              <td class="py-2 text-gray-600">Min. 1 USD, max. 1% hodnoty</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Evropské akcie/ETF</td>
+              <td class="py-2">0.05% hodnoty</td>
+              <td class="py-2 text-gray-600">Min. 1.25 EUR, max. 29 EUR</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Měnová konverze</td>
+              <td class="py-2">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">0.002%</span>
+              </td>
+              <td class="py-2 text-gray-600">Min. $2 za konverzi</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Minimální vklad</td>
+              <td class="py-2">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">0 USD</span>
+              </td>
+              <td class="py-2 text-gray-600">Zrušen od 2021</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Tržní data</td>
+              <td class="py-2">1-45 USD/měsíc</td>
+              <td class="py-2 text-gray-600">Podle typu dat</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Platformy -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-purple-600">🛡</span>
+        Obchodní platformy
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3">Trader Workstation (TWS)</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Nejpokročilejší desktopová obchodní platforma
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Komplexní analýzy a nástroje
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Algoritmické obchodování
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-amber-600">⚠</span>
+              Složitá pro začátečníky
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">IBKR Mobile & WebTrader</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Zjednodušená mobilní aplikace
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Webová verze bez stahování
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Základní funkce pro běžné obchodování
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-amber-600">⚠</span>
+              Omezené možnosti oproti TWS
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pro koho je vhodný -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Pro koho je Interactive Brokers vhodný?</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3 text-green-600">✅ Vhodné pro</h4>
+          <ul class="space-y-2 text-sm">
+            <li>• Pokročilé investory s kapitálem 20k+ USD</li>
+            <li>• Profesionální tradery a portfolio manažery</li>
+            <li>• Investory hledající nejširší nabídku instrumentů</li>
+            <li>• Ty, kdo potřebují přístup k mezinárodním trhům</li>
+            <li>• Aktivní obchodníky s velkými objemy</li>
+            <li>• Zkušené uživatele komplexních platforem</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3 text-red-600">❌ Nevhodné pro</h4>
+          <ul class="space-y-2 text-sm">
+            <li>• Začátečníky v investování</li>
+            <li>• Investory s malým kapitálem (pod 5k USD)</li>
+            <li>• Ty, kdo preferují jednoduché rozhraní</li>
+            <li>• Neaktivní investory (buy-and-hold)</li>
+            <li>• Uživatele preferující český jazyk</li>
+            <li>• Investory pouze do ETF</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upozornění pro začátečníky -->
+    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-8 mb-8">
+      <h2 class="text-xl font-bold text-amber-700 mb-4 flex items-center gap-2">
+        <span>⚠</span>
+        Vhodné pouze pro pokročilé investory
+      </h2>
+      <p class="text-amber-800">
+        Interactive Brokers nabízí velmi široké možnosti obchodování a profesionální nástroje,
+        ale složitost platforem je vhodná především pro zkušené a profesionální investory.
+      </p>
+    </div>
+
+    <!-- Závěr -->
+    <div class="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Závěrečné hodnocení</h2>
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-6 py-3 rounded-full text-lg font-semibold">
+          <span>🏆</span>
+          85/100 bodů - VELMI DOBRÁ
+        </div>
+      </div>
+
+      <p class="text-gray-700 leading-relaxed mb-4 max-w-4xl mx-auto">
+        Interactive Brokers je jedním z nejkomplexnějších a nejpokročilejších brokerů na světě.
+        Nabízí velmi nízké poplatky, nejširší výběr instrumentů (150+ milionů) a profesionální
+        nástroje. Je však určen především pro zkušené investory se znalostí angličtiny.
+      </p>
+      <p class="text-gray-700 leading-relaxed mb-6 max-w-4xl mx-auto">
+        Pro začátečníky nebo investory s menším kapitálem doporučujeme začít s jednoduššími
+        alternativami jako XTB či DEGIRO. K IBKR můžete přejít později, když získáte zkušenosti
+        a vyšší kapitál (doporučujeme minimálně 20 000 USD).
+      </p>
+
+      <div class="text-center">
+        <a
+          href="https://www.interactivebrokers.com/"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Otevřít účet u IBKR
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

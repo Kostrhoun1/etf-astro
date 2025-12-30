@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import EmergencyFundContent from '../../components/tools/EmergencyFundContent';
+---
+
+<Layout
+  title="Kalkulačka nouzové rezervy - Emergency fund"
+  description="Spočítejte si optimální velikost nouzové rezervy. Kalkulačka emergency fund podle vaší situace, příjmů a výdajů."
+  canonical="/kalkulacky/nouzova-rezerva"
+  keywords="nouzová rezerva, emergency fund, kalkulačka rezervy, finanční polštář, finanční rezerva, měsíční výdaje, osobní finance"
+  ogImage="/og-nouzova-rezerva.jpg"
+  ogTitle="Kalkulačka nouzové rezervy - Emergency fund | ETF průvodce"
+  ogDescription="Spočítejte si optimální velikost nouzové rezervy. Kalkulačka emergency fund podle vaší situace."
+>
+  <EmergencyFundContent client:load />
+</Layout>

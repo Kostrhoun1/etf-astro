@@ -1,0 +1,891 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import { supabase } from '../../lib/supabase';
+
+export async function getStaticPaths() {
+  // Paginate to get ALL ETFs (Supabase has 1000 row limit)
+  const allIsins: { isin: string }[] = [];
+  const pageSize = 1000;
+  let page = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data: etfs, error } = await supabase
+      .from('etf_funds')
+      .select('isin')
+      .range(page * pageSize, (page + 1) * pageSize - 1);
+
+    if (error || !etfs || etfs.length === 0) {
+      hasMore = false;
+    } else {
+      allIsins.push(...etfs);
+      page++;
+      hasMore = etfs.length === pageSize;
+    }
+  }
+
+  console.log(`getStaticPaths: Found ${allIsins.length} ETFs`);
+
+  return allIsins.map(etf => ({
+    params: { isin: etf.isin }
+  }));
+}
+
+const { isin } = Astro.params;
+
+const { data: etf } = await supabase
+  .from('etf_funds')
+  .select('*')
+  .eq('isin', isin)
+  .single();
+
+if (!etf) {
+  return Astro.redirect('/404');
+}
+
+// Get related ETFs
+const { data: relatedETFs } = await supabase
+  .from('etf_funds')
+  .select('isin, name, primary_ticker, ter_numeric, return_1y, rating, fund_size_numeric')
+  .neq('isin', isin)
+  .eq('category', etf.category)
+  .gte('fund_size_numeric', 50)
+  .order('fund_size_numeric', { ascending: false })
+  .limit(6);
+
+function formatPercent(value: number | null): string {
+  if (value === null || value === undefined) return '-';
+  // Database values are already in percent format (e.g., 2.57 means 2.57%)
+  return value.toFixed(2) + '%';
+}
+
+function formatSize(size: number | null): string {
+  if (size === null) return '-';
+  if (size >= 1000) return (size / 1000).toFixed(1) + ' mld €';
+  return Math.round(size) + ' mil €';
+}
+
+function getRatingStars(rating: number | null): string {
+  if (rating === null) return '-';
+  const stars = Math.round(rating);
+  return '★'.repeat(stars) + '☆'.repeat(5 - stars);
+}
+
+const ticker = etf.primary_ticker || etf.isin.substring(0, 6);
+const currentYear = new Date().getFullYear();
+
+const etfSchema = {
+  "@context": "https://schema.org",
+  "@type": "FinancialProduct",
+  "name": etf.name,
+  "identifier": etf.isin,
+  "provider": { "@type": "Organization", "name": etf.fund_provider },
+  "description": etf.strategy || etf.name
+};
+
+const relatedLinks = [
+  { title: "Nejlepší ETF", href: "/nejlepsi-etf", description: "Všechny kategorie ETF", icon: "📊" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů", icon: "🏦" },
+  { title: "Srovnání ETF", href: "/srovnani-etf", description: "Porovnejte ETF", icon: "📈" }
+];
+
+// Get top holdings
+const topHoldings = [];
+for (let i = 1; i <= 10; i++) {
+  const name = etf[`holding_${i}_name`];
+  const weight = etf[`holding_${i}_weight`];
+  if (name && weight) {
+    topHoldings.push({ name, weight });
+  }
+}
+
+// Get top countries
+const topCountries = [];
+for (let i = 1; i <= 5; i++) {
+  const name = etf[`country_${i}_name`];
+  const weight = etf[`country_${i}_weight`];
+  if (name && weight) {
+    topCountries.push({ name, weight });
+  }
+}
+
+// Get top sectors
+const topSectors = [];
+for (let i = 1; i <= 5; i++) {
+  const name = etf[`sector_${i}_name`];
+  const weight = etf[`sector_${i}_weight`];
+  if (name && weight) {
+    topSectors.push({ name, weight });
+  }
+}
+
+// Get exchanges
+const exchanges = [];
+for (let i = 1; i <= 10; i++) {
+  const name = etf[`exchange_${i}_name`];
+  const ticker = etf[`exchange_${i}_ticker`];
+  const currency = etf[`exchange_${i}_currency`];
+  if (name && name.trim()) {
+    exchanges.push({ name, ticker, currency });
+  }
+}
+
+function getCountryFlag(countryName: string): string {
+  const name = countryName.toLowerCase();
+  if (name.includes('united states') || name.includes('usa')) return '🇺🇸';
+  if (name.includes('germany') || name.includes('německo')) return '🇩🇪';
+  if (name.includes('france') || name.includes('francie')) return '🇫🇷';
+  if (name.includes('united kingdom') || name.includes('uk')) return '🇬🇧';
+  if (name.includes('japan') || name.includes('japonsko')) return '🇯🇵';
+  if (name.includes('china') || name.includes('čína')) return '🇨🇳';
+  if (name.includes('switzerland') || name.includes('švýcarsko')) return '🇨🇭';
+  if (name.includes('netherlands') || name.includes('nizozemsko')) return '🇳🇱';
+  if (name.includes('canada') || name.includes('kanada')) return '🇨🇦';
+  if (name.includes('australia') || name.includes('austrálie')) return '🇦🇺';
+  if (name.includes('ireland') || name.includes('irsko')) return '🇮🇪';
+  if (name.includes('taiwan')) return '🇹🇼';
+  if (name.includes('korea')) return '🇰🇷';
+  return '🏳️';
+}
+---
+
+<Layout
+  title={ticker + ' - ' + etf.name + ' | ETF průvodce'}
+  description={'Detailní analýza ETF ' + etf.name + '. TER ' + formatPercent(etf.ter_numeric) + ', výkonnost, složení portfolia.'}
+  canonical={'/etf/' + isin}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(etfSchema)} />
+
+  <section class="py-12 bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <a href="/" class="text-gray-500 hover:text-gray-700">Domů</a>
+        <span class="text-gray-400">/</span>
+        <a href="/nejlepsi-etf" class="text-gray-500 hover:text-gray-700">Nejlepší ETF</a>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-900">{ticker}</span>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+          <div class="flex items-center gap-4 mb-4">
+            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+              {etf.category || 'ETF'}
+            </span>
+            {etf.distribution_policy && (
+              <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                {etf.distribution_policy}
+              </span>
+            )}
+          </div>
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            {ticker} - {etf.name}
+          </h1>
+          <p class="text-gray-600 mb-4">{etf.fund_provider} · ISIN: {etf.isin}</p>
+          {etf.strategy && (
+            <p class="text-gray-600">{etf.strategy}</p>
+          )}
+
+          <!-- Author byline + Last Updated - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600 mt-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+              Tomáš Kostrhoun
+            </a>
+            {etf.updated_at && (
+              <>
+                <span class="text-gray-400">•</span>
+                <span>
+                  Aktualizováno: {new Date(etf.updated_at).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-lg">
+          <div class="text-center mb-4">
+            <div class="text-3xl text-yellow-500 mb-2">{getRatingStars(etf.rating)}</div>
+            <div class="text-sm text-gray-600">Celkové hodnocení</div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex justify-between">
+              <span class="text-gray-600">TER</span>
+              <span class="font-bold text-gray-900">{formatPercent(etf.ter_numeric)}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Velikost fondu</span>
+              <span class="font-bold text-gray-900">{formatSize(etf.fund_size_numeric)}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">1R výnos</span>
+              <span class:list={['font-bold', etf.return_1y && etf.return_1y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                {formatPercent(etf.return_1y)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Výkonnost</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <div class="text-sm text-gray-500 mb-1">YTD</div>
+          <div class:list={['text-xl font-bold', etf.return_ytd && etf.return_ytd > 0 ? 'text-emerald-600' : 'text-red-600']}>
+            {formatPercent(etf.return_ytd)}
+          </div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <div class="text-sm text-gray-500 mb-1">1 měsíc</div>
+          <div class:list={['text-xl font-bold', etf.return_1m && etf.return_1m > 0 ? 'text-emerald-600' : 'text-red-600']}>
+            {formatPercent(etf.return_1m)}
+          </div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <div class="text-sm text-gray-500 mb-1">3 měsíce</div>
+          <div class:list={['text-xl font-bold', etf.return_3m && etf.return_3m > 0 ? 'text-emerald-600' : 'text-red-600']}>
+            {formatPercent(etf.return_3m)}
+          </div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <div class="text-sm text-gray-500 mb-1">1 rok</div>
+          <div class:list={['text-xl font-bold', etf.return_1y && etf.return_1y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+            {formatPercent(etf.return_1y)}
+          </div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <div class="text-sm text-gray-500 mb-1">3 roky</div>
+          <div class:list={['text-xl font-bold', etf.return_3y && etf.return_3y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+            {formatPercent(etf.return_3y)}
+          </div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <div class="text-sm text-gray-500 mb-1">5 let</div>
+          <div class:list={['text-xl font-bold', etf.return_5y && etf.return_5y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+            {formatPercent(etf.return_5y)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detailní informace -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Detailní informace</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl p-6 shadow">
+          <h3 class="font-bold text-gray-900 mb-4">Základní informace</h3>
+          <dl class="space-y-3">
+            <div class="flex justify-between">
+              <dt class="text-gray-600">ISIN</dt>
+              <dd class="font-medium text-gray-900">{etf.isin}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Ticker</dt>
+              <dd class="font-medium text-gray-900">{etf.primary_ticker || '-'}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Poskytovatel</dt>
+              <dd class="font-medium text-gray-900">{etf.fund_provider}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Domicil</dt>
+              <dd class="font-medium text-gray-900">{etf.fund_domicile || '-'}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Měna</dt>
+              <dd class="font-medium text-gray-900">{etf.fund_currency || 'EUR'}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow">
+          <h3 class="font-bold text-gray-900 mb-4">Struktura fondu</h3>
+          <dl class="space-y-3">
+            <div class="flex justify-between">
+              <dt class="text-gray-600">TER</dt>
+              <dd class="font-medium text-gray-900">{formatPercent(etf.ter_numeric)}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Velikost fondu</dt>
+              <dd class="font-medium text-gray-900">{formatSize(etf.fund_size_numeric)}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Replikace</dt>
+              <dd class="font-medium text-gray-900">{etf.replication || '-'}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Dividendy</dt>
+              <dd class="font-medium text-gray-900">{etf.distribution_policy || '-'}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-gray-600">Rok založení</dt>
+              <dd class="font-medium text-gray-900">{etf.inception_date ? new Date(etf.inception_date).getFullYear() : '-'}</dd>
+            </div>
+            {etf.index_name && (
+              <div class="flex justify-between">
+                <dt class="text-gray-600">Sledovaný index</dt>
+                <dd class="font-medium text-gray-900">{etf.index_name}</dd>
+              </div>
+            )}
+            {etf.legal_structure && (
+              <div class="flex justify-between">
+                <dt class="text-gray-600">Právní struktura</dt>
+                <dd class="font-medium text-gray-900">{etf.legal_structure}</dd>
+              </div>
+            )}
+            {etf.sustainability && (
+              <div class="flex justify-between">
+                <dt class="text-gray-600">ESG hodnocení</dt>
+                <dd class="font-medium text-gray-900">{etf.sustainability}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detailní analýza výkonnosti - staticky generováno pro SEO -->
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Detailní analýza výkonnosti</h2>
+        <!-- Přepínač měny -->
+        <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1" id="currency-switcher">
+          <button data-currency="EUR" class="currency-btn px-4 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+            🇪🇺 EUR
+          </button>
+          <button data-currency="CZK" class="currency-btn px-4 py-2 rounded-md text-sm font-medium bg-white text-gray-900 shadow-sm">
+            🇨🇿 CZK
+          </button>
+          <button data-currency="USD" class="currency-btn px-4 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+            🇺🇸 USD
+          </button>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Výkonnost podle období -->
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <h3 class="font-bold text-gray-900 mb-4">Výkonnost podle období</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-3 px-2 text-sm font-medium text-gray-500">Období</th>
+                  <th class="text-right py-3 px-2 text-sm font-medium text-gray-500">Výnos (<span id="currency-label">CZK</span>)</th>
+                  <th class="text-right py-3 px-2 text-sm font-medium text-gray-500">Výnos/riziko</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-2 text-gray-700">1 měsíc</td>
+                  <td class="py-3 px-2 text-right font-medium performance-value"
+                      data-eur={etf.return_1m ?? ''}
+                      data-czk={etf.return_1m_czk ?? ''}
+                      data-usd={etf.return_1m_usd ?? ''}>
+                    <span class:list={[etf.return_1m_czk && etf.return_1m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                      {etf.return_1m_czk ? etf.return_1m_czk.toFixed(2) + '%' : '-'}
+                    </span>
+                  </td>
+                  <td class="py-3 px-2 text-right text-gray-500">-</td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-2 text-gray-700">3 měsíce</td>
+                  <td class="py-3 px-2 text-right font-medium performance-value"
+                      data-eur={etf.return_3m ?? ''}
+                      data-czk={etf.return_3m_czk ?? ''}
+                      data-usd={etf.return_3m_usd ?? ''}>
+                    <span class:list={[etf.return_3m_czk && etf.return_3m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                      {etf.return_3m_czk ? etf.return_3m_czk.toFixed(2) + '%' : '-'}
+                    </span>
+                  </td>
+                  <td class="py-3 px-2 text-right text-gray-500">-</td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-2 text-gray-700">6 měsíců</td>
+                  <td class="py-3 px-2 text-right font-medium performance-value"
+                      data-eur={etf.return_6m ?? ''}
+                      data-czk={etf.return_6m_czk ?? ''}
+                      data-usd={etf.return_6m_usd ?? ''}>
+                    <span class:list={[etf.return_6m_czk && etf.return_6m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                      {etf.return_6m_czk ? etf.return_6m_czk.toFixed(2) + '%' : '-'}
+                    </span>
+                  </td>
+                  <td class="py-3 px-2 text-right text-gray-500">-</td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-2 text-gray-700">YTD</td>
+                  <td class="py-3 px-2 text-right font-medium performance-value"
+                      data-eur={etf.return_ytd ?? ''}
+                      data-czk={etf.return_ytd_czk ?? ''}
+                      data-usd={etf.return_ytd_usd ?? ''}>
+                    <span class:list={[etf.return_ytd_czk && etf.return_ytd_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                      {etf.return_ytd_czk ? etf.return_ytd_czk.toFixed(2) + '%' : '-'}
+                    </span>
+                  </td>
+                  <td class="py-3 px-2 text-right text-gray-500">-</td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-2 text-gray-700">1 rok</td>
+                  <td class="py-3 px-2 text-right font-medium performance-value"
+                      data-eur={etf.return_1y ?? ''}
+                      data-czk={etf.return_1y_czk ?? ''}
+                      data-usd={etf.return_1y_usd ?? ''}>
+                    <span class:list={[etf.return_1y_czk && etf.return_1y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                      {etf.return_1y_czk ? etf.return_1y_czk.toFixed(2) + '%' : '-'}
+                    </span>
+                  </td>
+                  <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_1y && etf.return_per_risk_1y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                    {etf.return_per_risk_1y ? etf.return_per_risk_1y.toFixed(2) : '-'}
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-2 text-gray-700">3 roky</td>
+                  <td class="py-3 px-2 text-right font-medium performance-value"
+                      data-eur={etf.return_3y ?? ''}
+                      data-czk={etf.return_3y_czk ?? ''}
+                      data-usd={etf.return_3y_usd ?? ''}>
+                    <span class:list={[etf.return_3y_czk && etf.return_3y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                      {etf.return_3y_czk ? etf.return_3y_czk.toFixed(2) + '%' : '-'}
+                    </span>
+                  </td>
+                  <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_3y && etf.return_per_risk_3y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                    {etf.return_per_risk_3y ? etf.return_per_risk_3y.toFixed(2) : '-'}
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 px-2 text-gray-700">5 let</td>
+                  <td class="py-3 px-2 text-right font-medium performance-value"
+                      data-eur={etf.return_5y ?? ''}
+                      data-czk={etf.return_5y_czk ?? ''}
+                      data-usd={etf.return_5y_usd ?? ''}>
+                    <span class:list={[etf.return_5y_czk && etf.return_5y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                      {etf.return_5y_czk ? etf.return_5y_czk.toFixed(2) + '%' : '-'}
+                    </span>
+                  </td>
+                  <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_5y && etf.return_per_risk_5y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                    {etf.return_per_risk_5y ? etf.return_per_risk_5y.toFixed(2) : '-'}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Roční výkonnost -->
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <h3 class="font-bold text-gray-900 mb-4">Roční výkonnost (<span id="currency-label-2">CZK</span>)</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center p-4 border border-gray-200 rounded-lg">
+              <div class="text-sm text-gray-500 mb-1">2021</div>
+              <div class="text-xl font-bold performance-value"
+                   data-eur={etf.return_2021 ?? ''}
+                   data-czk={etf.return_2021_czk ?? ''}
+                   data-usd={etf.return_2021_usd ?? ''}>
+                <span class:list={[etf.return_2021_czk && etf.return_2021_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2021_czk ? etf.return_2021_czk.toFixed(2) + '%' : '-'}
+                </span>
+              </div>
+            </div>
+            <div class="text-center p-4 border border-gray-200 rounded-lg">
+              <div class="text-sm text-gray-500 mb-1">2022</div>
+              <div class="text-xl font-bold performance-value"
+                   data-eur={etf.return_2022 ?? ''}
+                   data-czk={etf.return_2022_czk ?? ''}
+                   data-usd={etf.return_2022_usd ?? ''}>
+                <span class:list={[etf.return_2022_czk && etf.return_2022_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2022_czk ? etf.return_2022_czk.toFixed(2) + '%' : '-'}
+                </span>
+              </div>
+            </div>
+            <div class="text-center p-4 border border-gray-200 rounded-lg">
+              <div class="text-sm text-gray-500 mb-1">2023</div>
+              <div class="text-xl font-bold performance-value"
+                   data-eur={etf.return_2023 ?? ''}
+                   data-czk={etf.return_2023_czk ?? ''}
+                   data-usd={etf.return_2023_usd ?? ''}>
+                <span class:list={[etf.return_2023_czk && etf.return_2023_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2023_czk ? etf.return_2023_czk.toFixed(2) + '%' : '-'}
+                </span>
+              </div>
+            </div>
+            <div class="text-center p-4 border border-gray-200 rounded-lg">
+              <div class="text-sm text-gray-500 mb-1">2024</div>
+              <div class="text-xl font-bold performance-value"
+                   data-eur={etf.return_2024 ?? ''}
+                   data-czk={etf.return_2024_czk ?? ''}
+                   data-usd={etf.return_2024_usd ?? ''}>
+                <span class:list={[etf.return_2024_czk && etf.return_2024_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2024_czk ? etf.return_2024_czk.toFixed(2) + '%' : '-'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Script pro přepínání měny - vanilla JS, žádný React -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('.currency-btn');
+      const values = document.querySelectorAll('.performance-value');
+      const label1 = document.getElementById('currency-label');
+      const label2 = document.getElementById('currency-label-2');
+
+      // Load saved preference
+      const saved = localStorage.getItem('etf-currency-preference') || 'CZK';
+      switchCurrency(saved);
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const currency = btn.getAttribute('data-currency');
+          localStorage.setItem('etf-currency-preference', currency);
+          switchCurrency(currency);
+        });
+      });
+
+      function switchCurrency(currency) {
+        // Update buttons
+        buttons.forEach(btn => {
+          if (btn.getAttribute('data-currency') === currency) {
+            btn.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+            btn.classList.remove('text-gray-600');
+          } else {
+            btn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+            btn.classList.add('text-gray-600');
+          }
+        });
+
+        // Update labels
+        if (label1) label1.textContent = currency;
+        if (label2) label2.textContent = currency;
+
+        // Update values
+        values.forEach(el => {
+          const val = el.getAttribute('data-' + currency.toLowerCase());
+          const num = parseFloat(val);
+          const span = el.querySelector('span') || el;
+
+          if (val && !isNaN(num)) {
+            span.textContent = num.toFixed(2) + '%';
+            span.className = num > 0 ? 'text-emerald-600' : 'text-red-600';
+          } else {
+            span.textContent = '-';
+            span.className = 'text-gray-500';
+          }
+        });
+      }
+    });
+  </script>
+
+  <!-- Popis fondu -->
+  {(etf.description_cs || etf.description_en) && (
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Popis fondu</h2>
+        <div class="bg-gray-50 rounded-xl p-6 shadow border border-gray-100">
+          <p class="text-gray-700 leading-relaxed">
+            {etf.description_cs || etf.description_en}
+          </p>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Největší pozice (Holdings) -->
+  {topHoldings.length > 0 && (
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Největší pozice</h2>
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <div class="space-y-4">
+            {topHoldings.map((holding, index) => (
+              <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm">
+                  {index + 1}
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="font-medium text-gray-900">{holding.name}</span>
+                    <span class="font-bold text-gray-900">{holding.weight.toFixed(2)}%</span>
+                  </div>
+                  <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                      style={`width: ${Math.min(holding.weight * 2, 100)}%`}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Geografické rozložení -->
+  {topCountries.length > 0 && (
+    <section class="py-12 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Geografické rozložení</h2>
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <div class="space-y-4">
+            {topCountries.map((country, index) => {
+              const colors = [
+                'from-blue-500 to-blue-600',
+                'from-emerald-500 to-emerald-600',
+                'from-violet-500 to-violet-600',
+                'from-amber-500 to-amber-600',
+                'from-rose-500 to-rose-600'
+              ];
+              return (
+                <div class="flex items-center gap-4">
+                  <div class="text-2xl">{getCountryFlag(country.name)}</div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="font-medium text-gray-900">{country.name}</span>
+                      <span class="font-bold text-gray-900">{country.weight.toFixed(2)}%</span>
+                    </div>
+                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        class={`h-full bg-gradient-to-r ${colors[index % colors.length]} rounded-full`}
+                        style={`width: ${Math.min(country.weight, 100)}%`}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Sektorové rozložení -->
+  {topSectors.length > 0 && (
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Sektorové rozložení</h2>
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <div class="space-y-4">
+            {topSectors.map((sector, index) => {
+              const colors = [
+                'from-indigo-500 to-indigo-600',
+                'from-rose-500 to-rose-600',
+                'from-amber-500 to-amber-600',
+                'from-cyan-500 to-cyan-600',
+                'from-violet-500 to-violet-600'
+              ];
+              const icons = ['💼', '🏭', '💡', '🏥', '🏦'];
+              return (
+                <div class="flex items-center gap-4">
+                  <div class="text-2xl">{icons[index % icons.length]}</div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="font-medium text-gray-900">{sector.name}</span>
+                      <span class="font-bold text-gray-900">{sector.weight.toFixed(2)}%</span>
+                    </div>
+                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        class={`h-full bg-gradient-to-r ${colors[index % colors.length]} rounded-full`}
+                        style={`width: ${Math.min(sector.weight, 100)}%`}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Dividendové informace -->
+  {(etf.current_dividend_yield_numeric || etf.dividends_12m_numeric) && (
+    <section class="py-12 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Dividendové informace</h2>
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <dl class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+              <dt class="text-sm text-gray-500 mb-1">Dividendový výnos</dt>
+              <dd class="text-xl font-bold text-emerald-600">
+                {etf.current_dividend_yield_numeric ? etf.current_dividend_yield_numeric.toFixed(2) + '%' : '-'}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500 mb-1">Dividendy za 12m</dt>
+              <dd class="text-xl font-bold text-gray-900">
+                {etf.dividends_12m_numeric ? etf.dividends_12m_numeric.toFixed(2) + ' ' + (etf.dividends_12m_currency || 'EUR') : '-'}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500 mb-1">Frekvence</dt>
+              <dd class="text-xl font-bold text-gray-900">
+                {etf.distribution_frequency || '-'}
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500 mb-1">Způsob</dt>
+              <dd class="text-xl font-bold text-gray-900">
+                {etf.distribution_policy || '-'}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Rizikovost -->
+  {(etf.beta || etf.volatility_1y || etf.max_drawdown_1y) && (
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Rizikovost</h2>
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-3 px-4 text-sm font-medium text-gray-500">Metrika</th>
+                  <th class="text-right py-3 px-4 text-sm font-medium text-gray-500">Hodnota</th>
+                </tr>
+              </thead>
+              <tbody>
+                {etf.beta && (
+                  <tr class="border-b border-gray-100">
+                    <td class="py-3 px-4 text-gray-700">Beta</td>
+                    <td class="py-3 px-4 text-right font-medium text-gray-900">{etf.beta.toFixed(2)}</td>
+                  </tr>
+                )}
+                {etf.correlation && (
+                  <tr class="border-b border-gray-100">
+                    <td class="py-3 px-4 text-gray-700">Korelace</td>
+                    <td class="py-3 px-4 text-right font-medium text-gray-900">{etf.correlation.toFixed(2)}</td>
+                  </tr>
+                )}
+                {etf.tracking_error && (
+                  <tr class="border-b border-gray-100">
+                    <td class="py-3 px-4 text-gray-700">Tracking error</td>
+                    <td class="py-3 px-4 text-right font-medium text-gray-900">{formatPercent(etf.tracking_error)}</td>
+                  </tr>
+                )}
+                {etf.volatility_1y && (
+                  <tr class="border-b border-gray-100">
+                    <td class="py-3 px-4 text-gray-700">Volatilita (1R)</td>
+                    <td class="py-3 px-4 text-right font-medium text-gray-900">{formatPercent(etf.volatility_1y)}</td>
+                  </tr>
+                )}
+                {etf.max_drawdown_1y && (
+                  <tr class="border-b border-gray-100">
+                    <td class="py-3 px-4 text-gray-700">Max. pokles (1R)</td>
+                    <td class="py-3 px-4 text-right font-medium text-red-600">{formatPercent(etf.max_drawdown_1y)}</td>
+                  </tr>
+                )}
+                {etf.max_drawdown_inception && (
+                  <tr class="border-b border-gray-100">
+                    <td class="py-3 px-4 text-gray-700">Max. pokles celkem</td>
+                    <td class="py-3 px-4 text-right font-medium text-red-600">{formatPercent(etf.max_drawdown_inception)}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Obchodní informace (Exchanges) -->
+  {exchanges.length > 0 && (
+    <section class="py-12 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Obchodní informace</h2>
+        <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
+          <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <div>
+              <dt class="text-sm text-gray-500 mb-1">Primární burza</dt>
+              <dd class="font-bold text-gray-900">{etf.primary_exchange || exchanges[0]?.name || '-'}</dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500 mb-1">Primární ticker</dt>
+              <dd class="font-bold text-gray-900">{etf.primary_ticker || '-'}</dd>
+            </div>
+            <div>
+              <dt class="text-sm text-gray-500 mb-1">Počet burz</dt>
+              <dd class="font-bold text-gray-900">{etf.total_exchanges || exchanges.length}</dd>
+            </div>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-4">Všechny burzy</h3>
+          <div class="space-y-3">
+            {exchanges.map((exchange, index) => (
+              <div class="flex items-center gap-4 py-2 border-b border-gray-100 last:border-0">
+                <div class="w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">
+                  {index + 1}
+                </div>
+                <div class="flex-1 grid grid-cols-3 gap-4">
+                  <span class="text-gray-900">{exchange.name}</span>
+                  <span class="font-mono text-sm text-gray-600">{exchange.ticker || '-'}</span>
+                  <span class="text-gray-500">{exchange.currency || '-'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {relatedETFs && relatedETFs.length > 0 && (
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Podobná ETF</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {relatedETFs.map((related) => (
+            <a href={'/etf/' + related.isin} class="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow block">
+              <div class="font-bold text-gray-900 mb-1">{related.primary_ticker || related.isin}</div>
+              <div class="text-sm text-gray-600 line-clamp-1 mb-2">{related.name}</div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">TER: {formatPercent(related.ter_numeric)}</span>
+                <span class:list={[related.return_1y && related.return_1y > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {formatPercent(related.return_1y)}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="py-12 bg-gradient-to-r from-blue-600 to-indigo-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-2xl font-bold text-white mb-4">Chcete koupit {ticker}?</h2>
+      <p class="text-blue-100 mb-6">Porovnejte nejlepší brokery pro nákup tohoto ETF</p>
+      <a href="/kde-koupit-etf" class="inline-block bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+        Kde koupit ETF →
+      </a>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NetSalaryCalculatorContent from '../../components/tools/NetSalaryCalculatorContent';
+---
+
+<Layout
+  title="Kalkulačka čisté mzdy 2026 - Výpočet čistého platu"
+  description="Kalkulačka čisté mzdy 2026 - spočítejte si čistý plat z hrubé mzdy. Aktuální sazby daní, pojištění, slevy na dani. Čistá mzda podle české legislativy."
+  canonical="/kalkulacky/cisty-plat-2026"
+  keywords="kalkulačka čisté mzdy, čistý plat 2026, hrubá mzda, výpočet mzdy, daň z příjmu, sociální pojištění, zdravotní pojištění, slevy na dani"
+  ogImage="/og-cisty-plat-2026.jpg"
+  ogTitle="Kalkulačka čisté mzdy 2026 - Výpočet čistého platu | ETF průvodce"
+  ogDescription="Kalkulačka čisté mzdy 2026 - spočítejte si čistý plat z hrubé mzdy. Aktuální sazby daní a pojištění."
+>
+  <NetSalaryCalculatorContent client:load />
+</Layout>

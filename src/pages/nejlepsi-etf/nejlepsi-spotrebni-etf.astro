@@ -1,0 +1,406 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ETFTable from '../../components/ETFTable.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-spotrebni-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const lastModified = new Date().toISOString().split('T')[0];
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší spotřební ETF ${currentYear} - consumer staples a discretionary`,
+  "description": `Srovnání nejlepších spotřebních ETF ${currentYear}. Consumer staples, discretionary, retail - TER, velikost fondů.`,
+  "image": "https://www.etfpruvodce.cz/og-consumer-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2025-01-15",
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-spotrebni-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": "spotřební ETF, consumer staples, consumer discretionary, retail, spotřební sektor",
+  "wordCount": 2600,
+  "inLanguage": "cs-CZ"
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší spotřební ETF v roce ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší spotřební ETF jsou: Xtrackers MSCI World Consumer Staples UCITS ETF (IE00BM67HK77) největší globální consumer staples ETF s 731 mil. EUR a TER 0,25%, iShares S&P 500 Consumer Discretionary Sector UCITS ETF (IE00B3WJKD61) s 645 mil. EUR a TER 0,15%, a iShares MSCI Europe Consumer Staples Sector UCITS ETF (IE00B4K6BW65) s 571 mil. EUR a TER 0,18%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co jsou spotřební ETF a jaké firmy obsahují?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Spotřební ETF investují do spotřebních společností jako Coca-Cola, P&G, Nestlé, Unilever, Amazon, Tesla a dalších consumer staples (základní spotřeba) a consumer discretionary (neesenciální spotřeba) firem. Sledují spotřební sektory různých indexů a poskytují diverzifikovaný přístup k investování do spotřeby."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi Consumer Staples a Consumer Discretionary ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Consumer Staples ETF investují do základní spotřeby (potraviny, nápoje, hygienické produkty) - defensivní sektor s stabilní poptávkou. Consumer Discretionary ETF zahrnují neesenciální spotřebu (luxusní zboží, restaurace, zábava) - cyklický sektor citlivý na ekonomické podmínky."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou náklady na spotřební ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER (celkové náklady) spotřebních ETF se pohybují mezi 0,12% až 0,30% ročně. USA Consumer ETF mají nejnižší TER kolem 0,12%, World Consumer Staples ETF mají TER kolem 0,25%. Sektorové spotřební ETF jsou cenově dostupné díky jednoduché pasivní strategii."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou spotřební ETF vhodné pro konzervativní investory?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Consumer Staples ETF jsou ideální pro konzervativní investory díky stabilní poptávce po základních produktech. Defensivní sektor s nižší volatilitou a pravidelnou dividendou. Consumer Discretionary ETF jsou cykličtější a vhodnější pro agresivnější investory."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit spotřební ETF v Česku?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Spotřební ETF můžete koupit u českých brokerů jako Degiro, XTB, Trading212 nebo Interactive Brokers. Náš TOP 3 (Xtrackers MSCI World Consumer Staples IE00BM67HK77, iShares S&P 500 Consumer Discretionary IE00B3WJKD61, iShares MSCI Europe Consumer Staples IE00B4K6BW65) jsou dostupné na evropských burzách s rozumnými transakčními poplatky."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší spotřební ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-spotrebni-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší dividendové ETF", href: "/nejlepsi-etf/nejlepsi-dividendove-etf", description: "Spotřební sektor s dividendami", icon: "💰" },
+  { title: "Nejlepší ESG ETF", href: "/nejlepsi-etf/nejlepsi-esg-etf", description: "Udržitelná spotřeba", icon: "🌱" },
+  { title: "Nejlepší Value ETF", href: "/nejlepsi-etf/nejlepsi-value-etf", description: "Value přístup ke spotřebě", icon: "📊" }
+];
+---
+
+<Layout
+  title={`Nejlepší spotřební ETF ${currentYear} | Srovnání`}
+  description={`Srovnání nejlepších spotřebních ETF ${currentYear}. Consumer staples, discretionary, retail - TER, velikost fondů.`}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-pink-50/50 via-rose-50/30 to-purple-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-pink-200 to-rose-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-rose-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-pink-100 to-rose-100 text-pink-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-pink-200/50">
+            🛒 Aktuální k {new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 bg-clip-text text-transparent">
+              spotřební ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>
+              Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších spotřebních ETF.
+            Consumer staples, discretionary a retail včetně Coca-Cola, P&G a Amazon.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md">
+              🛒 Spotřební trendy
+            </a>
+          </div>
+        </div>
+
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-pink-100 rounded-xl mb-3">
+                <span class="text-2xl">🛒</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Spotřební sektor v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro spotřební investice</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-pink-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-pink-600">☕</span>
+                  <span class="text-xs text-gray-500 font-medium">STAPLES ETF</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">731M</div>
+                <div class="text-xs text-gray-600">World Consumer Staples</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-rose-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-rose-600">💰</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,12%</div>
+                <div class="text-xs text-gray-600">USA Consumer</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-pink-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-pink-600">📦</span>
+                  <span class="text-xs text-gray-500 font-medium">TOP HOLDING</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">3%</div>
+                <div class="text-xs text-gray-600">Amazon podíl</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-rose-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-rose-600">👥</span>
+                  <span class="text-xs text-gray-500 font-medium">DEFENSIVNÍ</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">Staples</div>
+                <div class="text-xs text-gray-600">stabilní poptávka</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-pink-100 w-20 h-20 mx-auto mb-8 hover:bg-pink-200 transition-colors">
+          <span class="text-4xl">🛒</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co jsou spotřební ETF?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Investiční fondy zaměřené na spotřební sektor rozdělený na základní spotřebu (staples)
+          a neesenciální spotřebu (discretionary) s expozicí ke spotřebitelským trendům
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-rose-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">☕</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-pink-800 transition-colors">Consumer Staples</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Základní spotřeba - potraviny, nápoje, hygienické produkty.
+            Defensivní sektor s stabilní poptávkou nezávislou na ekonomických cyklech.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-rose-500 to-purple-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">📦</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-rose-800 transition-colors">Consumer Discretionary</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Neesenciální spotřeba - luxusní zboží, restaurace, zábava, automobily.
+            Cyklický sektor citlivý na ekonomické podmínky a příjmy spotřebitelů.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">📈</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-purple-800 transition-colors">Spotřebitelské trendy</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            E-commerce, udržitelnost, zdravý životní styl a digitální transformace
+            formují budoucnost spotřebního sektoru a jeho investiční příležitosti.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Section -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 ETF v této kategorii
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="spotřební" />
+
+  <!-- FAQ Section -->
+  <section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Často kladené otázky</h2>
+
+      <div class="space-y-4">
+        <details class="group border border-gray-200 rounded-lg hover:border-pink-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-pink-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-pink-800">Jaké jsou nejlepší spotřební ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-pink-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší spotřební ETF jsou: <strong>Xtrackers MSCI World Consumer Staples UCITS ETF</strong> (IE00BM67HK77)
+            největší globální consumer staples ETF s 731 mil. EUR a TER 0,25%, <strong>iShares S&P 500 Consumer Discretionary Sector UCITS ETF</strong> (IE00B3WJKD61)
+            s 645 mil. EUR a TER 0,15%, a <strong>iShares MSCI Europe Consumer Staples Sector UCITS ETF</strong>
+            (IE00B4K6BW65) s 571 mil. EUR a TER 0,18%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-pink-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-pink-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-pink-800">Co jsou spotřební ETF a jaké firmy obsahují?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-pink-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Spotřební ETF</strong> investují do spotřebních společností jako Coca-Cola, P&G, Nestlé,
+            Unilever, Amazon, Tesla a dalších consumer staples (základní spotřeba) a consumer discretionary
+            (neesenciální spotřeba) firem. Sledují spotřební sektory různých indexů a poskytují diverzifikovaný přístup k investování do spotřeby.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-pink-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-pink-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-pink-800">Jaký je rozdíl mezi Consumer Staples a Consumer Discretionary ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-pink-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Consumer Staples ETF</strong> investují do základní spotřeby (potraviny, nápoje, hygienické produkty) -
+            defensivní sektor s stabilní poptávkou. <strong>Consumer Discretionary ETF</strong> zahrnují neesenciální spotřebu
+            (luxusní zboží, restaurace, zábava) - cyklický sektor citlivý na ekonomické podmínky.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-pink-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-pink-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-pink-800">Jaké jsou náklady na spotřební ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-pink-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>TER (celkové náklady) spotřebních ETF</strong> se pohybují mezi 0,12% až 0,30% ročně. USA Consumer ETF mají nejnižší TER kolem 0,12%, World Consumer Staples ETF mají TER kolem 0,25%. Sektorové spotřební ETF jsou cenově dostupné díky jednoduché pasivní strategii.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-pink-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-pink-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-pink-800">Jsou spotřební ETF vhodné pro konzervativní investory?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-pink-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Consumer Staples ETF jsou ideální pro konzervativní investory</strong> díky stabilní poptávce po základních produktech. Defensivní sektor s nižší volatilitou a pravidelnou dividendou. Consumer Discretionary ETF jsou cykličtější a vhodnější pro agresivnější investory.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-pink-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-pink-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-pink-800">Kde koupit spotřební ETF v Česku?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-pink-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Spotřební ETF můžete koupit</strong> u českých brokerů jako Degiro, XTB, Trading212 nebo Interactive Brokers. Náš TOP 3 (Xtrackers MSCI World Consumer Staples IE00BM67HK77, iShares S&P 500 Consumer Discretionary IE00B3WJKD61, iShares MSCI Europe Consumer Staples IE00B4K6BW65) jsou dostupné na evropských burzách s rozumnými transakčními poplatky.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

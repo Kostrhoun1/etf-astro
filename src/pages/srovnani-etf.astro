@@ -1,0 +1,167 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SrovnaniETFWrapper from '../components/comparison/SrovnaniETFWrapper';
+import { getInitialETFs, getTotalETFCount } from '../lib/etf-data';
+
+const currentYear = new Date().getFullYear();
+
+// Fetch initial ETFs server-side for SSR/SEO
+const [initialETFs, totalCount] = await Promise.all([
+  getInitialETFs(50),
+  getTotalETFCount(),
+]);
+
+const datasetSchema = {
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": `ETF databáze ${currentYear}`,
+  "description": "Kompletní databáze ETF fondů s aktuálními daty o výkonnosti, poplatcích a rizicích pro české investory",
+  "keywords": ["ETF", "fondy", "TER", "výkonnost", "investice", "DEGIRO"],
+  "creator": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "application/json",
+      "contentUrl": "https://www.etfpruvodce.cz/api/etf"
+    }
+  ],
+  "temporalCoverage": `${currentYear}`,
+  "spatialCoverage": "Globální ETF trhy",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "measurementTechnique": "Finanční analýza a porovnání",
+  "variableMeasured": [
+    "TER poplatky",
+    "Historická výkonnost",
+    "Velikost fondu",
+    "Dividendový výnos",
+    "Volatilita"
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "ETF srovnání",
+      "item": "https://www.etfpruvodce.cz/srovnani-etf"
+    }
+  ]
+};
+---
+
+<Layout
+  title={`Srovnání ETF | ETF srovnávač - Porovnání 4300+ fondů ${currentYear}`}
+  description="Srovnání ETF fondů online zdarma. Porovnejte 4300+ ETF podle TER, výkonnosti, velikosti a rizika. Nejlepší ETF srovnávač pro české investory."
+  canonical="/srovnani-etf"
+  keywords={`srovnání ETF, ETF srovnání, porovnání ETF, ETF srovnávač, srovnat ETF fondy, ETF porovnání, nejlepší ETF ${currentYear}, ETF filtr, TER poplatky ETF, výkonnost ETF, ETF databáze`}
+  ogImage="/og-etf-comparison.jpg"
+  ogTitle={`ETF srovnání ${currentYear} - Porovnání všech ETF fondů`}
+  ogDescription={`Nejpokročilejší ETF srovnání pro české investory. Porovnejte 4300+ ETF podle TER, výkonnosti a rizika.`}
+  twitterTitle={`ETF srovnání ${currentYear}`}
+  twitterDescription="Nejpokročilejší ETF srovnání pro české investory. Porovnejte 4300+ ETF podle TER a výkonnosti."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(datasetSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-8 md:py-12 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-violet-50/30 to-purple-50/50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-3">
+          Srovnání
+          <span class="bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
+            ETF fondů
+          </span>
+        </h1>
+
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Porovnejte více než 4300 ETF fondů. Filtrujte podle kategorií, poplatků a výkonnosti.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Comparison Tool -->
+  <section class="py-8 bg-white">
+    <SrovnaniETFWrapper client:load initialETFs={initialETFs} totalCount={totalCount} />
+  </section>
+
+  <!-- Popular Comparisons -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Populární srovnání</h2>
+        <p class="text-gray-600">Připravená srovnání nejoblíbenějších ETF</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="/srovnani-etf/vwce-vs-cspx" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">VWCE vs CSPX</h3>
+          <p class="text-gray-600 text-sm">All-World vs S&P 500 - nejpopulárnější srovnání</p>
+        </a>
+        <a href="/srovnani-etf/iwda-vs-cspx" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">IWDA vs CSPX</h3>
+          <p class="text-gray-600 text-sm">MSCI World vs S&P 500</p>
+        </a>
+        <a href="/srovnani-etf/vwce-vs-iwda" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">VWCE vs IWDA</h3>
+          <p class="text-gray-600 text-sm">All-World vs MSCI World</p>
+        </a>
+        <a href="/srovnani-etf/cspx-vs-vwra" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">CSPX vs VWRA</h3>
+          <p class="text-gray-600 text-sm">S&P 500 akumulační vs All-World distribuční</p>
+        </a>
+        <a href="/srovnani-etf/cspx-vs-vuaa" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">CSPX vs VUAA</h3>
+          <p class="text-gray-600 text-sm">iShares vs Vanguard S&P 500</p>
+        </a>
+        <a href="/srovnani-etf/swrd-vs-iwda" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">SWRD vs IWDA</h3>
+          <p class="text-gray-600 text-sm">SPDR vs iShares MSCI World</p>
+        </a>
+        <a href="/srovnani-etf/vwce-vs-vwrl" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">VWCE vs VWRL</h3>
+          <p class="text-gray-600 text-sm">Akumulační vs distribuční All-World</p>
+        </a>
+        <a href="/srovnani-etf/iwda-vs-vwra" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">IWDA vs VWRA</h3>
+          <p class="text-gray-600 text-sm">MSCI World vs All-World distribuční</p>
+        </a>
+        <a href="/srovnani-etf/cspx-vs-eunl" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">CSPX vs EUNL</h3>
+          <p class="text-gray-600 text-sm">USA vs Evropa</p>
+        </a>
+        <a href="/srovnani-etf/vwce-vs-eunl" class="bg-white rounded-xl p-6 hover:shadow-lg transition-all group">
+          <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-blue-600">VWCE vs EUNL</h3>
+          <p class="text-gray-600 text-sm">Globální vs evropské akcie</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skrytý SEO obsah pro crawlery -->
+  <div class="sr-only">
+    <h2>Nejpopulárnější ETF kategorie:</h2>
+    <ul>
+      <li>MSCI World ETF - globální diverzifikace s důrazem na vyspělé trhy</li>
+      <li>S&P 500 ETF - americké velké společnosti</li>
+      <li>MSCI Europe ETF - evropské akciové trhy</li>
+      <li>MSCI Emerging Markets ETF - rozvíjející se trhy</li>
+      <li>Nasdaq-100 ETF - technologické akcie</li>
+    </ul>
+  </div>
+</Layout>

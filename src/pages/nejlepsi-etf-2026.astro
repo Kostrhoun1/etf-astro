@@ -1,0 +1,540 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF 2026",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf-2026"
+    }
+  ]
+};
+
+const listSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Nejlepší ETF fondy 2026",
+  "description": "Výběr nejlepších ETF fondů pro investování v roce 2026 podle kategorií a investičních cílů",
+  "numberOfItems": 5,
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Vanguard FTSE All-World UCITS ETF (VWCE)",
+      "url": "https://www.etfpruvodce.cz/etf/IE00BK5BQT80"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "iShares Core MSCI World UCITS ETF (IWDA)",
+      "url": "https://www.etfpruvodce.cz/etf/IE00B4L5Y983"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Vanguard S&P 500 UCITS ETF (VUAA)",
+      "url": "https://www.etfpruvodce.cz/etf/IE00BFMXXD54"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "iShares Core Euro Aggregate Bond UCITS ETF (AGGH)",
+      "url": "https://www.etfpruvodce.cz/etf/IE00B3DKXQ41"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "iShares MSCI Emerging Markets UCITS ETF (IEMA)",
+      "url": "https://www.etfpruvodce.cz/etf/IE00B4L5YC18"
+    }
+  ]
+};
+
+const topETFs = [
+  {
+    rank: 1,
+    name: "Vanguard FTSE All-World",
+    ticker: "VWCE",
+    isin: "IE00BK5BQT80",
+    category: "🌍 Celosvětové akcie",
+    ter: "0.22%",
+    assets: "15.8 mld EUR",
+    description: "Nejlepší ETF pro začátečníky i pokročilé investory",
+    pros: ["4000+ akcií z celého světa", "Automatická diverzifikace", "Nízké poplatky", "Vysoká likvidita"],
+    cons: ["Vyšší TER než IWDA", "Bez dividend reinvestice"],
+    recommendation: "Nejlepší volba pro všechny",
+    badge: "🏆 #1 Volba",
+    badgeColor: "bg-yellow-100 text-yellow-800",
+    performance: "+8.5% ročně (5 let)"
+  },
+  {
+    rank: 2,
+    name: "iShares Core MSCI World",
+    ticker: "IWDA",
+    isin: "IE00B4L5Y983",
+    category: "🌎 Rozvinuté země",
+    ter: "0.20%",
+    assets: "63.2 mld EUR",
+    description: "Nejpopulárnější světový ETF s nejnižšími poplatky",
+    pros: ["Nejnižší TER (0.20%)", "Obrovské AUM", "Výborná likvidita", "Jen rozvinuté trhy"],
+    cons: ["Bez emerging markets", "Menší diverzifikace"],
+    recommendation: "Pro nákladově citlivé investory",
+    badge: "💰 Nejnižší TER",
+    badgeColor: "bg-green-100 text-green-800",
+    performance: "+8.1% ročně (5 let)"
+  },
+  {
+    rank: 3,
+    name: "Vanguard S&P 500",
+    ticker: "VUAA",
+    isin: "IE00BFMXXD54",
+    category: "🇺🇸 USA akcie",
+    ter: "0.07%",
+    assets: "9.1 mld EUR",
+    description: "Nejlepší ETF pro investice do USA technologií",
+    pros: ["Nejnižší poplatky", "500 největších USA firem", "Dlouhá historie", "Tech giganti"],
+    cons: ["Pouze USA", "Koncentrace do tech", "Měnové riziko"],
+    recommendation: "Pro růstové investory",
+    badge: "🚀 USA Tech",
+    badgeColor: "bg-blue-100 text-blue-800",
+    performance: "+12.8% ročně (5 let)"
+  },
+  {
+    rank: 4,
+    name: "iShares Core Euro Aggregate Bond",
+    ticker: "AGGH",
+    isin: "IE00B3DKXQ41",
+    category: "🏛️ Evropské dluhopisy",
+    ter: "0.12%",
+    assets: "2.1 mld EUR",
+    description: "Nejlepší dluhopisový ETF pro stabilizaci portfolia",
+    pros: ["Nízké riziko", "Stabilní výnosy", "EUR denominace", "Kvalitní dluhopisy"],
+    cons: ["Nízké výnosy", "Citlivost na úroky", "Inflační riziko"],
+    recommendation: "Pro konzervativní část portfolia",
+    badge: "🛡️ Stabilita",
+    badgeColor: "bg-gray-100 text-gray-800",
+    performance: "+1.2% ročně (5 let)"
+  },
+  {
+    rank: 5,
+    name: "iShares MSCI Emerging Markets",
+    ticker: "IEMA",
+    isin: "IE00B4L5YC18",
+    category: "🌏 Rozvíjející se trhy",
+    ter: "0.18%",
+    assets: "14.9 mld EUR",
+    description: "Nejlepší ETF pro diverzifikaci do rozvíjejících se trhů",
+    pros: ["Rychle rostoucí ekonomiky", "Nízká korelace s USA", "Vysoký růstový potenciál"],
+    cons: ["Vyšší volatilita", "Politická rizika", "Měnové výkyvy"],
+    recommendation: "Max. 20% portfolia",
+    badge: "📈 Vysoký růst",
+    badgeColor: "bg-purple-100 text-purple-800",
+    performance: "+2.1% ročně (5 let)"
+  }
+];
+
+const portfolioSuggestions = [
+  {
+    name: "Konzervativní portfolio",
+    ageGroup: "50+ let",
+    allocation: [
+      { etf: "IWDA", percentage: 50, name: "Světové akcie" },
+      { etf: "AGGH", percentage: 40, name: "Dluhopisy" },
+      { etf: "IEMA", percentage: 10, name: "Emerging markets" }
+    ],
+    expectedReturn: "5-7% ročně",
+    riskLevel: "Nízké"
+  },
+  {
+    name: "Vyvážené portfolio",
+    ageGroup: "30-50 let",
+    allocation: [
+      { etf: "VWCE", percentage: 70, name: "Světové akcie" },
+      { etf: "AGGH", percentage: 20, name: "Dluhopisy" },
+      { etf: "IEMA", percentage: 10, name: "Emerging markets" }
+    ],
+    expectedReturn: "6-9% ročně",
+    riskLevel: "Střední"
+  },
+  {
+    name: "Růstové portfolio",
+    ageGroup: "20-40 let",
+    allocation: [
+      { etf: "VWCE", percentage: 80, name: "Světové akcie" },
+      { etf: "VUAA", percentage: 15, name: "USA Tech" },
+      { etf: "IEMA", percentage: 5, name: "Emerging markets" }
+    ],
+    expectedReturn: "8-12% ročně",
+    riskLevel: "Vysoké"
+  }
+];
+
+const faqs = [
+  {
+    question: "Který ETF je nejlepší pro začátečníky?",
+    answer: "VWCE (Vanguard All-World) je ideální pro začátečníky. Obsahuje přes 4000 akcií z celého světa, takže získáte maximální diverzifikaci v jednom ETF."
+  },
+  {
+    question: "Stačí investovat pouze do jednoho ETF?",
+    answer: "Ano, VWCE nebo IWDA vám poskytnou dostatečnou diverzifikaci. Pro začátek je často lepší jeden kvalitní ETF než komplikované portfolio."
+  },
+  {
+    question: "Jaký je rozdíl mezi VWCE a IWDA?",
+    answer: "VWCE obsahuje i rozvojové trhy (23%), IWDA pouze rozvinuté země. IWDA má nižší poplatky (0.20% vs 0.22%), VWCE větší diverzifikaci."
+  },
+  {
+    question: "Měl bych přidat dluhopisy do portfolia?",
+    answer: "Záleží na věku a rizikovém profilu. Mladší investoři (do 40) mohou být 100% v akciích. Starší by měli zvážit 20-40% v dluhopisech (AGGH)."
+  },
+  {
+    question: "Kde koupit tyto ETF nejlevněji?",
+    answer: "XTB a Trading 212 nabízí většinu ETF bez poplatků. DEGIRO má poplatek 2€/rok za ETF, ale má nejširší nabídku."
+  },
+  {
+    question: "Kdy rebalancovat portfolio?",
+    answer: "Rebalancujte 1-2x ročně nebo když se alokace odchýlí o více než 5% od cílové. Častější rebalancování snižuje výnosy kvůli poplatkům."
+  }
+];
+
+const relatedLinks = [
+  { title: "Srovnání ETF fondů", href: "/srovnani-etf", description: "Detailní databáze všech ETF", icon: "📊" },
+  { title: "Jak začít investovat", href: "/co-jsou-etf", description: "Kompletní průvodce pro začátečníky", icon: "📚" },
+  { title: "Nejlepší brokeři 2026", href: "/srovnani-brokeru", description: "Kde koupit ETF nejlevněji", icon: "🏦" },
+  { title: "Portfolio strategie", href: "/portfolio-strategie", description: "Jak sestavit ideální portfolio", icon: "🎯" }
+];
+---
+
+<Layout
+  title="Nejlepší ETF 2026 - Top 10 fondů pro investování"
+  description="Nejlepší ETF fondy 2026: VWCE, IWDA, VUAA a další. Detailní analýza, poplatky, výnosy. Sestavte si ideální portfolio s minimálními náklady!"
+  canonical="/nejlepsi-etf-2026"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(listSchema)} />
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Hero sekce -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+        🏆 Aktualizováno pro rok 2026
+      </div>
+      <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+        Nejlepší ETF 2026
+      </h1>
+      <p class="text-xl text-gray-600 max-w-4xl mx-auto mb-8">
+        Výběr top ETF fondů pro rok 2026. Detailní analýza výnosů, poplatků a rizik.
+        Sestavte si ideální portfolio s našimi doporučeními od expertů.
+      </p>
+      <div class="flex items-center justify-center gap-6 text-sm text-gray-600">
+        <div class="flex items-center gap-2">
+          <span>🏆</span>
+          <span>Top 10 ETF</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span>📈</span>
+          <span>Aktuální data 2026</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span>🛡️</span>
+          <span>EU regulované</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kritéria výběru -->
+    <div class="mb-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        ⭐ Podle jakých kritérií vybíráme nejlepší ETF?
+      </h2>
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="text-center">
+          <div class="text-3xl mb-2">💰</div>
+          <h3 class="font-semibold mb-2">Nízké poplatky</h3>
+          <p class="text-sm text-gray-600">TER pod 0.25%, žádné skryté poplatky</p>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">📊</div>
+          <h3 class="font-semibold mb-2">Velikost fondu</h3>
+          <p class="text-sm text-gray-600">AUM nad 100 mil. EUR pro stabilitu</p>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">🌍</div>
+          <h3 class="font-semibold mb-2">Diverzifikace</h3>
+          <p class="text-sm text-gray-600">Široká geografická a sektorová</p>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl mb-2">📈</div>
+          <h3 class="font-semibold mb-2">Dlouhodobé výnosy</h3>
+          <p class="text-sm text-gray-600">Konzistentní performance</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top ETF seznam -->
+    <div class="space-y-6 mb-12">
+      <h2 class="text-3xl font-bold text-gray-900 text-center mb-8">
+        🏆 Top 5 nejlepších ETF pro rok 2026
+      </h2>
+
+      {topETFs.map((etf) => (
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  {etf.rank}
+                </div>
+                <div>
+                  <div class="flex items-center gap-3 mb-1">
+                    <h3 class="text-xl font-bold text-gray-900">{etf.name}</h3>
+                    <span class={`px-3 py-1 rounded-full text-sm font-medium ${etf.badgeColor}`}>{etf.badge}</span>
+                  </div>
+                  <div class="flex items-center gap-4 text-sm text-gray-600">
+                    <span class="font-mono font-semibold">{etf.ticker}</span>
+                    <span>{etf.category}</span>
+                    <span>TER: {etf.ter}</span>
+                    <span>AUM: {etf.assets}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-lg font-semibold text-green-600">{etf.performance}</div>
+                <div class="text-sm text-gray-600">5letý průměr</div>
+              </div>
+            </div>
+
+            <p class="text-gray-700 mb-4">{etf.description}</p>
+
+            <div class="grid md:grid-cols-3 gap-6">
+              <div>
+                <h4 class="font-semibold mb-3 text-green-600 flex items-center gap-2">
+                  ✓ Výhody
+                </h4>
+                <ul class="space-y-1">
+                  {etf.pros.map((pro) => (
+                    <li class="text-sm flex items-center gap-2">
+                      <span class="text-green-500">✓</span>
+                      {pro}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-3 text-red-600 flex items-center gap-2">
+                  ✗ Nevýhody
+                </h4>
+                <ul class="space-y-1">
+                  {etf.cons.map((con) => (
+                    <li class="text-sm flex items-center gap-2">
+                      <span class="text-red-500">✗</span>
+                      {con}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-3">Kde koupit nejlevněji</h4>
+                <ul class="space-y-1 text-sm">
+                  <li>DEGIRO: 2€/rok</li>
+                  <li>XTB: 0€</li>
+                  <li>Trading 212: 0€</li>
+                </ul>
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <div class="font-semibold text-blue-800 text-sm">{etf.recommendation}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t">
+              <a href={`/etf/${etf.isin}`} class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium">
+                Zobrazit detail ETF →
+              </a>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Portfolio návrhy -->
+    <div class="mb-12 bg-white rounded-2xl shadow-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        📊 Doporučená portfolia podle věku
+      </h2>
+      <p class="text-gray-600 mb-6">Jak sestavit portfolio z nejlepších ETF podle vašeho věku a rizikového profilu</p>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        {portfolioSuggestions.map((portfolio) => (
+          <div class="p-6 border-2 border-gray-200 rounded-xl hover:border-blue-300 transition-colors">
+            <div class="text-center mb-4">
+              <h3 class="text-lg font-bold">{portfolio.name}</h3>
+              <p class="text-sm text-gray-600">{portfolio.ageGroup}</p>
+            </div>
+
+            <div class="space-y-3 mb-4">
+              {portfolio.allocation.map((item) => (
+                <div class="flex justify-between items-center">
+                  <div>
+                    <span class="font-semibold">{item.percentage}%</span>
+                    <span class="text-sm text-gray-600 ml-2">{item.name}</span>
+                  </div>
+                  <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">{item.etf}</span>
+                </div>
+              ))}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t">
+              <div>
+                <div class="text-xs text-gray-500 uppercase">Očekávané výnosy</div>
+                <div class="font-semibold text-green-600">{portfolio.expectedReturn}</div>
+              </div>
+              <div>
+                <div class="text-xs text-gray-500 uppercase">Riziko</div>
+                <div class="font-semibold">{portfolio.riskLevel}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Srovnávací tabulka -->
+    <div class="mb-12 bg-white rounded-2xl shadow-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Rychlé srovnání top ETF</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-3 font-semibold">ETF</th>
+              <th class="text-left py-3 font-semibold">TER</th>
+              <th class="text-left py-3 font-semibold">AUM</th>
+              <th class="text-left py-3 font-semibold">5letý výnos</th>
+              <th class="text-left py-3 font-semibold">Počet pozic</th>
+              <th class="text-left py-3 font-semibold">Riziko</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3">
+                <div>
+                  <div class="font-semibold">VWCE</div>
+                  <div class="text-xs text-gray-600">Vanguard All-World</div>
+                </div>
+              </td>
+              <td class="py-3">0.22%</td>
+              <td class="py-3">15.8 mld €</td>
+              <td class="py-3 text-green-600 font-semibold">+8.5%</td>
+              <td class="py-3">4000+</td>
+              <td class="py-3">
+                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Střední</span>
+              </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3">
+                <div>
+                  <div class="font-semibold">IWDA</div>
+                  <div class="text-xs text-gray-600">iShares MSCI World</div>
+                </div>
+              </td>
+              <td class="py-3 text-green-600 font-semibold">0.20%</td>
+              <td class="py-3">63.2 mld €</td>
+              <td class="py-3 text-green-600 font-semibold">+8.1%</td>
+              <td class="py-3">1500+</td>
+              <td class="py-3">
+                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Střední</span>
+              </td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3">
+                <div>
+                  <div class="font-semibold">VUAA</div>
+                  <div class="text-xs text-gray-600">Vanguard S&P 500</div>
+                </div>
+              </td>
+              <td class="py-3 text-green-600 font-semibold">0.07%</td>
+              <td class="py-3">9.1 mld €</td>
+              <td class="py-3 text-green-600 font-semibold">+12.8%</td>
+              <td class="py-3">500</td>
+              <td class="py-3">
+                <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">Vyšší</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Často kladené otázky -->
+    <div class="mb-12 bg-white rounded-2xl shadow-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        ❓ Často kladené otázky o nejlepších ETF
+      </h2>
+      <div class="max-w-4xl mx-auto space-y-4">
+        {faqs.map((faq) => (
+          <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">{faq.question}</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+
+    <!-- CTA sekce -->
+    <div class="mb-12 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-2">Připraveni investovat do nejlepších ETF?</h2>
+      <p class="text-gray-600 text-center mb-6">
+        Vyberte si brokera a začněte stavět své portfolio z top ETF fondů
+      </p>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="p-6 bg-white rounded-xl shadow-sm border-2 border-blue-200 text-center">
+          <span class="text-4xl block mb-2">👥</span>
+          <h3 class="text-lg font-bold mb-2">Začátečník?</h3>
+          <p class="text-sm text-gray-600 mb-4">Trading 212 - nejjednoduší cesta k ETF</p>
+          <a href="/trading212-recenze" class="inline-block w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            Začít investovat
+          </a>
+        </div>
+
+        <div class="p-6 bg-white rounded-xl shadow-sm border-2 border-green-200 text-center">
+          <span class="text-4xl block mb-2">⭐</span>
+          <h3 class="text-lg font-bold mb-2">ETF expert?</h3>
+          <p class="text-sm text-gray-600 mb-4">XTB - 3000+ ETF bez poplatků</p>
+          <a href="/xtb-recenze" class="inline-block w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+            Pokračovat s XTB
+          </a>
+        </div>
+
+        <div class="p-6 bg-white rounded-xl shadow-sm border-2 border-yellow-200 text-center">
+          <span class="text-4xl block mb-2">🛡️</span>
+          <h3 class="text-lg font-bold mb-2">Nejnižší náklady?</h3>
+          <p class="text-sm text-gray-600 mb-4">DEGIRO - evropský lídr</p>
+          <a href="/degiro-recenze" class="inline-block w-full bg-yellow-600 text-white py-2 rounded-lg hover:bg-yellow-700">
+            Ušetřit s DEGIRO
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Související stránky -->
+    <InternalLinking links={relatedLinks} title="Další užitečné články" />
+  </div>
+</Layout>

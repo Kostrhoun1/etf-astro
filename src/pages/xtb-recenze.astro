@@ -1,0 +1,643 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+import BrokerRatingGrid from '../components/broker/BrokerRatingGrid';
+
+const currentYear = new Date().getFullYear();
+
+const reviewSchema = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  "itemReviewed": {
+    "@type": "FinancialService",
+    "name": "XTB",
+    "description": "Online broker pro obchodování s ETF, akciemi a dalšími finančními instrumenty",
+    "url": "https://www.xtb.com/cz",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Purkyňova 2121/3",
+      "addressLocality": "Praha",
+      "postalCode": "110 00",
+      "addressCountry": "CZ"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "94",
+      "bestRating": "100",
+      "worstRating": "0",
+      "reviewCount": "1"
+    }
+  },
+  "reviewRating": {
+    "@type": "Rating",
+    "ratingValue": "94",
+    "bestRating": "100"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz"
+  },
+  "datePublished": "2026-09-26",
+  "dateModified": "2026-09-26",
+  "reviewBody": "XTB je transparentní broker s českou licencí ČNB, kótovaný na varšavské burze. Nabízí bezplatné ETF obchody do 100k EUR měsíčně a 24/7 českou podporu. Hodnocení 94/100 bodů."
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kde koupit ETF",
+      "item": "https://www.etfpruvodce.cz/kde-koupit-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": `XTB recenze ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/xtb-recenze"
+    }
+  ]
+};
+
+const pros = [
+  "Investování do akcií a ETF bez komisí",
+  "Přes 7 000 akcií a 1 600+ ETF",
+  "Česká zákaznická podpora dostupná 24/7",
+  "Moderní obchodní platforma xStation 5 zdarma",
+  "Možnost XTB demo účtu s 200 000 Kč",
+  "Frakční práva pro investice s malým kapitálem",
+  "Rychlé vklady a výběry, většinou zdarma",
+  "Transparentní broker kótovaný na varšavské burze",
+  "Kvalitní vzdělávací sekce a webináře"
+];
+
+const cons = [
+  "Nenabízí obchodování opcí a futures kontraktů",
+  "České akcie mají vysoké zdanění dividend (35 %)",
+  "Platforma může být pro nováčky zpočátku nepřehledná"
+];
+
+const categories = [
+  { name: 'Poplatky', score: 90, description: '0% až do 100k EUR měsíčně' },
+  { name: 'Platforma', score: 95, description: 'xStation 5 je vynikající' },
+  { name: 'Nabídka', score: 90, description: 'Široký výběr akcií a ETF' },
+  { name: 'Podpora', score: 100, description: '24/7 česká podpora' },
+  { name: 'Důvěryhodnost', score: 100, description: 'ČNB licence, kótován na burze' },
+  { name: 'Vzdělání', score: 95, description: 'Kvalitní sekce a webináře' }
+];
+
+const relatedLinks = [
+  { title: "Kde koupit ETF - přehled brokerů", href: "/kde-koupit-etf#porovnani", description: "Zpět na kompletní přehled a srovnání všech brokerů" },
+  { title: "Srovnání brokerů 2026", href: "/srovnani-brokeru", description: "Porovnejte XTB s dalšími populárními brokery" },
+  { title: "DEGIRO recenze", href: "/degiro-recenze", description: "Alternativa s ještě nižšími poplatky" },
+  { title: "Trading 212 recenze", href: "/trading212-recenze", description: "Zcela bezpoplatkový broker z Bulharska" },
+  { title: "Nejlepší ETF 2026", href: "/nejlepsi-etf/nejlepsi-etf-2026", description: "Doporučené ETF pro investování přes XTB" },
+  { title: "Jak začít investovat", href: "/co-jsou-etf/jak-zacit-investovat", description: "Kompletní průvodce pro začátečníky" },
+  { title: "Portfolio strategie", href: "/portfolio-strategie", description: "Vytvořte si optimální investiční portfolio" },
+  { title: "Investiční kalkulačka", href: "/kalkulacky/investicni-kalkulacka", description: "Spočítejte si budoucí hodnotu investic" },
+  { title: "Backtest portfolia", href: "/kalkulacky/backtest-portfolia", description: "Otestujte historickou výkonnost portfolia" }
+];
+---
+
+<Layout
+  title={`XTB recenze ${currentYear} - Komplexní test a hodnocení brokera`}
+  description={`XTB recenze ${currentYear} - hodnocení 94/100. Transparentní broker s českou licencí ČNB, bezplatnými ETF obchody a 24/7 podporou.`}
+  canonical="/xtb-recenze"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+      <div class="flex items-center justify-center gap-4 mb-6">
+        <img
+          src="/lovable-uploads/a7162820-5478-4cd8-9bfd-fd04b80a42ff.png"
+          alt="XTB logo"
+          class="w-20 h-20 object-contain"
+        />
+        <div>
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+            XTB recenze {currentYear}
+          </h1>
+          <div class="flex items-center justify-center gap-2">
+            <div class="flex text-yellow-400">
+              {'★'.repeat(5)}
+            </div>
+            <span class="text-lg font-semibold text-gray-700">94/100 bodů</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Summary -->
+    <div class="mb-8 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-xl p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+          XTB je vynikající volba pro české investory
+        </h2>
+        <p class="text-gray-600 text-lg">
+          Veřejně obchodovaný polský broker s českou licencí ČNB, 1,7 miliony klientů a více než 11 400 instrumentů
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-green-800 mb-3 flex items-center">
+            <span class="mr-2 text-green-600">✓</span>
+            Hlavní výhody
+          </h3>
+          <ul class="space-y-2 text-sm">
+            {pros.map((pro) => (
+              <li class="flex items-center gap-2">
+                <span class="text-green-600 flex-shrink-0">✓</span>
+                <span>{pro}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-amber-800 mb-3 flex items-center">
+            <span class="mr-2 text-amber-600">⚠</span>
+            Na co si dát pozor
+          </h3>
+          <ul class="space-y-2 text-sm">
+            {cons.map((con) => (
+              <li class="flex items-center gap-2">
+                <span class="text-red-500 flex-shrink-0">✕</span>
+                <span>{con}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Rating -->
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+      <h2 class="text-center text-2xl font-bold text-gray-900 mb-2">Detailní hodnocení</h2>
+      <p class="text-center text-gray-600 mb-6">
+        Náš verdikt založený na důkladné analýze všech aspektů brokera
+      </p>
+      <BrokerRatingGrid
+        client:load
+        overallRating={94}
+        overallDescription="Komplexní hodnocení brokera"
+        categories={categories}
+      />
+    </div>
+
+    <!-- About XTB -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">🌍</span>
+        O společnosti XTB
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Historie a pozadí</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              XTB (X-Trade Brokers) byla založena v roce 2002 v Polsku. Jedná se o veřejně
+              obchodovanou společnost na Varšavské burze cenných papírů, což zajišťuje vysokou
+              míru transparentnosti a finančního reportingu.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Regulace a licence</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Pro české klienty má XTB licenci České národní banky, což je zásadní výhoda
+              pro místní investory. Tato licence zajišťuje dodržování českých právních předpisů
+              a regulací.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Velikost a dosah</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              S více než 1,7 miliony klientů po celém světě patří XTB mezi největší evropské
+              brokery. Společnost nabízí služby ve více než 13 zemích.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Bezpečnost prostředků</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Jako veřejně obchodovaná společnost s licencí ČNB poskytuje XTB vysokou úroveň
+              transparentnosti. Prostředky klientů jsou uloženy na segregovaných účtech
+              u renomovaných bank.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trading Platform -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-green-600">📱</span>
+        Obchodní platforma xStation 5
+      </h2>
+      <div class="mb-6">
+        <p class="text-gray-600 leading-relaxed">
+          XTB nabízí proprietární platformu xStation 5, která je dostupná jako webová aplikace,
+          desktopová verze i mobilní aplikace pro iOS a Android. Platforma je známá svou
+          intuitivností a moderním designem.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Klíčové funkce</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Pokročilé charting nástroje
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Technická analýza (80+ indikátorů)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              One-click trading
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Kalkulátor pozic
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Ekonomický kalendář
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Dostupnost</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Webová verze (bez stahování)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Desktop verze (Windows, Mac)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Mobilní aplikace (iOS/Android)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Česká lokalizace
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Demo účet</h4>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-700 mb-2">
+              <strong>200 000 Kč virtuálních prostředků</strong>
+            </p>
+            <p class="text-xs text-gray-600">
+              Perfektní pro vyzkoušení platformy a testování strategií bez rizika.
+              Demo účet je dostupný zdarma a bez časového omezení.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instruments & Markets -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-purple-600">📈</span>
+        Nabídka instrumentů
+      </h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h4 class="font-semibold mb-4 text-gray-900">Dostupné instrumenty</h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">📈 Akcie</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">7 000+</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">🏛️ ETF</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">1 690</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">💱 Forex</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">69 párů</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">📊 Indexy</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">27</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">🥇 Komodity</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">27</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">₿ Kryptoměny</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">40</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-4 text-gray-900">Speciální funkce</h4>
+          <div class="space-y-4">
+            <div class="border-l-4 border-green-500 pl-4">
+              <h5 class="font-medium text-green-800">Frakční podíly</h5>
+              <p class="text-sm text-gray-600 mt-1">
+                Můžete investovat i do zlomků akcií - například koupit 0,1 akcie Apple
+                místo celé akcie za tisíce korun.
+              </p>
+            </div>
+
+            <div class="border-l-4 border-blue-500 pl-4">
+              <h5 class="font-medium text-blue-800">Fyzické vs CFD</h5>
+              <p class="text-sm text-gray-600 mt-1">
+                U akcií a ETF získáváte skutečné vlastnictví (ne CFD), což znamená
+                práva akcionáře včetně dividend.
+              </p>
+            </div>
+
+            <div class="border-l-4 border-purple-500 pl-4">
+              <h5 class="font-medium text-purple-800">Globální trhy</h5>
+              <p class="text-sm text-gray-600 mt-1">
+                Přístup k akcím z USA, Evropy, Asie včetně hlavních burz jako NYSE,
+                NASDAQ, LSE, Xetra a další.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fees Structure -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        <span class="text-green-600">💰</span>
+        Struktura poplatků
+      </h2>
+      <p class="text-gray-600 mb-6">
+        Detailní přehled všech poplatků - transparentně a bez skrytých nákladů
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b-2 border-gray-200">
+              <th class="text-left py-3 px-4 font-semibold text-gray-900">Typ transakce</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-900">Poplatek</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-900">Poznámka</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Akcie a ETF obchody</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">0 %</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                Bez provize - spread-based pricing
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Bankovní převody</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">Zdarma</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                SEPA převody z banky zdarma
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Vklady kartou (CZK)</td>
+              <td class="py-3 px-4 text-amber-700 font-semibold">0,77 %</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                Pouze při platbě kartou
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Vklady kartou (EUR)</td>
+              <td class="py-3 px-4 text-amber-700 font-semibold">0,70 %</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                Pouze při platbě kartou
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Měnová konverze</td>
+              <td class="py-3 px-4 text-amber-700 font-semibold">0,5 %</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                Spread nad tržním kurzem
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Výběry</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">Zdarma</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                Bez poplatku při výběru
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Minimální vklad</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">0 EUR</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                Žádný povinný minimální vklad
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Neaktivita</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">Zdarma</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">
+                12 měsíců bez poplatku za neaktivitu
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+        <h4 class="font-semibold text-green-800 mb-2">💡 Tip pro úsporu nákladů</h4>
+        <p class="text-sm text-green-700">
+          <strong>Vždy použijte bankovní převod namísto karty!</strong> SEPA převody z banky jsou zdarma,
+          zatímco poplatky za kartu jsou 0,77% (CZK) nebo 0,70% (EUR). Ušetříte tak stovky korun.
+        </p>
+      </div>
+    </div>
+
+    <!-- Taxation -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-amber-600">🛡</span>
+        Zdanění pro české investory
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Zdanění dividend</h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+              <span class="text-sm">🇨🇿 České akcie</span>
+              <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">35 %</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+              <span class="text-sm">🇺🇸 Americké akcie</span>
+              <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">15 %</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+              <span class="text-sm">🇪🇺 EU akcie</span>
+              <span class="bg-yellow-600 text-white px-3 py-1 rounded-full text-sm font-semibold">Různě</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Kapitálové zisky</h4>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Kapitálové zisky z prodeje akcií a ETF podléhají české daňové povinnosti.
+              Akcie držené déle než 3 roky jsou osvobozené od daně z kapitálových zisků
+              (test času).
+            </p>
+          </div>
+
+          <div class="mt-4 p-3 bg-amber-50 rounded-lg border-l-4 border-amber-400">
+            <p class="text-xs text-amber-800">
+              <strong>Pozor:</strong> Vyšší zdanění českých dividend (35% vs standardních 15%)
+              je nevýhoda tohoto brokera pro investory zaměřené na české akcie.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Support -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">👥</span>
+        Zákaznická podpora
+      </h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-2xl">📞</span>
+          </div>
+          <h4 class="font-semibold mb-2">Telefonní podpora</h4>
+          <p class="text-sm text-gray-600 mb-2">24/7 dostupnost</p>
+          <p class="text-xs text-gray-500">Česky mluvící operátoři</p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-2xl">💬</span>
+          </div>
+          <h4 class="font-semibold mb-2">Live chat</h4>
+          <p class="text-sm text-gray-600 mb-2">Rychlá odpověď</p>
+          <p class="text-xs text-gray-500">Přímo v platformě</p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-2xl">✉️</span>
+          </div>
+          <h4 class="font-semibold mb-2">Email podpora</h4>
+          <p class="text-sm text-gray-600 mb-2">Odpověď do 24h</p>
+          <p class="text-xs text-gray-500">Detailní řešení problémů</p>
+        </div>
+      </div>
+
+      <div class="mt-6 p-4 bg-green-50 rounded-lg">
+        <p class="text-sm text-green-800">
+          <strong>Naše zkušenost:</strong> Česká zákaznická podpora dostupná 24/7 patří mezi nejlepší na trhu.
+          Operátoři jsou kompetentní a dokáží vyřešit i složitější dotazy. Rychlé vklady a výběry
+          jsou většinou zdarma, což oceníte především u bankovních převodů.
+        </p>
+      </div>
+    </div>
+
+    <!-- Final Verdict -->
+    <div class="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Závěrečné hodnocení</h2>
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full text-lg font-semibold">
+          <span>🏆</span>
+          94/100 bodů - VYNIKAJÍCÍ
+        </div>
+      </div>
+
+      <p class="text-gray-700 leading-relaxed mb-6 text-left max-w-4xl mx-auto">
+        <strong>XTB je jasně jedním z nejlepších brokerů pro české investory.</strong> Investování do akcií a ETF
+        bez komisí, transparentní broker kótovaný na varšavské burze, česká zákaznická podpora 24/7
+        a moderní platforma xStation 5 vytváří nabídku, kterou jen těžko někdo překoná.
+      </p>
+
+      <p class="text-gray-700 leading-relaxed mb-6 text-left max-w-4xl mx-auto">
+        S více než 7 000 akcií a 1 600+ ETF nabízí dostatečnou diverzifikaci. Frakční práva umožňují
+        investování i s malým kapitálem. Demo účet s 200 000 Kč je perfektní pro vyzkoušení platformy,
+        kterou doplňuje kvalitní vzdělávací sekce s webináři.
+      </p>
+
+      <p class="text-gray-700 leading-relaxed mb-8 text-left max-w-4xl mx-auto">
+        Hlavními nevýhodami jsou chybějící opce a futures kontrakty, vysoké zdanění českých dividend (35%)
+        a platforma, která může být pro nováčky zpočátku nepřehledná. Pro většinu ETF investorů to však
+        nejsou zásadní problémy.
+      </p>
+
+      <div class="bg-blue-50 p-6 rounded-lg mb-6 max-w-4xl mx-auto">
+        <h4 class="font-semibold text-blue-800 mb-2">🎯 Pro koho je XTB ideální?</h4>
+        <ul class="text-sm text-blue-700 text-left space-y-1">
+          <li>• Investoři hledající bezpoplatkové obchodování s ETF a akciemi</li>
+          <li>• Začátečníci ocenující českou podporu 24/7 a demo účet</li>
+          <li>• Investoři s malým kapitálem díky frakčním právům</li>
+          <li>• Ti, kdo chtějí transparentního brokera s kvalitním vzděláváním</li>
+          <li>• Investoři vyhýbající se českým akciím (kvůli vyššímu zdanění)</li>
+        </ul>
+      </div>
+
+      <div class="text-center">
+        <a
+          href="https://www.xtb.com/cz"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Otevřít účet u XTB
+          <span>→</span>
+        </a>
+
+        <p class="text-xs text-gray-500 mt-3">
+          * CFD jsou složité nástroje a nesou vysoké riziko rychlé ztráty peněz kvůli finanční páce.
+        </p>
+      </div>
+    </div>
+
+    <InternalLinking links={relatedLinks} title="Související články a nástroje" />
+  </div>
+</Layout>

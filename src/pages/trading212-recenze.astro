@@ -1,0 +1,476 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+import BrokerRatingGrid from '../components/broker/BrokerRatingGrid';
+
+const currentYear = new Date().getFullYear();
+
+const reviewSchema = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  "itemReviewed": {
+    "@type": "FinancialService",
+    "name": "Trading 212",
+    "description": "Online broker s komisí 0% pro akcie a ETF investice",
+    "url": "https://www.trading212.com/",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "107 Cheapside",
+      "addressLocality": "London",
+      "postalCode": "EC2V 6DN",
+      "addressCountry": "GB"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "87",
+      "bestRating": "100",
+      "worstRating": "0",
+      "reviewCount": "1"
+    }
+  },
+  "reviewRating": {
+    "@type": "Rating",
+    "ratingValue": "87",
+    "bestRating": "100",
+    "worstRating": "0"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF Průvodce"
+  },
+  "datePublished": "2026-09-26",
+  "dateModified": "2026-09-26",
+  "reviewBody": "Trading 212 získává hodnocení 87/100 bodů za 0% poplatky za akcie a ETF, pokročilý AutoInvest systém a frakční obchodování. Ideální pro začátečníky i pokročilé investory hledající automatizované investování."
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kde koupit ETF",
+      "item": "https://www.etfpruvodce.cz/kde-koupit-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": `Trading 212 recenze ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/trading212-recenze"
+    }
+  ]
+};
+
+const pros = [
+  "0% poplatky za akcie a ETF (bez omezení)",
+  "Frakční obchodování od 25 Kč",
+  "AutoInvest & Pies - pokročilá automatizace",
+  "9000+ akcií a ETF z celého světa",
+  "Úroky na neinvestované prostředky",
+  "Bezplatné vklady a výběry",
+  "Demo účet s 50 000 virtuální měny",
+  "Regulace FCA (UK) a CySEC (Cyprus)"
+];
+
+const cons = [
+  "Bez českých akcií (nejsou na BCPP)",
+  "Bez MetaTrader platformy",
+  "Především anglická komunikace",
+  "Bez telefonní podpory",
+  "Poplatek za měnové konverze (0,15%)",
+  "Omezené analytické nástroje",
+  "Lending program (půjčování akcií)"
+];
+
+const categories = [
+  { name: 'Poplatky', score: 95, description: '0% poplatky za akcie a ETF' },
+  { name: 'Platforma', score: 90, description: 'Intuitivní mobilní aplikace' },
+  { name: 'Nabídka', score: 83, description: '9000+ akcií a ETF' },
+  { name: 'Podpora', score: 85, description: 'Převážně anglická komunikace' },
+  { name: 'Důvěryhodnost', score: 90, description: 'FCA a CySEC regulace' },
+  { name: 'Vzdělání', score: 85, description: 'Základní materiály a AutoInvest' }
+];
+
+const relatedLinks = [
+  { title: "Kde koupit ETF - přehled brokerů", href: "/kde-koupit-etf#porovnani", description: "Zpět na kompletní přehled a srovnání všech brokerů" },
+  { title: "DEGIRO recenze", href: "/degiro-recenze", description: "Porovnání s dalším populárním brokerem" },
+  { title: "XTB recenze", href: "/xtb-recenze", description: "Alternativa s pokročilejšími funkcemi" },
+  { title: "Návod pro začátečníky", href: "/co-jsou-etf/jak-zacit-investovat", description: "Jak začít s investováním do ETF" },
+  { title: "Nejlepší ETF 2026", href: "/nejlepsi-etf/nejlepsi-etf-2026", description: "Doporučené ETF pro investování" },
+  { title: "Monte Carlo simulátor", href: "/kalkulacky/monte-carlo-simulator", description: "Prognóza budoucnosti vašeho portfolia" },
+  { title: "Nouzová rezerva", href: "/kalkulacky/nouzova-rezerva", description: "Kolik byste měli mít stranou?" }
+];
+---
+
+<Layout
+  title={`Trading 212 recenze ${currentYear} - Test a hodnocení`}
+  description={`Trading 212 recenze ${currentYear} - hodnocení 87/100. Zcela bezpoplatkový broker s moderní mobilní aplikací a frakčním investováním.`}
+  canonical="/trading212-recenze"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Hero sekce -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Trading 212 recenze {currentYear}
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+        Kompletní recenze Trading 212 - britského brokera s 0% poplatky a pokročilým AutoInvest systémem.
+        Ideální pro začátečníky i pokročilé investory hledající automatizované investování.
+      </p>
+    </div>
+
+    <!-- Detailed Rating -->
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+      <h2 class="text-center text-2xl font-bold text-gray-900 mb-2">Detailní hodnocení</h2>
+      <p class="text-center text-gray-600 mb-6">
+        Náš verdikt založený na důkladné analýze všech aspektů brokera
+      </p>
+      <BrokerRatingGrid
+        client:load
+        overallRating={87}
+        overallDescription="Komplexní hodnocení brokera"
+        categories={categories}
+      />
+    </div>
+
+    <!-- Rychlý přehled -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-green-600 mb-4 flex items-center gap-2">
+          <span class="text-green-600">✓</span>
+          Výhody Trading 212
+        </h3>
+        <ul class="space-y-2">
+          {pros.map((pro) => (
+            <li class="flex items-center gap-2">
+              <span class="text-green-600 flex-shrink-0">✓</span>
+              <span class="text-sm">{pro}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">
+          <span class="text-red-500">✕</span>
+          Nevýhody Trading 212
+        </h3>
+        <ul class="space-y-2">
+          {cons.map((con) => (
+            <li class="flex items-center gap-2">
+              <span class="text-red-500 flex-shrink-0">✕</span>
+              <span class="text-sm">{con}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Klíčové informace -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">👥</span>
+        Klíčové informace o Trading 212
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2">Založení a regulace</h4>
+            <p class="text-sm text-gray-600">
+              Založeno v roce 2004 v Bulharsku. Pro české klienty Trading 212 Markets Ltd.
+              regulované kyperskou CySEC (evropské klienty).
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-2">Velikost a dosah</h4>
+            <p class="text-sm text-gray-600">
+              Více než 2.5 milionu registrovaných uživatelů.
+              Rychle rostoucí broker v Evropě.
+            </p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2">Nabídka instrumentů</h4>
+            <p class="text-sm text-gray-600">
+              11 000+ akcií a 1400+ ETF z USA a EU burz.
+              Zaměření na akcie a ETF.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-2">Ochrana klientů</h4>
+            <p class="text-sm text-gray-600">
+              Hotovost u německých bank (JP Morgan SE, Sparkasse) pojištěna do 100k €.
+              Investice pojištěny kyperským ICF do 20k €.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poplatky -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        <span class="text-green-600">📈</span>
+        Struktura poplatků
+      </h2>
+      <p class="text-gray-600 mb-6">Jedny z nejnižších poplatků na trhu</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-2 font-semibold">Typ transakce</th>
+              <th class="text-left py-2 font-semibold">Poplatek</th>
+              <th class="text-left py-2 font-semibold">Poznámka</th>
+            </tr>
+          </thead>
+          <tbody class="space-y-2">
+            <tr class="border-b">
+              <td class="py-2">Akcie a ETF</td>
+              <td class="py-2">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">0%</span>
+              </td>
+              <td class="py-2 text-gray-600">Bez omezení objemu</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Měnová konverze</td>
+              <td class="py-2">0.15%</td>
+              <td class="py-2 text-gray-600">Víkendy 0.5%</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Výběr prostředků</td>
+              <td class="py-2">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">0 EUR</span>
+              </td>
+              <td class="py-2 text-gray-600">Zdarma</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Poplatek za neaktivitu</td>
+              <td class="py-2">10 EUR/rok</td>
+              <td class="py-2 text-gray-600">Po 12 měsících bez aktivity</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2">Dividend handling</td>
+              <td class="py-2">
+                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">0%</span>
+              </td>
+              <td class="py-2 text-gray-600">Bez poplatků</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Platforma a aplikace -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-purple-600">🛡</span>
+        Platformy a aplikace
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3">Mobilní aplikace</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Velmi intuitivní design
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Fractional shares (část akcie)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              AutoInvest funkce
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Rychlé obchodování
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">Webová platforma</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Synchronizace s aplikací
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Základní charty
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-amber-600">⚠</span>
+              Omezené analytické nástroje
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-red-500">✕</span>
+              Žádné pokročilé obchodní typy
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- AutoInvest funkce -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 mb-8 border border-blue-200">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">📈</span>
+        AutoInvest - Automatické investování
+      </h2>
+      <p class="text-gray-600 mb-6">Jedinečná funkce pro pravidelné investování</p>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3">Jak funguje AutoInvest</h4>
+          <ul class="space-y-2 text-sm">
+            <li>• Nastavte si měsíční částku pro investování</li>
+            <li>• Vyberte ETF nebo akcie do portfolia</li>
+            <li>• Určete procentuální rozdělení</li>
+            <li>• Trading 212 automaticky nakupuje každý měsíc</li>
+            <li>• Možnost i fractional shares (části akcií)</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">Výhody AutoInvest</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Pravidelné investování (DCA)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Automatické rebalancování
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Žádné další poplatky
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Možnost úprav kdykoliv
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pro koho je vhodný -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Pro koho je Trading 212 vhodný?</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3 text-green-600">✅ Vhodné pro</h4>
+          <ul class="space-y-2 text-sm">
+            <li>• Začátečníky v investování</li>
+            <li>• Investory hledající jednoduchost</li>
+            <li>• Ty, kdo preferují mobilní aplikace</li>
+            <li>• Buy-and-hold investory</li>
+            <li>• Pravidelné investory (DCA)</li>
+            <li>• Investory s menším kapitálem</li>
+            <li>• Ty, kdo chtějí 0% komise</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3 text-red-600">❌ Nevhodné pro</h4>
+          <ul class="space-y-2 text-sm">
+            <li>• Pokročilé tradery a analýzy</li>
+            <li>• Aktivní day tradery</li>
+            <li>• Ty, kdo potřebují pokročilé obchodní typy</li>
+            <li>• Investory vyžadující detailní analytiku</li>
+            <li>• Ty, kdo se obávají lending programu</li>
+            <li>• Investory preferující desktop platformy</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bezpečnostní upozornění -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-8 mb-8">
+      <h2 class="text-2xl font-bold text-amber-700 mb-6 flex items-center gap-2">
+        <span>⚠</span>
+        Důležité bezpečnostní informace
+      </h2>
+      <div class="space-y-4">
+        <div>
+          <h4 class="font-semibold mb-2">Lending Program</h4>
+          <p class="text-sm text-gray-700">
+            Trading 212 automaticky zapojuje vaše akcie do program půjčování třetím stranám.
+            V krizích může být problém s dostupností akcií. Doporučujeme program vypnout
+            v nastavení účtu.
+          </p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-2">Výpadky systému</h4>
+          <p class="text-sm text-gray-700">
+            Občas dochází k výpadkům aplikace při extrémní volatilitě trhu.
+            Mějte připravený backup plán pro urgentní obchody.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upozornění o lending programu -->
+    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-8 mb-8">
+      <h2 class="text-xl font-bold text-amber-700 mb-4 flex items-center gap-2">
+        <span>⚠</span>
+        Pozor na lending program
+      </h2>
+      <p class="text-amber-800">
+        Trading 212 automaticky zapojuje vaše akcie do lending programu (půjčování).
+        To může být rizikem při krizích. Program lze vypnout, ale pozor na automatické zapojení
+        nových pozic.
+      </p>
+    </div>
+
+    <!-- Závěr -->
+    <div class="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Závěrečné hodnocení</h2>
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 bg-indigo-100 text-indigo-800 px-6 py-3 rounded-full text-lg font-semibold">
+          <span>🏆</span>
+          87/100 bodů - VELMI DOBRÁ
+        </div>
+      </div>
+
+      <p class="text-gray-700 leading-relaxed mb-4 max-w-4xl mx-auto">
+        Trading 212 je výborná volba pro začátečníky a jednoduché investování díky 0% komisím
+        a intuitivní aplikaci. AutoInvest funkce je skvělá pro pravidelné investování do ETF.
+        Hlavními nevýhodami jsou omezené pokročilé funkce a lending program.
+      </p>
+      <p class="text-gray-700 leading-relaxed mb-6 max-w-4xl mx-auto">
+        Pro začátečníky hledající jednoduché a levné řešení je Trading 212 jedna z nejlepších voleb.
+        Pokročilí investoři by měli zvážit DEGIRO či Interactive Brokers s lepšími analytickými nástroji.
+      </p>
+
+      <div class="text-center">
+        <a
+          href="https://www.trading212.com/"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Otevřít účet u Trading 212
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

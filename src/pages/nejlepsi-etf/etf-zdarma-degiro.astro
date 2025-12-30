@@ -1,0 +1,497 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['etf-zdarma-degiro'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString().split('T')[0];
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `ETF zdarma na DEGIRO ${currentYear} - Kompletní seznam komisně bezplatných fondů`,
+  "description": `Kompletní seznam 65+ ETF fondů zdarma na DEGIRO ${currentYear}. CSPX, IWDA, EMIM - nulové komise pro první obchod měsíčně.`,
+  "image": "https://www.etfpruvodce.cz/og-degiro-free-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": `${currentYear}-01-30`,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/etf-zdarma-degiro"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": `DEGIRO ETF zdarma, CSPX, IWDA, EMIM, investování, indexové fondy`,
+  "wordCount": 2500,
+  "inLanguage": "cs-CZ"
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jak funguje Fair Use Policy na DEGIRO?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "První obchod s každým ETF každý kalendářní měsíc je zdarma do €1,000 za transakci. Od druhého obchodu se stejným ETF ve stejném měsíci se účtuje administrativní poplatek €1 + spread."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kolik ETF fondů je dostupných zdarma na DEGIRO?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DEGIRO nabízí více než 65 ETF fondů v rámci své Fair Use Policy. Zahrnuje nejpopulárnější ETF od iShares, Vanguard, SPDR a dalších poskytovatelů pokrývající všechny hlavní indexy a regiony."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nejlepší ETF zdarma na DEGIRO?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejpopulárnější jsou iShares Core S&P 500 (CSPX), iShares Core MSCI World (IWDA) a iShares Core MSCI Emerging Markets (EMIM). Tyto ETF nabízejí širokou diverzifikaci a nízké poplatky v kombinaci s nulovými komisemi."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Platí Fair Use Policy i pro prodeje ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, Fair Use Policy platí jak pro nákupy, tak pro prodeje. První prodej každého ETF měsíčně je zdarma, další prodeje stojí €1 + spread. To je důležité plánovat při rebalancování portfolia."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi €1 poplatkem a běžnými komisemi?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Běžné komise u jiných brokerů se pohybují od €5-20 za obchod. DEGIRO účtuje pouze €1 za druhý a další obchody, což je významná úspora. Při měsíční DCA strategii platíte nulu komisí."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou data v našich žebříčcích aktuální?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, všechny žebříčky jsou generovány živě z naší databáze při každém načtení stránky. Zahrnují nejnovější data o TER, velikosti fondů, výkonnosti a DEGIRO free statusu všech ETF dostupných pro evropské investory."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "ETF zdarma na DEGIRO",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/etf-zdarma-degiro"
+    }
+  ]
+};
+
+const fairUsePolicyFeatures = [
+  {
+    title: "První obchod zdarma",
+    description: "Každý kalendářní měsíc můžete koupit nebo prodat každý ETF jednou zcela zdarma až do €1,000 za transakci.",
+    color: "green"
+  },
+  {
+    title: "Druhý obchod za €1",
+    description: "Od druhého obchodu se stejným ETF ve stejném měsíci se účtuje administrativní poplatek €1 + spread.",
+    color: "orange"
+  },
+  {
+    title: "Strategie DCA",
+    description: "Pro pravidelné investování doporučujeme provádět pouze jeden nákup každého ETF měsíčně, ideálně vždy ke stejnému datu.",
+    color: "blue"
+  }
+];
+
+const faqs = [
+  {
+    question: "Jak funguje Fair Use Policy na DEGIRO?",
+    answer: "První obchod s každým ETF každý kalendářní měsíc je zdarma do €1,000 za transakci. Od druhého obchodu se stejným ETF ve stejném měsíci se účtuje administrativní poplatek €1 + spread. Tato politika je ideální pro měsíční DCA strategii."
+  },
+  {
+    question: "Kolik ETF fondů je dostupných zdarma na DEGIRO?",
+    answer: "DEGIRO nabízí více než 65 ETF fondů v rámci své Fair Use Policy. Zahrnuje nejpopulárnější ETF od iShares, Vanguard, SPDR a dalších poskytovatelů pokrývající všechny hlavní indexy a regiony."
+  },
+  {
+    question: "Jaké jsou nejlepší ETF zdarma na DEGIRO?",
+    answer: "Nejpopulárnější jsou iShares Core S&P 500 (CSPX), iShares Core MSCI World (IWDA) a iShares Core MSCI Emerging Markets (EMIM). Tyto ETF nabízejí širokou diverzifikaci a nízké poplatky v kombinaci s nulovými komisemi."
+  },
+  {
+    question: "Platí Fair Use Policy i pro prodeje ETF?",
+    answer: "Ano, Fair Use Policy platí jak pro nákupy, tak pro prodeje. První prodej každého ETF měsíčně je zdarma, další prodeje stojí €1 + spread. To je důležité plánovat při rebalancování portfolia."
+  },
+  {
+    question: "Jaký je rozdíl mezi €1 poplatkem a běžnými komisemi?",
+    answer: "Běžné komise u jiných brokerů se pohybují od €5-20 za obchod. DEGIRO účtuje pouze €1 za druhý a další obchody, což je významná úspora. Při měsíční DCA strategii platíte nulu komisí."
+  },
+  {
+    question: "Jsou data v našich žebříčcích aktuální?",
+    answer: "Ano, všechny žebříčky jsou generovány živě z naší databáze při každém načtení stránky. Zahrnují nejnovější data o TER, velikosti fondů, výkonnosti a DEGIRO free statusu všech ETF dostupných pro evropské investory."
+  }
+];
+
+const relatedLinks = [
+  { title: "Nejlepší ETF", href: "/nejlepsi-etf", description: "Všechny kategorie ETF", icon: "📊" },
+  { title: "S&P 500 ETF", href: "/nejlepsi-etf/nejlepsi-sp500-etf", description: "Americké ETF", icon: "🇺🇸" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů", icon: "🏦" },
+  { title: "DEGIRO recenze", href: "/degiro-recenze", description: "Podrobná recenze brokera", icon: "⭐" }
+];
+---
+
+<Layout
+  title={`ETF zdarma na DEGIRO ${currentYear} | Srovnání`}
+  description={`Kompletní seznam 65+ ETF fondů zdarma na DEGIRO ${currentYear}. CSPX, IWDA, EMIM - nulové komise, poplatky pouze €1 za 2. obchod.`}
+  canonical="/nejlepsi-etf/etf-zdarma-degiro"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-orange-50/50 via-red-50/30 to-yellow-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-orange-200 to-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-red-200 to-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-orange-100 to-red-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-orange-200/50">
+            🆓 Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            ETF zdarma na
+            <span class="bg-gradient-to-r from-orange-600 via-red-600 to-yellow-600 bg-clip-text text-transparent">
+              DEGIRO
+            </span>
+          </h1>
+
+          <!-- Author byline -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date().toLocaleDateString('cs-CZ')}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní seznam 65+ ETF fondů, které můžete obchodovat bez komisí na DEGIRO brokeru.
+            První obchod měsíčně zdarma, další za pouhý €1.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md">
+              🛡️ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold rounded-md">
+              📊 Kompletní seznam
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - DEGIRO Stats -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+
+            <!-- Simple Header -->
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-3">
+                🛡️
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">
+                DEGIRO v číslech
+              </h3>
+              <p class="text-sm text-gray-600">Klíčová fakta o brokeru</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-orange-600">🏢</span>
+                  <span class="text-xs text-gray-500 font-medium">ETF ZDARMA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">65+</div>
+                <div class="text-xs text-gray-600">komisně bezplatných</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-green-600">💰</span>
+                  <span class="text-xs text-gray-500 font-medium">POPLATEK</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">€1</div>
+                <div class="text-xs text-gray-600">za 2. obchod měsíčně</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-blue-600">🌍</span>
+                  <span class="text-xs text-gray-500 font-medium">POKRYTÍ</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">Globální</div>
+                <div class="text-xs text-gray-600">všechny regiony</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-purple-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-purple-600">🛡️</span>
+                  <span class="text-xs text-gray-500 font-medium">OCHRANA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">€20k</div>
+                <div class="text-xs text-gray-600">investorská ochrana</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-orange-100 w-20 h-20 mx-auto mb-8 hover:bg-orange-200 transition-colors">
+          <span class="text-3xl">🛡️</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Jak funguje Fair Use Policy?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          DEGIRO nabízí více než 65 ETF fondů s nulovými komisemi pro první obchod měsíčně
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {fairUsePolicyFeatures.map((item, index) => (
+          <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+            <div class={`flex items-center justify-center rounded-full w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform ${
+              item.color === 'green' ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
+              item.color === 'orange' ? 'bg-gradient-to-r from-orange-500 to-red-600' :
+              'bg-gradient-to-r from-blue-500 to-indigo-600'
+            }`}>
+              <span class="text-2xl text-white">
+                {item.color === 'green' ? '💰' : item.color === 'orange' ? '⚠️' : '🎯'}
+              </span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-orange-800 transition-colors">
+              {item.title}
+            </h3>
+            <p class="text-gray-600 leading-relaxed text-center">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 ETF v této kategorii
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="DEGIRO" />
+
+  <!-- Selection Guide Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div id="pruvodce" class="bg-gradient-to-br from-white to-orange-50 rounded-3xl p-12 border border-orange-100 shadow-xl">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-orange-100 to-red-100 w-20 h-20 mx-auto mb-6">
+            <span class="text-3xl">🎯</span>
+          </div>
+          <h4 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            💡 Jak maximálně využít DEGIRO Fair Use Policy?
+          </h4>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Praktické tipy pro investování s nulovými komisemi
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
+            <div class="flex items-center mb-4">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                <span class="text-green-600 font-bold text-sm">1</span>
+              </div>
+              <h5 class="text-lg font-bold text-green-800">Měsíční DCA strategie</h5>
+            </div>
+            <p class="text-green-700 leading-relaxed">
+              Investujte pravidelně každý měsíc stejnou částku do vybraných ETF.
+              Jeden nákup měsíčně = nulové komise po celý rok.
+            </p>
+          </div>
+
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+            <div class="flex items-center mb-4">
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <span class="text-blue-600 font-bold text-sm">2</span>
+              </div>
+              <h5 class="text-lg font-bold text-blue-800">Diversifikace zdarma</h5>
+            </div>
+            <p class="text-blue-700 leading-relaxed">
+              Kombinujte různé ETF: světové akcie (IWDA), emerging markets (EMIM),
+              dluhopisy - každý měsíčně jednou bez komisí.
+            </p>
+          </div>
+
+          <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+            <div class="flex items-center mb-4">
+              <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                <span class="text-purple-600 font-bold text-sm">3</span>
+              </div>
+              <h5 class="text-lg font-bold text-purple-800">Správné načasování</h5>
+            </div>
+            <p class="text-purple-700 leading-relaxed">
+              Naplánujte si investice na konkrétní den v měsíci.
+              Vyhněte se impulzivním nákupům, které by stály €1 extra.
+            </p>
+          </div>
+
+          <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-200">
+            <div class="flex items-center mb-4">
+              <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                <span class="text-orange-600 font-bold text-sm">4</span>
+              </div>
+              <h5 class="text-lg font-bold text-orange-800">Akumulační vs distribuční</h5>
+            </div>
+            <p class="text-orange-700 leading-relaxed">
+              Preferujte akumulační ETF (reinvestice dividend) pro automatický růst.
+              Vyhnete se nuceným prodejům kvůli daním z dividend.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-orange-100 w-20 h-20 mx-auto mb-8 hover:bg-orange-200 transition-colors">
+          <span class="text-2xl">❓</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Často kladené otázky o ETF zdarma na DEGIRO
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Odpovědi na nejčastější dotazy o investování bez komisí
+        </p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-8 shadow-md">
+        <div class="max-w-4xl mx-auto space-y-6">
+          {faqs.map((faq, index) => (
+            <details class="group border border-gray-200 rounded-lg hover:border-orange-200 transition-colors">
+              <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-orange-50 rounded-lg group-open:rounded-b-none transition-colors">
+                <span class="font-semibold text-lg text-gray-900 group-hover:text-orange-800">{faq.question}</span>
+                <svg class="w-5 h-5 text-gray-500 group-hover:text-orange-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+                {faq.answer}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-orange-100 w-20 h-20 mx-auto mb-8 hover:bg-orange-200 transition-colors">
+          <span class="text-3xl">⚡</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Připraveni investovat zdarma na DEGIRO?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Otevřete si účet na DEGIRO a začněte s investováním do 65+ ETF bez komisí
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <a href="/degiro-recenze" class="inline-flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 py-4 text-lg font-semibold rounded-md">
+            👥 Přečíst DEGIRO recenzi
+          </a>
+          <a href="/srovnani-brokeru" class="inline-flex items-center justify-center border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-4 text-lg font-semibold rounded-md">
+            📊 Srovnat s jinými brokery
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

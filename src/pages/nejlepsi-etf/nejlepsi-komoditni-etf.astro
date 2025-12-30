@@ -1,0 +1,528 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-komoditni-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString();
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší komoditní ETF 2026 - zlato, ropa, zemědělství`,
+  "description": `Kompletní srovnání nejlepších komoditních ETF 2026. Zlato, ropa, kovy, zemědělství - poplatky TER, diverzifikace, výnosy.`,
+  "image": "https://www.etfpruvodce.cz/og-commodity-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": `2026-01-20`,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-komoditni-etf"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `Jaké jsou nejlepší komoditní ETF v roce 2026?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Nejlepší komoditní ETF jsou: ${etfs[0]?.name || 'iShares Diversified Commodity Swap UCITS ETF'}, ${etfs[1]?.name || 'L&G All Commodities UCITS ETF'}, a ${etfs[2]?.name || 'WisdomTree Broad Commodities UCITS ETF'}. Tyto ETF nabízejí širokou diverzifikaci napříč komoditami.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč investovat do komoditních ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Komoditní ETF nabízejí ochranu proti inflaci, diverzifikaci portfolia (nízká korelace s akciemi) a expozici k reálným aktivům."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi swap-based a physically-backed komoditními ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Swap-based ETF jako iShares ICOM (IE00BDQZRK82) nedrží fyzické komodity, ale používají deriváty (swapy) k replikaci výkonnosti komoditního indexu. Physically-backed ETF vlastní skutečné komodity (např. zlato v trezorech). Swap-based mají nižší TER, ale vyšší protistranu riziko."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké typy komodit obsahují diverzifikované komoditní ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Diverzifikované komoditní ETF typicky obsahují čtyři hlavní kategorie: energetické komodity (ropa, zemní plyn - cca 35%), zemědělské produkty (obilí, sója, káva - cca 25%), průmyslové kovy (měď, hliník, zinek - cca 20%) a drahé kovy (zlato, stříbro - cca 20%)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jakou část portfolia by měly tvořit komoditní ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Komoditní ETF jsou vysoce volatilní a doporučuje se alokovat pouze 5-10% celkového portfolia. Slouží primárně jako ochrana před inflací a nástroj diverzifikace díky nízké korelaci s akciemi a dluhopisy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co je contango efekt a jak ovlivňuje komoditní ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Contango je situace na futures trhu, kdy jsou budoucí kontrakty dražší než spotové ceny. Komoditní ETF musí pravidelně rolovat futures kontrakty, což při contangu způsobuje ztráty (roll yield). Proto dlouhodobé držení komoditních ETF může mít nižší výnosy než samotná podkladová komodita."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Domů", "item": "https://www.etfpruvodce.cz" },
+    { "@type": "ListItem", "position": 2, "name": "Nejlepší ETF", "item": "https://www.etfpruvodce.cz/nejlepsi-etf" },
+    { "@type": "ListItem", "position": 3, "name": "Nejlepší komoditní ETF", "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-komoditni-etf" }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší zlaté ETF", href: "/nejlepsi-etf/nejlepsi-zlate-etf", description: "Specializované ETF na fyzické zlato", icon: "🥇" },
+  { title: "Nejlepší dluhopisové ETF", href: "/nejlepsi-etf/nejlepsi-dluhopisove-etf", description: "Další aktivum pro diverzifikaci", icon: "💵" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů pro investice", icon: "🏦" },
+  { title: "Portfolio strategie", href: "/portfolio-strategie", description: "Jak sestavit diverzifikované portfolio", icon: "📊" }
+];
+---
+
+<Layout
+  title={`Nejlepší Komoditní ETF 2026 | Zlato, Ropa, Kovy`}
+  description={`✅ Kompletní srovnání nejlepších komoditních ETF 2026. Zlato, ropa, kovy, zemědělství - poplatky TER, diverzifikace. Aktuální data k ${currentDate}.`}
+  canonical="/nejlepsi-etf/nejlepsi-komoditni-etf"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-orange-50/30 to-brown-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-yellow-200 to-amber-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-amber-200/50">
+            🛢️ Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší
+            <span class="bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent">
+              komoditní ETF
+            </span>
+          </h1>
+
+          <!-- Author byline -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">Tomáš Kostrhoun</a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date().toLocaleDateString('cs-CZ')}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších komoditních ETF.
+            Zlato, ropa, kovy, zemědělství - poplatky TER, diverzifikace a výnosy.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+              🛢️ Komodity
+            </a>
+          </div>
+        </div>
+
+        <!-- Stats Box -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-amber-100 rounded-xl mb-3">
+                <span class="text-2xl">🛢️</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Komoditní trh v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro komoditní investice</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-amber-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-amber-600">🏆</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJVĚTŠÍ FOND</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">3,2B</div>
+                <div class="text-xs text-gray-600">iShares Diversified Commodity</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-orange-600">💰</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,19%</div>
+                <div class="text-xs text-gray-600">L&G All Commodities</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-amber-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-amber-600">📊</span>
+                  <span class="text-xs text-gray-500 font-medium">DIVERZIFIKACE</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">20+</div>
+                <div class="text-xs text-gray-600">různých komodit</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-orange-600">🛡️</span>
+                  <span class="text-xs text-gray-500 font-medium">OCHRANA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">Inflace</div>
+                <div class="text-xs text-gray-600">zajištění hodnoty</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-amber-100 w-20 h-20 mx-auto mb-8 hover:bg-amber-200 transition-colors">
+          <span class="text-3xl">🛢️</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co jsou komoditní ETF?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Investiční fondy zaměřené na komodity a přírodní zdroje
+          pro ochranu před inflací a diverzifikaci portfolia
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🛡️</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-amber-800 transition-colors">Ochrana před inflací</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Komodity historicky rostou s inflací a poskytují ochranu kupní síly.
+            Ceny základních surovin rostou při zvýšených nákladech na výrobu.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-yellow-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">📊</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-orange-800 transition-colors">Diverzifikace sektorů</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Energetické (ropa, plyn), zemědělské (obilí, káva), průmyslové kovy (měď, hliník)
+            a drahé kovy (zlato, stříbro) poskytují širokou diverzifikaci.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-yellow-500 to-amber-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🌍</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-yellow-800 transition-colors">Negativní korelace</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Komodity mají často negativní korelaci s akciemi a dluhopisy.
+            Poskytují ochranu během ekonomických krizí a trhových poklesů.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 nejlepší komoditní ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} komoditních ETF fondů
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Database Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="komoditní" />
+
+  <!-- Selection Guide Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div id="pruvodce" class="bg-gradient-to-br from-white to-amber-50 rounded-3xl p-12 border border-amber-100 shadow-xl">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-amber-100 to-orange-100 w-20 h-20 mx-auto mb-6">
+            <span class="text-3xl">🎯</span>
+          </div>
+          <h4 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            🥇 Jak vybrat ten správný komoditní ETF?
+          </h4>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Praktický průvodce výběrem nejlepšího komoditního ETF podle vaší investiční strategie a ekonomického cyklu
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-amber-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-xl mb-4">
+              <span class="text-xl">📊</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Typy komodit</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Energetické (ropa 35%), zemědělské (obilí 25%), průmyslové kovy (měď 20%)
+              a drahé kovy (zlato 20%). Diverzifikované ETF kombinují všechny.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-orange-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
+              <span class="text-xl">🔄</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Struktura a náklady</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Swap-based ETF (nižší TER 0,19-0,65%) vs physically-backed (vyšší náklady).
+              Pozor na contango efekt u futures kontraktů.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-yellow-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-xl mb-4">
+              <span class="text-xl">💰</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Ekonomický cyklus</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Komodity prospívají během pozdní fáze ekonomického růstu a vysoké inflace.
+              Trpí během recese a deflace.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-amber-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-xl mb-4">
+              <span class="text-xl">🌍</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Měnové riziko</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Komodity jsou denominované v USD. Silný EUR snižuje výnosy z commodity ETF
+              pro evropské investory.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-orange-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-xl mb-4">
+              <span class="text-xl">📈</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Volatilita a timing</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Komoditní ETF jsou vysoce volatilní. Ideální jako malá část portfolia (5-10%)
+              pro diverzifikaci a inflační ochranu.
+            </p>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl mb-4">
+              <span class="text-xl">🏆</span>
+            </div>
+            <h5 class="text-lg font-bold text-gray-900 mb-3">Velikost a likvidita</h5>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Vybírejte ETF s minimálně 1 mld. EUR pro stabilitu. iShares ICOM (2,8 mld.)
+              má nejvyšší likviditu a nejužší spready.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Často kladené otázky</h2>
+        <p class="text-xl text-gray-600">Odpovědi na nejčastější dotazy o komoditní ETF</p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group border border-gray-200 rounded-lg hover:border-amber-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-amber-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-amber-800">Jaké jsou nejlepší komoditní ETF v roce {currentYear}?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-amber-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší komoditní ETF jsou: <strong>{etfs[0]?.name || 'iShares Diversified Commodity Swap UCITS ETF'}</strong>,
+            <strong>{etfs[1]?.name || 'L&G All Commodities UCITS ETF'}</strong>, a
+            <strong>{etfs[2]?.name || 'WisdomTree Broad Commodities UCITS ETF'}</strong>.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-amber-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-amber-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-amber-800">Co jsou komoditní ETF a jak fungují?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-amber-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Komoditní ETF</strong> investují do futures kontraktů na komodity jako zlato, ropa, zemědělské produkty a průmyslové kovy.
+            Poskytují expozici k cenám komodit bez fyzického vlastnictví a ochranu před inflací.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-amber-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-amber-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-amber-800">Proč investovat do komoditních ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-amber-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Komoditní ETF poskytují ochranu před inflací</strong>, diverzifikaci portfolia a často negativní korelaci s akciemi.
+            Jsou ideální během období vysoké inflace a ekonomické nejistoty.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-amber-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-amber-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-amber-800">Jaké jsou nejlevnější komoditní ETF s nízkými náklady?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-amber-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlevnější komoditní ETF jsou: <strong>iShares Diversified Commodity Swap UCITS ETF</strong> (ICOM, IE00BDQZRK82)
+            s TER 0,19%, <strong>WisdomTree Broad Commodities UCITS ETF</strong> (GCOM, IE00B8CRQX21)
+            s TER 0,49%, a <strong>Xtrackers DBLCI Optimum Yield Commodity UCITS ETF</strong> (XCOM, LU0292106167) s TER 0,65%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-amber-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-amber-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-amber-800">Který komoditní ETF má největší velikost a likviditu?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-amber-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Největší komoditní ETF je <strong>iShares Diversified Commodity Swap UCITS ETF</strong> (ICOM, IE00BDQZRK82)
+            s velikostí 2,81 mld. EUR. Poskytuje nejvyšší likviditu, nejužší spready a nejvíce diverzifikovanou expozici k 24 komoditám.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-amber-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-amber-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-amber-800">Jaký je rozdíl mezi swap-based a physically-backed komoditními ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-amber-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Swap-based ETF</strong> jako iShares ICOM (IE00BDQZRK82) nedrží fyzické komodity, ale používají deriváty.
+            <strong>Physically-backed ETF</strong> vlastní skutečné komodity (např. zlato). Swap-based mají nižší TER ale vyšší protistranu riziko.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-br from-amber-50 to-orange-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-3xl p-12 shadow-xl border border-amber-100">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-amber-100 to-orange-100 w-20 h-20 mx-auto mb-6">
+            <span class="text-3xl">🚀</span>
+          </div>
+          <h3 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Připraveni ochránit se před inflací?
+          </h3>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Komoditní ETF poskytují ochranu před inflací a diverzifikaci portfolia.
+            Objevte nejlepší commodity fondy a chraňte své úspory před znehodnocením.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div class="text-center p-6 bg-amber-50 rounded-xl border border-amber-100">
+            <span class="text-2xl mb-3 block">🛢️</span>
+            <h4 class="font-bold text-gray-900 mb-2">Inflační ochrana</h4>
+            <p class="text-sm text-gray-600">Komodity rostou s inflací</p>
+          </div>
+          <div class="text-center p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <span class="text-2xl mb-3 block">🏭</span>
+            <h4 class="font-bold text-gray-900 mb-2">Diverzifikace</h4>
+            <p class="text-sm text-gray-600">Negativní korelace s akciemi</p>
+          </div>
+          <div class="text-center p-6 bg-orange-50 rounded-xl border border-orange-100">
+            <span class="text-2xl mb-3 block">⛽</span>
+            <h4 class="font-bold text-gray-900 mb-2">Přírodní zdroje</h4>
+            <p class="text-sm text-gray-600">Základní suroviny ekonomiky</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#top3" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+            ⭐ Vybrat komoditní ETF
+          </a>
+          <a href="/srovnani-etf" class="inline-flex items-center justify-center gap-2 border-2 border-amber-300 text-amber-700 hover:bg-amber-50 px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+            📊 Porovnat všechny ETF
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

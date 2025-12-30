@@ -1,0 +1,461 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETFServer from '../../components/etf/Top3ETFServer';
+import Top10SectionsServer from '../../components/etf/Top10SectionsServer';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-technologicke-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString().split('T')[0];
+
+// JSON-LD strukturovaná data pro SEO
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší technologické ETF 2026 - NASDAQ 100 a tech sektory`,
+  "description": `Srovnání nejlepších technologických ETF 2026. NASDAQ 100, S&P 500 Tech, Information Technology - TER, velikost fondů.`,
+  "image": "https://www.etfpruvodce.cz/og-technology-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2026-01-15",
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-technologicke-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": "technologicke ETF, NASDAQ 100, S&P 500 Technology, Information Technology, tech sektor",
+  "wordCount": 2800,
+  "inLanguage": "cs-CZ",
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Technology ETF",
+      "description": "Exchange-traded funds focused on technology sector stocks like Apple, Microsoft, Google"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares Nasdaq 100 UCITS ETF (Acc)",
+      "identifier": "IE00B53SZB19"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares S&P 500 Information Technology Sector UCITS ETF USD (Acc)",
+      "identifier": "IE00B3WJKG14"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "Invesco EQQQ Nasdaq-100 UCITS ETF",
+      "identifier": "IE0032077012"
+    }
+  ],
+  "mentions": [
+    {
+      "@type": "Thing",
+      "name": "NASDAQ 100",
+      "description": "Index of 100 largest non-financial companies on NASDAQ, dominated by tech giants"
+    },
+    {
+      "@type": "Thing",
+      "name": "Technology Sector Investing",
+      "description": "Investment strategy focused on technology companies like Apple, Microsoft, Google, Amazon"
+    }
+  ]
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nejlepší technologické ETF v roce 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší technologické ETF jsou: iShares Nasdaq 100 UCITS ETF (IE00B53SZB19) největší tech ETF s 17,9 mld. EUR a TER 0,30%, iShares S&P 500 Information Technology Sector UCITS ETF (IE00B3WJKG14) s 12,3 mld. EUR a TER 0,15%, a Invesco EQQQ Nasdaq-100 UCITS ETF (IE0032077012) s 9,4 mld. EUR a TER 0,30%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co jsou technologické ETF a jaké firmy obsahují?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Technologické ETF investují do technologických společností jako Apple, Microsoft, Google (Alphabet), Amazon, Tesla, NVIDIA a dalších tech gigantů. Sledují indexy jako NASDAQ 100 nebo S&P 500 Information Technology sektor a poskytují diverzifikovaný přístup k investování do technologického sektoru."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi NASDAQ 100 ETF a S&P 500 Technology ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "NASDAQ 100 ETF obsahuje 100 největších nebankovních společností na NASDAQ burze (cca 50% technologie, ale i jiné sektory). S&P 500 Technology ETF je čistě zaměřený na technologický sektor S&P 500 indexu. NASDAQ 100 je diversifikovanější, zatímco S&P 500 Tech je čistě technologický."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou náklady na technologické ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER (celkové náklady) technologických ETF se pohybují mezi 0,15% až 0,50% ročně. Naše TOP 3 má konkurenční poplatky: iShares Nasdaq 100 (IE00B53SZB19) má TER 0,30%, iShares S&P 500 IT Sector (IE00B3WJKG14) má nejnižší TER 0,15% a Invesco EQQQ (IE0032077012) má TER 0,30%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaká jsou rizika investování do technologických ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Hlavní rizika technologických ETF zahrnují: vyšší volatilitu oproti širokému trhu, koncentraci do několika velkých firem (Apple, Microsoft, NVIDIA), citlivost na úrokové sazby, regulatorní rizika v oblastech jako AI a antitrust, a cyklickou povahu technologického sektoru. Pro snížení rizika je vhodné kombinovat tech ETF s jinými sektory."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit technologické ETF v České republice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Technologické ETF jako iShares Nasdaq 100 (IE00B53SZB19), iShares S&P 500 IT Sector (IE00B3WJKG14) a Invesco EQQQ (IE0032077012) můžete koupit u českých brokerů: Degiro, Interactive Brokers, XTB, Trading212, Portu nebo Fio e-Broker. Porovnejte si transakční poplatky a dostupnost jednotlivých ETF."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší technologické ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-technologicke-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  {
+    href: "/nejlepsi-etf/nejlepsi-nasdaq-etf",
+    title: "Nejlepší NASDAQ ETF",
+    description: "Specializované NASDAQ 100 fondy"
+  },
+  {
+    href: "/nejlepsi-etf/nejlepsi-ai-etf",
+    title: "Nejlepší AI ETF",
+    description: "Umělá inteligence a robotika"
+  },
+  {
+    href: "/nejlepsi-etf/nejlepsi-growth-etf",
+    title: "Nejlepší Growth ETF",
+    description: "Růstové ETF pro tech investory"
+  }
+];
+---
+
+<Layout
+  title={`Nejlepší technologické ETF 2026 | Srovnání`}
+  description={`Srovnání nejlepších technologických ETF 2026. NASDAQ 100, S&P 500 Tech, Information Technology - TER, velikost fondů. Aktuální data k ${currentDate}.`}
+  canonical="/nejlepsi-etf/nejlepsi-technologicke-etf"
+>
+  <!-- Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-purple-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-blue-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+            </svg>
+            Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              technologické ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a
+              href="/o-nas"
+              class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+            >
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>
+              Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších technologických ETF.
+            NASDAQ 100, S&P 500 Technology a Information Technology včetně Apple, Microsoft a Google.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+              </svg>
+              Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+              </svg>
+              Tech inovace
+            </a>
+          </div>
+        </div>
+
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-3">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Technologický sektor v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro tech investice</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJVĚTŠÍ TECH ETF</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">17,9B</div>
+                <div class="text-xs text-gray-600">NASDAQ 100 iShares</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-indigo-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,15%</div>
+                <div class="text-xs text-gray-600">S&P 500 IT sektor</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                  <span class="text-xs text-gray-500 font-medium">TOP HOLDING</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">7%</div>
+                <div class="text-xs text-gray-600">Apple podíl</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-indigo-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                  <span class="text-xs text-gray-500 font-medium">10Y VÝNOS</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">15%</div>
+                <div class="text-xs text-gray-600">ročně historicky</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-blue-100 w-20 h-20 mx-auto mb-8 hover:bg-blue-200 transition-colors hover-scale">
+          <svg class="w-10 h-10 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+          </svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co jsou technologické ETF?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Investiční fondy zaměřené na technologické společnosti jako Apple, Microsoft, Google,
+          Amazon a další tech giganty s nejvyšším růstovým potenciálem
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.2s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-blue-800 transition-colors">FAANG a tech giganty</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Investice do největších technologických společností světa -
+            Apple, Microsoft, Google, Amazon, Meta a dalších lídrů inovací.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.3s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-indigo-800 transition-colors">Dlouhodobý růst</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Technologický sektor historicky dosahuje nejvyšších výnosů
+            díky neustálým inovacím, digitalizaci a rostoucí poptávce.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.4s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-blue-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-purple-800 transition-colors">Budoucnost ekonomiky</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            AI, cloud computing, elektromobilita a další trendy
+            formují budoucnost a technologické ETF vám dají přístup k těmto inovacím.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 nejlepší technologické ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} technologických ETF fondů
+        </p>
+      </div>
+
+      <Top3ETFServer etfs={etfs} currency="EUR" client:load />
+    </div>
+  </section>
+
+  <Top10SectionsServer etfs={etfs} currency="EUR" categoryName="technologicke" client:load />
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Často kladené otázky</h2>
+        <p class="text-xl text-gray-600">Odpovědi na nejčastější dotazy o technologických ETF</p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaké jsou nejlepší technologické ETF v roce 2026?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší technologické ETF jsou: <strong>iShares Nasdaq 100 UCITS ETF</strong> (IE00B53SZB19)
+            největší tech ETF s 17,9 mld. EUR a TER 0,30%, <strong>iShares S&P 500 Information Technology Sector UCITS ETF</strong> (IE00B3WJKG14)
+            s 12,3 mld. EUR a TER 0,15%, a <strong>Invesco EQQQ Nasdaq-100 UCITS ETF</strong>
+            (IE0032077012) s 9,4 mld. EUR a TER 0,30%.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Co jsou technologické ETF a jaké firmy obsahují?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Technologické ETF</strong> investují do technologických společností jako Apple, Microsoft, Google (Alphabet),
+            Amazon, Tesla, NVIDIA a dalších tech gigantů. Sledují indexy jako NASDAQ 100 nebo S&P 500 Information Technology
+            sektor a poskytují diverzifikovaný přístup k investování do technologického sektoru.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaký je rozdíl mezi NASDAQ 100 ETF a S&P 500 Technology ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>NASDAQ 100 ETF</strong> obsahuje 100 největších nebankovních společností na NASDAQ burze
+            (cca 50% technologie, ale i jiné sektory). <strong>S&P 500 Technology ETF</strong> je čistě zaměřený
+            na technologický sektor S&P 500 indexu. NASDAQ 100 je diversifikovanější, zatímco S&P 500 Tech je čistě technologický.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

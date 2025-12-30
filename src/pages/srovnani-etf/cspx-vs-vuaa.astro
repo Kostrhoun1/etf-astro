@@ -1,0 +1,93 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const currentYear = new Date().getFullYear();
+---
+
+<Layout
+  title={`CSPX vs VUAA - Srovnání ETF ${currentYear}`}
+  description="Detailní srovnání ETF CSPX vs VUAA. iShares vs Vanguard S&P 500 - TER, výkonnost, poskytovatel."
+  canonical="/srovnani-etf/cspx-vs-vuaa"
+  keywords="CSPX vs VUAA, srovnání ETF, S&P 500 ETF, iShares, Vanguard, akumulační ETF"
+  ogImage="/og-etf-comparison.jpg"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+        ETF Srovnání
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        CSPX vs VUAA
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        iShares vs Vanguard S&P 500 - dva nejpopulárnější S&P 500 ETF
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+      <div class="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
+        <h2 class="text-2xl font-bold text-blue-900 mb-4">CSPX</h2>
+        <p class="text-gray-700 mb-4">iShares Core S&P 500 UCITS ETF (Acc)</p>
+        <div class="space-y-3">
+          <div class="flex justify-between"><span class="text-gray-600">TER</span><span class="font-semibold">0.07%</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Poskytovatel</span><span class="font-semibold">iShares (BlackRock)</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Velikost</span><span class="font-semibold">~90 mld EUR</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Založeno</span><span class="font-semibold">2010</span></div>
+        </div>
+        <a href="/etf/IE00B5BMR087" class="mt-4 inline-block w-full text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Detail ETF</a>
+      </div>
+
+      <div class="bg-violet-50 rounded-xl p-6 border-2 border-violet-200">
+        <h2 class="text-2xl font-bold text-violet-900 mb-4">VUAA</h2>
+        <p class="text-gray-700 mb-4">Vanguard S&P 500 UCITS ETF (Acc)</p>
+        <div class="space-y-3">
+          <div class="flex justify-between"><span class="text-gray-600">TER</span><span class="font-semibold">0.07%</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Poskytovatel</span><span class="font-semibold">Vanguard</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Velikost</span><span class="font-semibold">~45 mld EUR</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Založeno</span><span class="font-semibold">2019</span></div>
+        </div>
+        <a href="/etf/IE00BFMXXD54" class="mt-4 inline-block w-full text-center bg-violet-600 text-white py-2 rounded-lg hover:bg-violet-700">Detail ETF</a>
+      </div>
+    </div>
+
+    <div class="bg-gray-50 rounded-xl p-8 mb-12">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Který vybrat?</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold text-blue-700 mb-3">Vyberte CSPX pokud:</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Preferujete větší a zavedený fond</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Důvěřujete značce iShares</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Chcete delší track record</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-violet-700 mb-3">Vyberte VUAA pokud:</h3>
+          <ul class="space-y-2 text-gray-700">
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Preferujete Vanguard filozofii</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Máte již jiné Vanguard ETF</li>
+            <li class="flex items-start gap-2"><span class="text-green-500">&#10003;</span>Je dostupnější na vašem brokerovi</li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+        <p class="text-green-800 font-medium">Oba ETF jsou prakticky identické - sledují stejný index se stejným TER. Rozdíl je minimální.</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border p-6">
+      <h3 class="font-semibold text-gray-900 mb-4">Další srovnání</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        <a href="/srovnani-etf/vwce-vs-cspx" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">VWCE vs CSPX</div>
+        </a>
+        <a href="/srovnani-etf/iwda-vs-cspx" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">IWDA vs CSPX</div>
+        </a>
+        <a href="/nejlepsi-etf" class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+          <div class="font-semibold text-blue-600">Nejlepší ETF</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

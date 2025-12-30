@@ -1,0 +1,512 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlevnejsi-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString();
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlevnější ETF 2026 - ETF s nejnižším TER`,
+  "description": `Kompletní srovnání nejlevnějších ETF 2026. Nejnižší poplatky TER od 0,03%, úspora na nákladech, kvalitní fondy.`,
+  "image": "https://www.etfpruvodce.cz/og-cheapest-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": `2026-01-10`,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlevnejsi-etf"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Co je TER poplatek a jak se počítá?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "TER (Total Expense Ratio) je celkový poplatek za správu ETF vyjádřený jako procento z hodnoty investice ročně. Například při TER 0,20% a investici 10.000 € zaplatíte 20 € ročně. Poplatek se strhává automaticky z výkonnosti fondu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi nejlevnějším a nejdražším ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlevnější ETF mají TER kolem 0,03-0,07%, zatímco nejdražší mohou mít 1-2% ročně. Na investici 100.000 € za 20 let může tento rozdíl znamenat 50.000+ € méně na konečné částce kvůli složenému úročení."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nejlepší nejlevnější ETF pro začátečníky?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pro začátečníky doporučujeme iShares Core S&P 500 ETF (CSPX, IE00B5BMR087) s TER 0,07%, UBS MSCI World ETF (WLDA, IE00B7KQ7B66) s TER 0,17% a iShares Core FTSE 100 ETF (ISF, IE00B53HP851) s TER 0,07%. Tyto ETF kombinují nízké poplatky s vysokou likviditou a stabilitou."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proč mají některé ETF vyšší poplatky než jiné?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Vyšší poplatky mohou odrážet složitější strategii, aktivní správu, menší velikost fondu nebo specializaci na konkrétní trhy. Základní indexové ETF na velké trhy mají zpravidla nejnižší poplatky díky úsporám z rozsahu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou data v našich žebříčcích aktuální?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, všechny žebříčky nejlevnějších ETF jsou generovány živě z naší databáze při každém načtení stránky. Zahrnují nejnovější data o TER, velikosti fondů a dalších klíčových parametrech všech ETF dostupných pro evropské investory."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jak ovlivní nízké poplatky můj dlouhodobý výnos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nízké poplatky mají zásadní vliv na dlouhodobé výnosy díky složenému úročení. Rozdíl 0,5% v TER může na 30letém investování snížit konečnou částku o 15-20%. Proto jsou nízké poplatky klíčové pro pasivní investory."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Domů", "item": "https://www.etfpruvodce.cz" },
+    { "@type": "ListItem", "position": 2, "name": "Nejlepší ETF", "item": "https://www.etfpruvodce.cz/nejlepsi-etf" },
+    { "@type": "ListItem", "position": 3, "name": "Nejlevnější ETF", "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlevnejsi-etf" }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší S&P 500 ETF", href: "/nejlepsi-etf/nejlepsi-sp500-etf", description: "Nejlevnější americké indexové fondy", icon: "🇺🇸" },
+  { title: "Nejlepší akumulační ETF", href: "/nejlepsi-etf/nejlepsi-akumulacni-etf", description: "ETF s reinvesticí dividend", icon: "📈" },
+  { title: "Kde koupit ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů pro investice", icon: "🏦" },
+  { title: "Portfolio strategie", href: "/portfolio-strategie", description: "Jak sestavit portfolio s nízkými náklady", icon: "📊" }
+];
+---
+
+<Layout
+  title={`Nejlevnější ETF 2026 | ETF s Nejnižším TER`}
+  description={`✅ Kompletní srovnání nejlevnějších ETF 2026. Nejnižší TER od 0,03%, úspora na poplatcích, kvalitní fondy. Aktuální data k ${currentDate}.`}
+  canonical="/nejlepsi-etf/nejlevnejsi-etf"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-green-50/30 to-teal-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-emerald-200 to-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-green-200 to-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-teal-200 to-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-emerald-200/50">
+            💸 Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlevnější
+            <span class="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent">
+              ETF
+            </span>
+          </h1>
+
+          <!-- Author byline -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a href="/o-nas" class="text-violet-600 hover:text-violet-700 font-medium hover:underline">Tomáš Kostrhoun</a>
+            <span class="text-gray-400">•</span>
+            <span>Aktualizováno: {new Date().toLocaleDateString('cs-CZ')}</span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání ETF s nejnižšími poplatky TER.
+            Ušetřete na nákladech a maximalizujte své dlouhodobé výnosy.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center gap-2 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+              💸 Nejlevnější ETF
+            </a>
+          </div>
+        </div>
+
+        <!-- Stats Box -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-xl mb-3">
+                <span class="text-2xl">💸</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">Poplatky v číslech</h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro úsporu nákladů</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-emerald-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-emerald-600">💰</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJNIŽŠÍ TER</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,03%</div>
+                <div class="text-xs text-gray-600">SPDR S&P 500</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-green-600">📊</span>
+                  <span class="text-xs text-gray-500 font-medium">PRŮMĚR</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">0,20%</div>
+                <div class="text-xs text-gray-600">průměrný TER na trhu</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-emerald-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-emerald-600">🎯</span>
+                  <span class="text-xs text-gray-500 font-medium">ÚSPORA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">85%</div>
+                <div class="text-xs text-gray-600">oproti průměru</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-green-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-green-600">🏆</span>
+                  <span class="text-xs text-gray-500 font-medium">TOP POSKYTOVATELÉ</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">SPDR</div>
+                <div class="text-xs text-gray-600">Invesco, iShares</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-emerald-100 w-20 h-20 mx-auto mb-8 hover:bg-emerald-200 transition-colors">
+          <span class="text-3xl">💸</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">💰 Proč jsou nízké poplatky klíčové?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Nízké TER poplatky mají obrovský dopad na dlouhodobé výnosy
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-green-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">💰</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-emerald-800 transition-colors">Složené úročení</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Každé procento poplatku snižuje konečnou částku. Na investici 100.000 € za 20 let může rozdíl 0,5% znamenat 10.000+ € méně.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-teal-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">📊</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-green-800 transition-colors">Transparentnost</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            TER je jednoduše srovnatelná metrika. Čím nižší číslo, tím více peněz zůstává ve vašem portfoliu.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 hover:shadow-md transition-shadow group">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-teal-500 to-emerald-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🏆</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-teal-800 transition-colors">Kontrola nákladů</h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Poplatky jsou to jediné, co můžete ovlivnit. Výnosy trhu jsou nepředvídatelné, poplatky ETF konstantní.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 ETF Section -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 nejlevnější ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} ETF fondů seřazených podle TER
+        </p>
+      </div>
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <section id="srovnani" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Top10Sections etfs={etfs} currency="EUR" categoryName="nejlevnější" />
+    </div>
+  </section>
+
+  <!-- Selection Guide Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div id="pruvodce" class="bg-gradient-to-br from-white to-emerald-50 rounded-3xl p-12 border border-emerald-100 shadow-xl">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-100 to-green-100 w-20 h-20 mx-auto mb-6">
+            <span class="text-3xl">🎯</span>
+          </div>
+          <h4 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            💡 Jak vybrat nejlevnější ETF?
+          </h4>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Praktický průvodce výběrem podle vašeho investičního profilu
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div class="space-y-6">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">✅ Na co se zaměřit</h3>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="text-green-600 font-bold text-sm">1</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">TER pod 0,3%</h4>
+                <p class="text-gray-600">Pro dlouhodobé investování vybírejte ETF s nejnižšími možnými poplatky.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="text-green-600 font-bold text-sm">2</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Velikost fondu</h4>
+                <p class="text-gray-600">Větší fondy (500M+) jsou stabilnější a mají lepší likviditu.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="text-green-600 font-bold text-sm">3</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Sledovaný index</h4>
+                <p class="text-gray-600">Důležitější než poskytovatel je kvalita a diverzifikace indexu.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">⚠️ Čeho se vyvarovat</h3>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <span class="text-red-600 font-bold text-sm">×</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Vysoké TER</h4>
+                <p class="text-gray-600">ETF s TER nad 0,7% jsou zpravidla příliš drahé pro pasivní investování.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <span class="text-red-600 font-bold text-sm">×</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Malé fondy</h4>
+                <p class="text-gray-600">Fondy pod 100M € mohou být uzavřeny nebo mít problémy s likviditou.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <span class="text-red-600 font-bold text-sm">×</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900 mb-1">Pákové ETF</h4>
+                <p class="text-gray-600">Leveraged ETF mají vyšší poplatky a jsou vhodné jen pro zkušené investory.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-green-100 w-20 h-20 mx-auto mb-8 hover:bg-green-200 transition-colors">
+          <span class="text-2xl">❓</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Často kladené otázky o nejlevnějších ETF
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Odpovědi na nejčastější dotazy o poplatcích a výběru ETF s nejnižšími náklady
+        </p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-shadow">
+        <div class="max-w-4xl mx-auto space-y-6">
+          <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Co je TER poplatek a jak se počítá?</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              TER (Total Expense Ratio) je celkový poplatek za správu ETF vyjádřený jako procento z hodnoty investice ročně. Například při TER 0,20% a investici 10.000 € zaplatíte 20 € ročně. Poplatek se strhává automaticky z výkonnosti fondu.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaký je rozdíl mezi nejlevnějším a nejdražším ETF?</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              Nejlevnější ETF mají TER kolem 0,03-0,07%, zatímco nejdražší mohou mít 1-2% ročně. Na investici 100.000 € za 20 let může tento rozdíl znamenat 50.000+ € méně na konečné částce kvůli složenému úročení.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jaké jsou nejlepší nejlevnější ETF pro začátečníky?</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              Pro začátečníky doporučujeme iShares Core S&P 500 ETF (CSPX, IE00B5BMR087) s TER 0,07%, UBS MSCI World ETF (WLDA, IE00B7KQ7B66) s TER 0,17% a iShares Core FTSE 100 ETF (ISF, IE00B53HP851) s TER 0,07%. Tyto ETF kombinují nízké poplatky s vysokou likviditou a stabilitou.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Proč mají některé ETF vyšší poplatky než jiné?</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              Vyšší poplatky mohou odrážet složitější strategii, aktivní správu, menší velikost fondu nebo specializaci na konkrétní trhy. Základní indexové ETF na velké trhy mají zpravidla nejnižší poplatky díky úsporám z rozsahu.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jsou data v našich žebříčcích aktuální?</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              Ano, všechny žebříčky nejlevnějších ETF jsou generovány živě z naší databáze při každém načtení stránky. Zahrnují nejnovější data o TER, velikosti fondů a dalších klíčových parametrech všech ETF dostupných pro evropské investory.
+            </div>
+          </details>
+
+          <details class="group border border-gray-200 rounded-lg hover:border-green-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-green-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-green-800">Jak ovlivní nízké poplatky můj dlouhodobý výnos?</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-green-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              Nízké poplatky mají zásadní vliv na dlouhodobé výnosy díky složenému úročení. Rozdíl 0,5% v TER může na 30letém investování snížit konečnou částku o 15-20%. Proto jsou nízké poplatky klíčové pro pasivní investory.
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-br from-emerald-50 to-green-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-3xl p-12 shadow-xl border border-emerald-100">
+        <div class="text-center mb-12">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-emerald-100 to-green-100 w-20 h-20 mx-auto mb-6">
+            <span class="text-3xl">🚀</span>
+          </div>
+          <h3 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Připraveni ušetřit na poplatcích?
+          </h3>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Nízké náklady jsou klíčem k dlouhodobému úspěchu.
+            Vyberte si ETF s nejnižšími poplatky a maximalizujte své výnosy.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#top3" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+            ⭐ Vybrat nejlevnější ETF
+          </a>
+          <a href="/srovnani-etf" class="inline-flex items-center justify-center gap-2 border-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 px-8 py-3 text-lg font-semibold rounded-lg transition-colors">
+            📊 Porovnat všechny ETF
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

@@ -1,0 +1,710 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+import { ETFGuideRelatedLinks } from '../data/internal-links';
+
+const currentYear = new Date().getFullYear();
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jsou ETF fondy bezpečné?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ETF s označením UCITS (většina evropských ETF) jsou velmi bezpečné díky přísné regulaci Evropské unie. Vaše peníze jsou odděleny od majetku správce fondu podle zákona o kolektivním investování. I kdyby správce ETF zkrachoval, vaše investice zůstávají chráněny jako samostatný majetek. ETF jsou proto bezpečnější než jednotlivé akcie nebo aktivní fondy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jak dlouho držet ETF investice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ETF jsou určené pro dlouhodobé investování (5+ let). Čím déle držíte, tím více se vyrovnají krátkodobé výkyvy. Historická data ukazují, že při držení déle než 15 let byla pravděpodobnost ztráty téměř nulová. Daňová výhoda v ČR: Zisky z prodeje ETF jsou po 3 letech držení osvobozeny od daně z příjmu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi VWCE a CSPX?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "VWCE (Vanguard FTSE All-World) obsahuje 3800+ firem z celého světa s TER 0,22%, zatímco CSPX (iShares Core S&P 500) obsahuje 500 největších US firem s TER 0,07%. Pro začátečníky doporučujeme VWCE - poskytuje větší diverzifikaci a automaticky vás chrání před koncentračním rizikem jednoho regionu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou poplatky u ETF a jak se platí?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ETF mají nejnižší poplatky ze všech investičních instrumentů. TER (Total Expense Ratio) je 0,03-0,5% ročně a automaticky se strhává z hodnoty ETF. Navíc platíte broker poplatky za nákup/prodej - Trading 212 a XTB nabízí 0% poplatky. Spread (rozdíl mezi nákupní a prodejní cenou) je u velkých ETF obvykle 0,01-0,05%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "S kolika penězi začít investovat do ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Můžete začít investovat do ETF už s 1000-5000 Kč. Moderní brokeři jako Trading 212 nebo XTB umožňují nákup frakčních podílů, takže nemusíte kupovat celý podíl ETF. Důležitější než velikost počáteční investice je pravidelnost - investování 3000 Kč měsíčně po dobu 20 let může při průměrném výnosu 7% p.a. vyrůst na více než 1,5 milionu korun."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jak se platí daně z ETF v České republice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Při držení méně než 3 roky platíte 15% daň z příjmu z realizovaného zisku. Při držení 3+ roky je zisk z prodeje zcela osvobozen od daně! Akumulační ETF (VWCE, CSPX) nevyplácí dividendy, takže neplatíte žádnou daň během držení. Pro daňovou efektivitu vybírejte akumulační ETF."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nevýhody ETF fondů?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ETF kopírují trh, takže během recesí klesají stejně jako celý trh. Zahraniční ETF jsou vystaveny měnovému riziku. U menších ETF může být větší spread. Tracking error způsobuje malé odchylky od indexu (0,1-0,3% ročně). Nemůžete ovlivnit, které konkrétní akcie ETF drží. Nevýhody ETF jsou však minimální ve srovnání s výhodami."
+      }
+    }
+  ]
+};
+
+const faqs = [
+  {
+    question: "Jsou ETF fondy bezpečné?",
+    answer: "ETF s označením UCITS (většina evropských ETF) jsou velmi bezpečné díky přísné regulaci Evropské unie. Vaše peníze jsou odděleny od majetku správce fondu podle zákona o kolektivním investování. I kdyby správce ETF zkrachoval, vaše investice zůstávají chráněny jako samostatný majetek. ETF jsou proto bezpečnější než jednotlivé akcie nebo aktivní fondy."
+  },
+  {
+    question: "Jak dlouho držet ETF investice?",
+    answer: "ETF jsou určené pro dlouhodobé investování (5+ let). Čím déle držíte, tím více se vyrovnají krátkodobé výkyvy. Historická data ukazují, že při držení déle než 15 let byla pravděpodobnost ztráty téměř nulová. Daňová výhoda v ČR: Zisky z prodeje ETF jsou po 3 letech držení osvobozeny od daně z příjmu."
+  },
+  {
+    question: "Jaký je rozdíl mezi VWCE a CSPX?",
+    answer: "VWCE (Vanguard FTSE All-World) obsahuje 3800+ firem z celého světa s TER 0,22%, zatímco CSPX (iShares Core S&P 500) obsahuje 500 největších US firem s TER 0,07%. Pro začátečníky doporučujeme VWCE - poskytuje větší diverzifikaci a automaticky vás chrání před koncentračním rizikem jednoho regionu."
+  },
+  {
+    question: "Jaké jsou poplatky u ETF a jak se platí?",
+    answer: "ETF mají nejnižší poplatky ze všech investičních instrumentů. TER (Total Expense Ratio) je 0,03-0,5% ročně a automaticky se strhává z hodnoty ETF. Navíc platíte broker poplatky za nákup/prodej - Trading 212 a XTB nabízí 0% poplatky. Spread (rozdíl mezi nákupní a prodejní cenou) je u velkých ETF obvykle 0,01-0,05%."
+  },
+  {
+    question: "S kolika penězi začít investovat do ETF?",
+    answer: "Můžete začít investovat do ETF už s 1000-5000 Kč. Moderní brokeři jako Trading 212 nebo XTB umožňují nákup frakčních podílů, takže nemusíte kupovat celý podíl ETF. Důležitější než velikost počáteční investice je pravidelnost - investování 3000 Kč měsíčně po dobu 20 let může při průměrném výnosu 7% p.a. vyrůst na více než 1,5 milionu korun."
+  },
+  {
+    question: "Jak se platí daně z ETF v České republice?",
+    answer: "Při držení méně než 3 roky platíte 15% daň z příjmu z realizovaného zisku. Při držení 3+ roky je zisk z prodeje zcela osvobozen od daně! Akumulační ETF (VWCE, CSPX) nevyplácí dividendy, takže neplatíte žádnou daň během držení. Pro daňovou efektivitu vybírejte akumulační ETF."
+  },
+  {
+    question: "Jaké jsou nevýhody ETF fondů?",
+    answer: "ETF kopírují trh, takže během recesí klesají stejně jako celý trh. Zahraniční ETF jsou vystaveny měnovému riziku. U menších ETF může být větší spread. Tracking error způsobuje malé odchylky od indexu (0,1-0,3% ročně). Nemůžete ovlivnit, které konkrétní akcie ETF drží. Nevýhody ETF jsou však minimální ve srovnání s výhodami."
+  }
+];
+---
+
+<Layout
+  title="Co jsou ETF | Co je ETF fond - Kompletní průvodce 2026"
+  description="Co jsou ETF fondy? Vše o ETF jednoduše vysvětleno. Co je ETF, jak funguje, výhody a nevýhody ETF fondů. Průvodce pro začátečníky i pokročilé investory."
+  canonical="/co-jsou-etf"
+  keywords="co jsou ETF, ETF fond, exchange traded fund, pasivní investování, diverzifikace, ETF pro začátečníky, jak fungují ETF"
+  ogImage="/og-what-are-etfs.jpg"
+  ogTitle="Co jsou ETF fondy - Kompletní průvodce 2026"
+  ogDescription="Co jsou ETF fondy? Vše o ETF jednoduše vysvětleno. Průvodce pro začátečníky i pokročilé investory."
+>
+  <!-- FAQ Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <!-- Modern Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-blue-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-emerald-200 to-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-teal-200 to-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-emerald-200/50">
+            <span class="mr-2">📖</span>
+            Kompletní průvodce ETF {currentYear}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Co jsou
+            <span class="bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 bg-clip-text text-transparent">
+              ETF fondy?
+            </span>
+          </h1>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Co je ETF a jak do něj investovat? ETF fondy jednoduše vysvětleny
+            pro začátečníky i pokročilé české investory.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href="/srovnani-etf"
+              class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2"
+            >
+              <span>📈</span>
+              Srovnat ETF fondy
+            </a>
+            <a
+              href="/kalkulacky/investicni-kalkulacka"
+              class="bg-white/80 backdrop-blur-sm border-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 px-8 py-4 text-lg font-semibold rounded-lg transition-all hover:shadow-lg flex items-center justify-center gap-2"
+            >
+              <span>🧮</span>
+              Kalkulačka výnosů
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Visual Element -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-blue-400/20 rounded-3xl transform rotate-3"></div>
+          <div class="relative bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 shadow-xl">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Klíčové výhody ETF</h3>
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                <span class="text-gray-700">Nízké poplatky 0,03-0,5% ročně</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-teal-500 rounded-full"></div>
+                <span class="text-gray-700">Automatická diverzifikace</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span class="text-gray-700">Vysoká likvidita</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-indigo-500 rounded-full"></div>
+                <span class="text-gray-700">Transparentnost</span>
+              </div>
+            </div>
+            <div class="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border border-emerald-200">
+              <p class="text-sm font-semibold text-emerald-800">
+                Jeden ETF = tisíce firem po celém světe
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <article class="prose prose-lg max-w-none">
+
+      <!-- 1. Definice ETF -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">ETF jednoduše vysvětleno</h2>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-8">
+          <div class="md:col-span-2">
+            <p class="text-xl text-gray-800 mb-6">
+              <strong class="text-emerald-700">ETF (Exchange Traded Fund)</strong> je investiční fond, který se obchoduje na burze jako akcie.
+              Jedním nákupem získáte podíl ve stovkách nebo tisících světových firem automaticky.
+            </p>
+
+            <div class="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-lg p-6 border border-emerald-200">
+              <h3 class="text-lg font-bold text-gray-900 mb-4">Klíčové vlastnosti ETF fondů:</h3>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span class="text-gray-700">Nízké poplatky (0,03-0,5%)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span class="text-gray-700">Automatická diverzifikace</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span class="text-gray-700">Vysoká likvidita</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span class="text-gray-700">Transparentnost</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <img
+              src="/images/etf-kosik-vs-akcie.png"
+              alt="ETF košík vs jednotlivé akcie - srovnání investičních strategií"
+              class="w-full rounded-lg shadow-lg"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Geografická diverzifikace ETF -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Světová diverzifikace ETF fondů</h2>
+
+        <div class="grid md:grid-cols-3 gap-8 items-center mb-8">
+          <div class="md:col-span-2">
+            <p class="text-lg text-gray-800 mb-6">
+              Jeden ETF vám umožní investovat do <strong>celého světa najednou</strong>. Například ETF VWCE obsahuje
+              3800+ firem z desítek zemí a automaticky vás diverzifikuje napříč všemi kontinenty.
+            </p>
+
+            <p class="text-lg text-gray-700">
+              Místo vybírání jednotlivých akcií z různých zemí stačí jeden nákup ETF a automaticky získáte
+              vyváženou expozici vůči všem hlavním světovým trhům podle jejich ekonomické velikosti.
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-blue-900">🇺🇸 Severní Amerika</span>
+                <span class="text-blue-700 font-bold">64%</span>
+              </div>
+            </div>
+            <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-emerald-900">🇪🇺 Evropa</span>
+                <span class="text-emerald-700 font-bold">15%</span>
+              </div>
+            </div>
+            <div class="bg-violet-50 rounded-lg p-3 border border-violet-200">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-violet-900">🇯🇵 Japonsko</span>
+                <span class="text-violet-700 font-bold">6%</span>
+              </div>
+            </div>
+            <div class="bg-amber-50 rounded-lg p-3 border border-amber-200">
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-amber-900">🌏 Ostatní trhy</span>
+                <span class="text-amber-700 font-bold">15%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Nejlepší ETF pro začátečníky -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Nejlepší ETF fondy pro začátečníky v roce 2026</h2>
+
+        <p class="text-lg text-gray-700 mb-8">
+          Pro začátečníky doporučujeme začít s jedním <strong>celosvětovým ETF</strong>, který poskytuje okamžitou diverzifikaci
+          do tisíců firem z celého světa. Zde jsou nejpopulárnější volby:
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+          <a href="/etf/IE00BK5BQT80" class="border-2 border-gray-200 rounded-xl p-6 hover:border-emerald-300 hover:shadow-lg transition-all group block">
+            <div class="text-center">
+              <div class="text-4xl mb-4">🌍</div>
+              <h3 class="font-bold text-xl mb-2 group-hover:text-emerald-600">VWCE</h3>
+              <div class="text-gray-600 mb-3">Vanguard FTSE All-World</div>
+              <div class="space-y-1 text-sm">
+                <div class="flex justify-between">
+                  <span>Počet firem:</span>
+                  <span class="font-semibold">3800+</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>TER poplatek:</span>
+                  <span class="font-semibold text-emerald-600">0,22%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Výkonnost 5 let:</span>
+                  <span class="font-semibold">+11,2% p.a.</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a href="/etf/IE00B5BMR087" class="border-2 border-gray-200 rounded-xl p-6 hover:border-emerald-300 hover:shadow-lg transition-all group block">
+            <div class="text-center">
+              <div class="text-4xl mb-4">🇺🇸</div>
+              <h3 class="font-bold text-xl mb-2 group-hover:text-emerald-600">CSPX</h3>
+              <div class="text-gray-600 mb-3">iShares Core S&P 500</div>
+              <div class="space-y-1 text-sm">
+                <div class="flex justify-between">
+                  <span>Počet firem:</span>
+                  <span class="font-semibold">500</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>TER poplatek:</span>
+                  <span class="font-semibold text-emerald-600">0,07%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Výkonnost 5 let:</span>
+                  <span class="font-semibold">+13,1% p.a.</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a href="/etf/IE00B4L5Y983" class="border-2 border-gray-200 rounded-xl p-6 hover:border-emerald-300 hover:shadow-lg transition-all group block">
+            <div class="text-center">
+              <div class="text-4xl mb-4">🏢</div>
+              <h3 class="font-bold text-xl mb-2 group-hover:text-emerald-600">SWDA</h3>
+              <div class="text-gray-600 mb-3">iShares Core MSCI World</div>
+              <div class="space-y-1 text-sm">
+                <div class="flex justify-between">
+                  <span>Počet firem:</span>
+                  <span class="font-semibold">1600+</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>TER poplatek:</span>
+                  <span class="font-semibold text-emerald-600">0,20%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Výkonnost 5 let:</span>
+                  <span class="font-semibold">+12,8% p.a.</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- 4. Jak fungují ETF technicky -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Jak fungují ETF fondy? Mechanismus pasivního investování</h2>
+
+        <p class="text-lg text-gray-700 mb-8">
+          ETF fungují na principu <strong>pasivního sledování indexů</strong>. Správce fondu automaticky nakupuje
+          všechny akcie obsažené v daném indexu ve správných poměrech podle jejich tržní kapitalizace.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
+            <h3 class="text-xl font-semibold mb-4 text-emerald-800 flex items-center gap-2">
+              <span>🔄</span> Fyzická replikace
+            </h3>
+            <div class="space-y-3 text-gray-700">
+              <div class="flex items-start gap-2">
+                <span class="text-emerald-600 mt-1">•</span>
+                <span>ETF skutečně vlastní všechny akcie z indexu</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="text-emerald-600 mt-1">•</span>
+                <span>Nejbezpečnější způsob replikace</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="text-emerald-600 mt-1">•</span>
+                <span>Používá VWCE, CSPX, SWDA</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="text-emerald-600 mt-1">•</span>
+                <span>Minimální tracking error</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl p-6 border border-blue-200">
+            <h3 class="text-xl font-semibold mb-4 text-blue-800 flex items-center gap-2">
+              <span>📊</span> Syntetická replikace
+            </h3>
+            <div class="space-y-3 text-gray-700">
+              <div class="flex items-start gap-2">
+                <span class="text-blue-600 mt-1">•</span>
+                <span>Používá deriváty (swapy) místo akcií</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="text-blue-600 mt-1">•</span>
+                <span>Umožňuje přístup k exotickým trhům</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="text-blue-600 mt-1">•</span>
+                <span>Counterparty riziko</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="text-blue-600 mt-1">•</span>
+                <span>Nižší transakční náklady</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. ETF vs jiné investice -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">ETF vs akcie vs aktivní fondy - srovnání</h2>
+
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="text-left py-4 px-6 font-semibold text-gray-900 border-b">Kritérium</th>
+                <th class="text-center py-4 px-6 font-semibold text-emerald-700 border-b">ETF fondy</th>
+                <th class="text-center py-4 px-6 font-semibold text-gray-700 border-b">Jednotlivé akcie</th>
+                <th class="text-center py-4 px-6 font-semibold text-gray-700 border-b">Aktivní fondy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-100">
+                <td class="py-4 px-6 font-medium">Diverzifikace</td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ✅ Automatická
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ❌ Ruční
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ⚠️ Závisí
+                  </span>
+                </td>
+              </tr>
+              <tr class="border-b border-gray-100">
+                <td class="py-4 px-6 font-medium">Poplatky ročně</td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ✅ 0,03-0,5%
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ✅ 0% (jen broker)
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ❌ 1-3%
+                  </span>
+                </td>
+              </tr>
+              <tr class="border-b border-gray-100">
+                <td class="py-4 px-6 font-medium">Časová náročnost</td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ✅ Minimální
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ❌ Vysoká
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ⚠️ Střední
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-4 px-6 font-medium">Pro začátečníky</td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ✅ Ideální
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ❌ Náročné
+                  </span>
+                </td>
+                <td class="text-center py-4 px-6">
+                  <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                    ❌ Drahé
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Praktická ukázka dopadu poplatků -->
+        <div class="mt-8 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-6 border border-red-200">
+          <h3 class="font-bold text-lg text-red-900 mb-4 flex items-center gap-2">
+            💸 Poplatky při investování 10 000 Kč měsíčně po 20 let
+          </h3>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg p-4 border border-emerald-200">
+              <h4 class="font-semibold text-emerald-800 mb-3">ETF fond (0,2% poplatek)</h4>
+              <div class="text-sm space-y-1">
+                <div class="flex justify-between">
+                  <span>Celková investice:</span>
+                  <span class="font-semibold">2 400 000 Kč</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Po 20 letech:</span>
+                  <span class="font-semibold text-emerald-600">4 853 044 Kč</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Zisk:</span>
+                  <span class="font-semibold text-emerald-600">+2 453 044 Kč</span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-red-200">
+              <h4 class="font-semibold text-red-800 mb-3">Aktivní fond (1,8% poplatek)</h4>
+              <div class="text-sm space-y-1">
+                <div class="flex justify-between">
+                  <span>Celková investice:</span>
+                  <span class="font-semibold">2 400 000 Kč</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Po 20 letech:</span>
+                  <span class="font-semibold text-red-600">4 040 000 Kč</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Zisk:</span>
+                  <span class="font-semibold text-red-600">+1 640 000 Kč</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 text-center">
+            <p class="text-red-800 font-semibold mb-3">
+              ⚠️ Rozdíl: <span class="text-xl">813 044 Kč</span> méně kvůli vyšším poplatkům!
+            </p>
+            <a
+              href="/kalkulacky/kalkulacka-poplatku-etf"
+              class="inline-block bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 text-sm font-semibold rounded-lg transition-all"
+            >
+              🧮 Spočítejte si dopad poplatků
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Jak začít investovat do ETF - 3 jednoduché kroky -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Jak začít investovat do ETF - 3 jednoduché kroky</h2>
+
+        <div class="grid md:grid-cols-3 gap-8 mb-8">
+          <!-- Krok 1: Vyberte si ETF -->
+          <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-8 border border-emerald-200 text-center flex flex-col">
+            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span class="text-2xl font-bold text-emerald-700">1</span>
+            </div>
+            <h3 class="text-xl font-bold text-emerald-900 mb-4">Vyberte si ETF</h3>
+            <p class="text-emerald-800 mb-6 flex-grow">
+              Porovnejte ETF fondy podle poplatků, výnosů a oblastí investování. Najděte si ty nejlepší pro vaše portfolio.
+            </p>
+            <a href="/srovnani-etf" class="block bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 text-sm font-semibold rounded-lg transition-all mt-auto">
+              🔍 Porovnat ETF fondy
+            </a>
+          </div>
+
+          <!-- Krok 2: Rozhodněte se kolik investovat -->
+          <div class="bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl p-8 border border-blue-200 text-center flex flex-col">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span class="text-2xl font-bold text-blue-700">2</span>
+            </div>
+            <h3 class="text-xl font-bold text-blue-900 mb-4">Rozhodněte se kolik investovat</h3>
+            <p class="text-blue-800 mb-6 flex-grow">
+              Spočítejte si, kolik investovat měsíčně a jaké můžete očekávat výnosy při různých strategiích.
+            </p>
+            <a href="/kalkulacky/investicni-kalkulacka" class="block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-sm font-semibold rounded-lg transition-all mt-auto">
+              💰 Spočítejte výnosy
+            </a>
+          </div>
+
+          <!-- Krok 3: Vyberte si brokera a pravidelně investujte -->
+          <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-8 border border-violet-200 text-center flex flex-col">
+            <div class="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span class="text-2xl font-bold text-violet-700">3</span>
+            </div>
+            <h3 class="text-xl font-bold text-violet-900 mb-4">Vyberte si brokera a pravidelně investujte</h3>
+            <p class="text-violet-800 mb-6 flex-grow">
+              Kde a jak koupit ETF? Porovnejte poplatky, funkce a dostupné ETF u různých brokerů.
+            </p>
+            <a href="/kde-koupit-etf" class="block bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 text-sm font-semibold rounded-lg transition-all mt-auto">
+              🏦 Srovnání brokerů
+            </a>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-8 border border-emerald-200">
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl">🎯</span>
+            </div>
+            <h3 class="font-bold text-xl text-emerald-900 mb-3">Nejjednodušší start pro začátečníky</h3>
+            <p class="text-emerald-800 mb-6">
+              Pokud se nechcete zabývat výběrem a chcete začít jednoduše, máme pro vás osvědčenou kombinaci:
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg p-4 border border-emerald-200">
+              <h4 class="font-semibold text-emerald-900 mb-2 flex items-center gap-2">📈 Doporučený ETF</h4>
+              <p class="text-sm text-emerald-800 mb-3">
+                <strong>VWCE</strong> - nejpopulárnější ETF pokrývající celý svět
+              </p>
+              <a href="/etf/IE00BK5BQT80" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-3 py-2 rounded-lg transition-all inline-block">
+                Podrobnosti o VWCE →
+              </a>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-emerald-200">
+              <h4 class="font-semibold text-emerald-900 mb-2 flex items-center gap-2">🏦 Doporučený broker</h4>
+              <p class="text-sm text-emerald-800 mb-3">
+                <strong>XTB</strong> - česká podpora a nulové poplatky
+              </p>
+              <a href="/xtb-recenze" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-3 py-2 rounded-lg transition-all inline-block">
+                Recenze XTB →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Často kladené otázky -->
+      <section class="mb-12">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Často kladené otázky o ETF fondech
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Odpovědi na nejčastější dotazy o ETF investování pro české investory
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-md">
+          <div class="max-w-4xl mx-auto space-y-6">
+            {faqs.map((faq, index) => (
+              <details class="group border border-gray-200 rounded-lg hover:border-emerald-200 transition-colors">
+                <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-emerald-50 rounded-lg group-open:rounded-b-none transition-colors">
+                  <span class="font-semibold text-lg text-gray-900 group-hover:text-emerald-800">{faq.question}</span>
+                  <svg class="w-5 h-5 text-gray-500 group-hover:text-emerald-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+                  {faq.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Závěr a CTA -->
+      <section class="mb-12">
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-xl p-8 text-center">
+          <h2 class="text-3xl font-bold mb-4">Začněte investovat do ETF fondů ještě dnes</h2>
+          <p class="text-xl mb-8 opacity-90">
+            ETF fondy jsou nejjednodušší způsob, jak začít s pasivním investováním.
+            Nízké poplatky, automatická diverzifikace a dlouhodobé zhodnocení.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/srovnani-etf" class="bg-white text-emerald-600 px-8 py-4 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all">
+              Srovnat všechny ETF
+            </a>
+            <a href="/kde-koupit-etf" class="border-2 border-white text-white px-8 py-4 text-lg font-semibold rounded-lg hover:bg-white/10 transition-all">
+              Kde koupit ETF
+            </a>
+          </div>
+        </div>
+      </section>
+    </article>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={ETFGuideRelatedLinks} />
+  </div>
+</Layout>

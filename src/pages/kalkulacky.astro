@@ -1,0 +1,464 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+
+const currentYear = new Date().getFullYear();
+
+// Breadcrumb Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": `Finanční kalkulačky ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/kalkulacky"
+    }
+  ]
+};
+
+// WebPage Schema with ItemList
+const sitemapSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": `Finanční kalkulačky ${currentYear} - Kompletní přehled`,
+  "description": `Kompletní přehled všech finančních kalkulaček. Hypotéka, úvěry, čistá mzda, investice. Bezplatné nástroje s aktuálními daty ${currentYear}.`,
+  "url": "https://www.etfpruvodce.cz/kalkulacky",
+  "breadcrumb": breadcrumbSchema,
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Finanční kalkulačky",
+    "numberOfItems": 5,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": `Hypoteční kalkulačka ${currentYear}`,
+        "url": "https://www.etfpruvodce.cz/kalkulacky/hypotecni-kalkulacka"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": `Kalkulačka čisté mzdy ${currentYear}`,
+        "url": "https://www.etfpruvodce.cz/kalkulacky/cisty-plat-2026"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Úvěrová kalkulačka",
+        "url": "https://www.etfpruvodce.cz/kalkulacky/uverova-kalkulacka"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Backtest portfolia",
+        "url": "https://www.etfpruvodce.cz/kalkulacky/backtest-portfolia"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "Monte Carlo simulátor",
+        "url": "https://www.etfpruvodce.cz/kalkulacky/monte-carlo-simulator"
+      }
+    ]
+  }
+};
+
+// Calculators organized by categories matching Next.js structure
+const financeCalculators = [
+  {
+    title: "Hypoteční kalkulačka",
+    description: "Spočítejte si hypoteční splátky a celkové náklady na bydlení",
+    href: "/kalkulacky/hypotecni-kalkulacka",
+    iconColor: "violet"
+  },
+  {
+    title: "Spotřebitelský úvěr",
+    description: "Kalkulačka splátek spotřebitelského úvěru a celkových nákladů",
+    href: "/kalkulacky/uverova-kalkulacka",
+    iconColor: "emerald"
+  },
+  {
+    title: "Čistý plat 2026",
+    description: "Výpočet čisté mzdy podle aktuální české legislativy",
+    href: "/kalkulacky/cisty-plat-2026",
+    iconColor: "violet"
+  },
+  {
+    title: "Nouzová rezerva",
+    description: "Optimální velikost emergency fund podle vaší situace",
+    href: "/kalkulacky/nouzova-rezerva",
+    iconColor: "emerald"
+  }
+];
+
+const investmentCalculators = [
+  {
+    title: "Investiční kalkulačka",
+    description: "DCA strategie a compound interest výpočty pro ETF investice",
+    href: "/kalkulacky/investicni-kalkulacka",
+    iconColor: "emerald"
+  },
+  {
+    title: "FIRE kalkulačka",
+    description: "4% withdrawal rule a FIRE plánování pro finanční nezávislost",
+    href: "/kalkulacky/fire-kalkulacka",
+    iconColor: "violet"
+  },
+  {
+    title: "ETF poplatky",
+    description: "Analýza dopadu TER a dalších poplatků na dlouhodobé výnosy",
+    href: "/kalkulacky/kalkulacka-poplatku-etf",
+    iconColor: "violet"
+  }
+];
+
+const advancedCalculators = [
+  {
+    title: "Backtest portfolia",
+    description: "Otestujte historickou výkonnost ETF portfolia od roku 2000",
+    href: "/kalkulacky/backtest-portfolia",
+    iconColor: "blue"
+  },
+  {
+    title: "Monte Carlo simulátor",
+    description: "Prognóza budoucnosti portfolia s tisíci scénářů",
+    href: "/kalkulacky/monte-carlo-simulator",
+    iconColor: "emerald"
+  },
+  {
+    title: "Měnový dopad",
+    description: "Analýza kurzového rizika a hedging strategií pro ETF",
+    href: "/kalkulacky/kurzovy-dopad-etf",
+    iconColor: "violet"
+  }
+];
+
+const categories = [
+  {
+    id: "finance",
+    title: "Finanční kalkulačky",
+    description: "Základní finanční výpočty pro každodenní použití",
+    calculators: financeCalculators
+  },
+  {
+    id: "investment",
+    title: "Investiční nástroje",
+    description: "Nástroje pro ETF investory a dlouhodobé spoření",
+    calculators: investmentCalculators
+  },
+  {
+    id: "advanced",
+    title: "Pokročilé analýzy",
+    description: "Pokročilé analýzy pro zkušené investory",
+    calculators: advancedCalculators
+  }
+];
+
+const faqs = [
+  {
+    question: `Jsou kalkulačky aktuální pro rok ${currentYear}?`,
+    answer: `Ano, všechny nástroje jsou pravidelně aktualizovány s nejnovějšími sazbami, daňovými změnami a legislativními úpravami pro rok ${currentYear}. Sledujeme aktuální úrokové sazby bank, daňové tabulky a další relevantní data.`
+  },
+  {
+    question: "Je používání kalkulaček zdarma?",
+    answer: "Všechny kalkulačky jsou zcela zdarma bez jakýchkoli omezení. Nepotřebujete registraci ani předplatné. Nástroje budou vždy dostupné bezplatně."
+  },
+  {
+    question: "Jak přesné jsou výpočty?",
+    answer: "Používáme stejné matematické vzorce jako banky a finanční instituce. Výsledky jsou kontrolovány finančními experty a pravidelně ověřovány proti skutečným bankám a pojišťovnám."
+  },
+  {
+    question: "Lze kalkulačky používat na mobilu?",
+    answer: "Ano, všechny nástroje jsou plně responzivní a fungují perfektně na mobilních telefonech a tabletech. Optimalizovali jsme uživatelské rozhraní pro dotykové ovládání."
+  },
+  {
+    question: "Ukládáte naše data?",
+    answer: "Ne, všechny výpočty probíhají přímo ve vašem prohlížeči. Žádná data se neukládají ani neodesílají na naše servery. Vaše finanční informace zůstávají pouze u vás."
+  },
+  {
+    question: "Máte i pokročilé nástroje?",
+    answer: "Ano, nabízíme backtest portfolia pro historickou analýzu od roku 2000, Monte Carlo simulace pro prognózu budoucnosti, kalkulátor měnových dopadů na ETF, FIRE kalkulátor pro předčasný důchod a další pokročilé nástroje pro zkušené investory."
+  }
+];
+
+// FAQ Schema
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer
+    }
+  }))
+};
+
+const relatedLinks = [
+  {
+    title: "Srovnání ETF fondů",
+    href: "/srovnani-etf",
+    description: "Najděte nejlepší ETF pro investice",
+    icon: "📈"
+  },
+  {
+    title: "Nejlepší brokeři 2026",
+    href: "/srovnani-brokeru",
+    description: "Kde nejlépe investovat a obchodovat",
+    icon: "🏦"
+  },
+  {
+    title: "Návod pro začátečníky",
+    href: "/co-jsou-etf/jak-zacit-investovat",
+    description: "Jak začít s investováním do ETF",
+    icon: "📖"
+  },
+  {
+    title: "Investiční tipy 2026",
+    href: "/tipy",
+    description: "Aktuální investiční strategie a rady",
+    icon: "💡"
+  }
+];
+---
+
+<Layout
+  title="Investiční kalkulačky | ETF kalkulačka a finanční nástroje 2026"
+  description={`Investiční kalkulačky zdarma: ETF kalkulačka, backtest portfolia, Monte Carlo simulace, FIRE kalkulačka. Spočítejte si výnosy z investic do ETF.`}
+  canonical="/kalkulacky"
+  keywords={`investiční kalkulačka, ETF kalkulačka, kalkulačka výnosů, backtest portfolia, Monte Carlo simulace, FIRE kalkulačka, investiční nástroje, finanční kalkulačky ${currentYear}`}
+  ogImage="/og-kalkulacky.jpg"
+  ogTitle="Investiční kalkulačky - ETF kalkulačka a finanční nástroje"
+  ogDescription="Investiční kalkulačky zdarma: ETF kalkulačka, backtest portfolia, Monte Carlo simulace. Spočítejte si výnosy z investic."
+  twitterTitle={`Finanční kalkulačky ${currentYear}`}
+  twitterDescription="Kompletní přehled finančních kalkulaček. Hypotéka, úvěry, mzda, investice. Vše zdarma."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(sitemapSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-violet-50/30 to-blue-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-purple-200 to-violet-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-violet-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-purple-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            Aktualizováno pro rok {currentYear}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Finanční{' '}
+            <span class="bg-gradient-to-r from-purple-600 via-violet-600 to-blue-600 bg-clip-text text-transparent">
+              kalkulačky
+            </span>
+          </h1>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní sada bezplatných finančních nástrojů s nejnovějšími daty.
+            Od hypotéky až po pokročilé investiční analýzy.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href="#kalkulacky"
+              class="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-8 py-4 text-lg font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              Zobrazit kalkulačky
+            </a>
+            <a
+              href="#faq"
+              class="bg-white/80 backdrop-blur-sm border-2 border-purple-300 text-purple-700 hover:bg-purple-50 px-8 py-4 text-lg font-semibold rounded-lg transition-all hover:shadow-lg flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              Jak fungují?
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Visual Element -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-blue-400/20 rounded-3xl transform rotate-3"></div>
+          <div class="relative bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 shadow-xl">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Proč naše kalkulačky?</h3>
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <span class="text-gray-700">Aktuální data {currentYear}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-violet-500 rounded-full"></div>
+                <span class="text-gray-700">Přesné výpočty jako banky</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span class="text-gray-700">Zdarma navždy</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-indigo-500 rounded-full"></div>
+                <span class="text-gray-700">Žádná registrace</span>
+              </div>
+            </div>
+            <div class="mt-6 p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-200">
+              <p class="text-sm font-semibold text-purple-800">
+                10+ specializovaných nástrojů včetně backtestů
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calculators by Categories -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" id="kalkulacky">
+    <div class="space-y-12">
+      {categories.map((category, catIndex) => (
+        <div class="animate-fade-in" style={`animation-delay: ${0.2 + catIndex * 0.1}s`}>
+          <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">
+              {category.title}
+            </h2>
+            <p class="text-gray-600">
+              {category.description}
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {category.calculators.map((calc, index) => (
+              <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover" style={`animation-delay: ${0.4 + index * 0.1}s`}>
+                <div class="flex items-center gap-3 mb-4">
+                  <div class={`flex items-center justify-center rounded-full w-12 h-12 group-hover:opacity-80 transition-colors hover-scale ${calc.iconColor === 'violet' ? 'bg-violet-100' : calc.iconColor === 'emerald' ? 'bg-emerald-100' : 'bg-blue-100'}`}>
+                    <svg class={`h-6 w-6 ${calc.iconColor === 'violet' ? 'text-violet-700' : calc.iconColor === 'emerald' ? 'text-emerald-700' : 'text-blue-700'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <h3 class="text-xl font-semibold text-gray-900 group-hover:text-violet-800 transition-colors">
+                      {calc.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <p class="text-gray-600 mb-4">{calc.description}</p>
+
+                <a href={calc.href} class="block">
+                  <button class="w-full hover-scale bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all">
+                    Spustit kalkulačku
+                  </button>
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <!-- SEO text pro kalkulačky -->
+      <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl p-8 card-hover animate-fade-in" style="animation-delay: 0.8s">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="flex items-center justify-center rounded-full bg-violet-100 w-12 h-12 group-hover:bg-violet-200 transition-colors hover-scale">
+            <span class="text-2xl">💎</span>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 group-hover:text-violet-800 transition-colors">
+            Proč používat naše finanční kalkulačky?
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center justify-center rounded-full bg-emerald-100 w-10 h-10 group-hover:bg-emerald-200 transition-colors hover-scale">
+                <span class="text-xl">📅</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-emerald-800 transition-colors">
+                Aktuální data 2026
+              </h3>
+            </div>
+            <p class="text-gray-600 mb-4">
+              Všechny naše kalkulačky používají nejnovější sazby, daňové změny a legislativní úpravy
+              platné pro rok 2026. Hypoteční sazby, daně z příjmů, pojistné - vše je aktuální.
+            </p>
+            <ul class="space-y-2 text-gray-600">
+              <li><strong>Daňové sazby:</strong> Aktuální slevy a sazby daně z příjmů</li>
+              <li><strong>Úrokové sazby:</strong> Současné sazby hypoték a úvěrů</li>
+              <li><strong>Pojistné:</strong> Zdravotní a sociální pojištění 2026</li>
+            </ul>
+          </div>
+          <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="flex items-center justify-center rounded-full bg-violet-100 w-10 h-10 group-hover:bg-violet-200 transition-colors hover-scale">
+                <span class="text-xl">📊</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-violet-800 transition-colors">
+                Komplexní finanční plánování
+              </h3>
+            </div>
+            <p class="text-gray-600 mb-4">
+              Od základních výpočtů po pokročilé investiční strategie. Naše nástroje pokrývají
+              celé spektrum finančního plánování - od hypotéky po FIRE movement.
+            </p>
+            <ul class="space-y-2 text-gray-600">
+              <li><strong>Základní výpočty:</strong> Mzda, úvěry, hypotéky</li>
+              <li><strong>Investiční plánování:</strong> ETF, DCA, compound interest</li>
+              <li><strong>Pokročilé analýzy:</strong> Backtest portfolia, Monte Carlo, měnová rizika</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="mb-12" id="faq">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Často kladené otázky
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Odpovědi na nejčastější dotazy o finančních kalkulačkách
+        </p>
+      </div>
+      <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-2xl p-8 card-hover animate-fade-in" style="animation-delay: 0.2s">
+        <div class="max-w-4xl mx-auto space-y-6">
+          {faqs.map((faq) => (
+            <details class="group border border-gray-200 rounded-lg hover:border-purple-200 transition-colors">
+              <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-purple-50 rounded-lg group-open:rounded-b-none transition-colors">
+                <span class="font-semibold text-lg text-gray-900 group-hover:text-purple-800">{faq.question}</span>
+                <svg class="w-5 h-5 text-gray-500 group-hover:text-purple-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+                {faq.answer}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Links -->
+    <InternalLinking links={relatedLinks} title="Další užitečné stránky" className="mt-16" />
+  </div>
+</Layout>

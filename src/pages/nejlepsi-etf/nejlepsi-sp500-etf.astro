@@ -1,0 +1,1156 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-sp500-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString().split('T')[0];
+
+// Enhanced structured data with FAQs and more products
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší S&P 500 ETF 2026 - CSPX vs SPXP vs SPY5`,
+  "description": `Srovnání nejlepších S&P 500 ETF 2026. CSPX, SPXP, SPY5 - poplatky TER, výnosy, velikost fondů.`,
+  "image": "https://www.etfpruvodce.cz/og-sp500-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": `2026-01-15`,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-sp500-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": `S&P 500 ETF, CSPX, SPXP, SPY5, investování, indexové fondy`,
+  "wordCount": 2500,
+  "inLanguage": "cs-CZ"
+};
+
+// FAQ structured data for better search snippets
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jak jste vybrali TOP 3 nejlepší S&P 500 ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Naše TOP 3 doporučení vychází z databáze více než 3000 ETF a zohledňuje klíčové faktory: velikost fondu, nízký TER, likviditu, tracking error a celkovou kvalitu. Každý ETF má 5hvězdičkové hodnocení založené na kombinaci těchto metrik."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi akumulačními a distribučními S&P 500 ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Akumulační ETF (jako CSPX, VUAA) automaticky reinvestují dividendy zpět do fondu, což je ideální pro dlouhodobý růst. Distribuční ETF (VUSA, SPY5) vyplácejí dividendy přímo investorům - vhodné pro ty, kteří chtějí pravidelný příjem."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Který S&P 500 ETF má nejnižší náklady?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejnižší TER obvykle nabízejí specializovaní poskytovatelé ETF, zatímco největší poskytovatelé mají vyšší poplatky, ale nabízejí lepší likviditu. Podívejte se na náš žebříček podle TER pro aktuální srovnání nákladů."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaká je historická výkonnost S&P 500 indexu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "S&P 500 index dosahuje historicky průměrného ročního výnosu přibližně 10% včetně reinvestovaných dividend od roku 1957. Za posledních 10 let (2014-2024) byl průměrný roční výnos dokonce vyšší, kolem 13%. Pro budoucnost je realističtější očekávat 7-10% nominálně, tedy 4-7% reálně po odečtení inflace."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde mohu koupit S&P 500 ETF v České republice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "S&P 500 ETF můžete koupit u většiny brokerů dostupných v ČR: DEGIRO nabízí nulové poplatky za vybrané ETF, XTB umožňuje investice od malých částek díky zlomkovým akciím, Interactive Brokers je vhodný pro větší portfolia. Další možnosti jsou Trading212, Portu nebo Fio e-Broker."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou daňové povinnosti při investování do S&P 500 ETF v ČR?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "V České republice platí, že prodej cenných papírů po 3 letech držby je osvobozen od daně z kapitálového zisku (§ 4 odst. 1 písm. w zákona o daních z příjmů). Při prodeji před uplynutím 3 let se platí 15% daň ze zisku. U akumulačních ETF (CSPX, VUAA) neplatíte průběžně žádnou daň z dividend, protože se reinvestují uvnitř fondu."
+      }
+    }
+  ]
+};
+
+// Breadcrumb structured data
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší S&P 500 ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-sp500-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší NASDAQ ETF", href: "/nejlepsi-etf/nejlepsi-nasdaq-etf", description: "Srovnání technologických ETF na NASDAQ 100 index", icon: "📈" },
+  { title: "Nejlepší světové ETF", href: "/nejlepsi-etf/nejlepsi-msci-world-etf", description: "Globální diverzifikace s MSCI World ETF", icon: "🌍" },
+  { title: "Kde koupit S&P 500 ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů pro investice do amerických ETF", icon: "🏦" },
+  { title: "Portfolio strategie s S&P 500", href: "/portfolio-strategie", description: "Modelová portfolia obsahující S&P 500 ETF", icon: "📊" }
+];
+
+const faqItems = [
+  {
+    question: "Jak jste vybrali TOP 3 nejlepší S&P 500 ETF?",
+    answer: "Naše TOP 3 doporučení vychází z databáze více než 3000 ETF a zohledňuje klíčové faktory: velikost fondu, nízký TER, likviditu, tracking error a celkovou kvalitu. Každý ETF má 5hvězdičkové hodnocení založené na kombinaci těchto metrik."
+  },
+  {
+    question: "Co znamenají TOP 10 žebříčky podle TER, velikosti fondu a výkonu?",
+    answer: "Naše žebříčky jsou generovány živě z databáze a filtrují pouze legitimní S&P 500 ETF. Automaticky vylučujeme čínské ETF, sektorové ETF a pákové (leveraged) produkty. Data jsou aktualizována pravidelně pro nejpřesnější srovnání."
+  },
+  {
+    question: "Proč se v seznamech neobjevují některé populární ETF?",
+    answer: "Naše filtry automaticky vylučují ETF, které nesledují čistě S&P 500 index - například KraneShares China S&P 500 ETF (sleduje čínský index), sektorové ETF jako Consumer Discretionary, nebo pákové ETF s 2x/3x multiplikátorem."
+  },
+  {
+    question: "Jaký je rozdíl mezi akumulačními a distribučními S&P 500 ETF?",
+    answer: "Akumulační ETF (jako CSPX, VUAA) automaticky reinvestují dividendy zpět do fondu, což je ideální pro dlouhodobý růst. Distribuční ETF (VUSA, SPY5) vyplácejí dividendy přímo investorům - vhodné pro ty, kteří chtějí pravidelný příjem."
+  },
+  {
+    question: "Který S&P 500 ETF má nejnižší náklady?",
+    answer: "Nejnižší TER obvykle nabízejí specializovaní poskytovatelé ETF, zatímco největší poskytovatelé mají vyšší poplatky, ale nabízejí lepší likviditu. Podívejte se na náš žebříček podle TER pro aktuální srovnání nákladů."
+  },
+  {
+    question: "Jsou data v žebříčcích aktuální?",
+    answer: "Ano, všechny žebříčky jsou generovány živě z naší databáze při každém načtení stránky. Zahrnují nejnovější data o TER, velikosti fondů, výkonnosti a dalších klíčových metrikách S&P 500 ETF dostupných pro evropské investory."
+  }
+];
+---
+
+<Layout
+  title={`Nejlepší S&P 500 ETF 2026 - CSPX vs SPXP vs SPY5`}
+  description={`Srovnání nejlepších S&P 500 ETF 2026. CSPX, SPXP, SPY5 - poplatky TER, výnosy, velikost fondů. Aktuální data k ${currentDate}.`}
+  canonical="/nejlepsi-etf/nejlepsi-sp500-etf"
+>
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section - Optimized for LCP -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-6">
+          <div class="inline-flex items-center bg-white text-blue-700 px-5 py-2.5 rounded-full text-sm font-medium shadow-sm border border-blue-100">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
+            Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+              S&P 500 ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a
+              href="/o-nas"
+              class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+            >
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">|</span>
+            <span>
+              Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších S&P 500 ETF fondů dostupných pro evropské investory.
+            Analýza poplatků, výkonnosti a praktické tipy pro výběr.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold shadow-md hover:shadow-lg transition-shadow rounded-xl h-12">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+            <a href="#top10" class="inline-flex items-center justify-center bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50 px-8 py-3 text-lg font-semibold rounded-xl h-12 transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+              Top 10 srovnání
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - S&P 500 Stats Card -->
+        <div class="hidden lg:block">
+          <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl mb-4 shadow-lg">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">S&P 500 v číslech</h3>
+              <p class="text-sm text-gray-500 mt-1">Klíčové informace o indexu</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                <svg class="w-5 h-5 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <div class="text-2xl font-bold text-gray-900">500</div>
+                <div class="text-xs text-gray-600 font-medium">největších firem</div>
+              </div>
+              <div class="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                <svg class="w-5 h-5 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <div class="text-2xl font-bold text-green-600">~10%</div>
+                <div class="text-xs text-gray-600 font-medium">ročně historicky</div>
+              </div>
+              <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border border-purple-100">
+                <svg class="w-5 h-5 text-purple-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="text-2xl font-bold text-gray-900">80%</div>
+                <div class="text-xs text-gray-600 font-medium">amerického trhu</div>
+              </div>
+              <div class="text-center p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100">
+                <svg class="w-5 h-5 text-orange-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <div class="text-2xl font-bold text-blue-600">{etfs.length}+</div>
+                <div class="text-xs text-gray-600 font-medium">ETF k dispozici</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          🏆 Top 3 nejlepší S&P 500 ETF {currentYear}
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení nejlepších S&P 500 ETF fondů na základě analýzy {etfs.length} fondů
+        </p>
+      </div>
+
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections - by TER, AUM, Performance -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="S&P 500" />
+
+  <!-- SECTION 0: Co je S&P 500 Index? -->
+  <section id="co-je-sp500" class="py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          📊 Co je S&P 500 Index?
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Než si vyberete konkrétní ETF, pojďme rychle vysvětlit, co vlastně sledují
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-blue-200 hover:shadow-2xl transition-all">
+          <div class="text-5xl mb-4 text-center">🏢</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">500 největších firem USA</h3>
+          <p class="text-gray-700 leading-relaxed">
+            S&P 500 je index obsahující <strong>500 největších veřejně obchodovaných amerických společností</strong>.
+            Najdete tu Apple, Microsoft, Amazon, Tesla, JPMorgan, Coca-Cola, Walmart a stovky dalších.
+            Společnosti jsou <strong>váženy podle tržní kapitalizace</strong> - čím větší firma, tím větší váhu má v indexu.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-green-200 hover:shadow-2xl transition-all">
+          <div class="text-5xl mb-4 text-center">🇺🇸</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">~80% amerického trhu</h3>
+          <p class="text-gray-700 leading-relaxed">
+            Těchto 500 společností představuje přibližně <strong>80% celkové tržní kapitalizace amerického akciového trhu</strong>.
+            Když investujete do S&P 500 ETF, získáváte expozici k největší a nejlikvidnější ekonomice světa.
+            Index je spravován společností S&P Dow Jones Indices a existuje od roku 1957.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-purple-200 hover:shadow-2xl transition-all">
+          <div class="text-5xl mb-4 text-center">📈</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">Historický výnos ~10% ročně</h3>
+          <p class="text-gray-700 leading-relaxed">
+            Od svého vzniku v roce 1957 <strong>průměrný roční výnos S&P 500 činil přibližně 10%</strong> včetně reinvestovaných dividend.
+            Poslední dekáda (2014-2024) byla výjimečná s průměrem ~13% ročně díky tech boomu.
+            Realističtější očekávání do budoucna je 7-10% p.a. nominálně, 4-7% reálně po inflaci.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1: Why These TOP 3? - Selection Criteria -->
+  <section id="proc-tyto-tri" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+        💡 Proč právě tyto TOP 3 ETF?
+      </h2>
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border-2 border-blue-300">
+        <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+          Z desítek S&P 500 ETF na trhu jsme vybrali CSPX, SPXP a SPY5 podle těchto kritérií:
+        </p>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl p-4 border border-blue-200">
+            <div class="text-3xl mb-2">💰</div>
+            <h4 class="font-bold text-gray-900 mb-1">Ultra nízký TER</h4>
+            <p class="text-sm text-gray-700">0,05-0,07% ročně (nejlevnější na trhu)</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 border border-blue-200">
+            <div class="text-3xl mb-2">🏰</div>
+            <h4 class="font-bold text-gray-900 mb-1">Obří velikost</h4>
+            <p class="text-sm text-gray-700">10+ mld. EUR aktiv = nulové riziko uzavření</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 border border-blue-200">
+            <div class="text-3xl mb-2">📊</div>
+            <h4 class="font-bold text-gray-900 mb-1">Precizní tracking</h4>
+            <p class="text-sm text-gray-700">Tracking error pod 0,1% ročně</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 border border-blue-200">
+            <div class="text-3xl mb-2">💧</div>
+            <h4 class="font-bold text-gray-900 mb-1">Masivní likvidita</h4>
+            <p class="text-sm text-gray-700">Denní objem desítky milionů EUR</p>
+          </div>
+          <div class="bg-white rounded-xl p-4 border border-blue-200">
+            <div class="text-3xl mb-2">⭐</div>
+            <h4 class="font-bold text-gray-900 mb-1">Top správci</h4>
+            <p class="text-sm text-gray-700">iShares (BlackRock) a Invesco = nejvyšší důvěryhodnost</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: Is S&P 500 Right For You? -->
+  <section id="je-pro-vas" class="py-16 bg-gradient-to-br from-gray-50 to-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+        Je S&P 500 ETF správná volba pro vás?
+      </h2>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <!-- Perfect For -->
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-300">
+          <h3 class="text-2xl font-bold text-green-800 mb-6 flex items-center gap-2">
+            <span class="text-3xl">✅</span>
+            Ideální pro vás, pokud:
+          </h3>
+          <ul class="space-y-4">
+            <li class="flex items-start gap-3">
+              <span class="text-green-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Investujete na 10+ let</span>
+                <p class="text-sm text-gray-700">Potřebujete čas přečkat krátkodobé poklesy (-30% až -50%)</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-green-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Věříte v USA ekonomiku</span>
+                <p class="text-sm text-gray-700">Comfort s 100% expozicí amerického trhu</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-green-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Chcete pasivní strategii</span>
+                <p class="text-sm text-gray-700">Buy & hold bez nutnosti výběru jednotlivých akcií</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-green-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Preferujete jednoduchost</span>
+                <p class="text-sm text-gray-700">Jediný ETF pokrývající 500 firem</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Not Ideal For -->
+        <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 border-2 border-orange-300">
+          <h3 class="text-2xl font-bold text-orange-800 mb-6 flex items-center gap-2">
+            <span class="text-3xl">⚠️</span>
+            Možná nevhodné, pokud:
+          </h3>
+          <ul class="space-y-4">
+            <li class="flex items-start gap-3">
+              <span class="text-orange-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Potřebujete peníze do 5 let</span>
+                <p class="text-sm text-gray-700">Krátkodobá volatilita může být extrémní</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-orange-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Chcete globální diverzifikaci</span>
+                <p class="text-sm text-gray-700">Zvažte MSCI World (23 zemí) <a href="/nejlepsi-etf/nejlepsi-msci-world-etf" class="text-blue-600 hover:underline">→</a></p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-orange-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Hledáte pasivní příjem</span>
+                <p class="text-sm text-gray-700">Akumulační ETF nereinvestují dividendy. Zkuste dividendové ETF. <a href="/nejlepsi-etf/nejlepsi-dividendove-etf" class="text-blue-600 hover:underline">→</a></p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-orange-600 font-bold mt-1">•</span>
+              <div>
+                <span class="font-bold text-gray-900">Máte nízkou rizikovou toleranci</span>
+                <p class="text-sm text-gray-700">Zvažte 60/40 portfolio (akcie/dluhopisy)</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: Real Cost-Benefit Math -->
+  <section id="naklady-vynosy" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+        Reálné náklady a výnosy (s matematikou)
+      </h2>
+
+      <!-- TER Impact Table -->
+      <div class="mb-12">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+          Dopad TER na váš výnos za 30 let
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full bg-white rounded-2xl shadow-lg border border-gray-200">
+            <thead>
+              <tr class="bg-gradient-to-r from-blue-100 to-indigo-100">
+                <th class="py-4 px-6 text-left font-bold text-gray-900">TER</th>
+                <th class="py-4 px-6 text-left font-bold text-gray-900">Typ fondu</th>
+                <th class="py-4 px-6 text-left font-bold text-gray-900">100k Kč → 30 let</th>
+                <th class="py-4 px-6 text-left font-bold text-gray-900">Ztráta vs 0,05%</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr class="hover:bg-green-50">
+                <td class="py-4 px-6 font-bold text-green-600">0,05%</td>
+                <td class="py-4 px-6">SPXP (nejlevnější)</td>
+                <td class="py-4 px-6 font-bold">1 684 000 Kč</td>
+                <td class="py-4 px-6 text-gray-500">-</td>
+              </tr>
+              <tr class="hover:bg-blue-50">
+                <td class="py-4 px-6 font-bold text-blue-600">0,07%</td>
+                <td class="py-4 px-6">CSPX, VUAA</td>
+                <td class="py-4 px-6 font-bold">1 671 000 Kč</td>
+                <td class="py-4 px-6 text-orange-600">-13k Kč</td>
+              </tr>
+              <tr class="hover:bg-orange-50">
+                <td class="py-4 px-6 font-bold text-orange-600">0,20%</td>
+                <td class="py-4 px-6">Dražší ETF</td>
+                <td class="py-4 px-6 font-bold">1 615 000 Kč</td>
+                <td class="py-4 px-6 text-orange-600">-69k Kč</td>
+              </tr>
+              <tr class="hover:bg-red-50">
+                <td class="py-4 px-6 font-bold text-red-600">1,50%</td>
+                <td class="py-4 px-6">Aktivní fond</td>
+                <td class="py-4 px-6 font-bold">1 151 000 Kč</td>
+                <td class="py-4 px-6 text-red-600">-533k Kč (!)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-sm text-gray-600 mt-4 italic text-center">
+          Výpočet: 10% průměrný roční výnos před poplatky. Rozdíl 0,05% vs 1,50% TER = <strong>půl milionu korun</strong> za 30 let.
+        </p>
+      </div>
+
+      <!-- Inflation-Adjusted Returns -->
+      <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-8 border-2 border-yellow-300">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+          <span class="text-3xl">📉</span>
+          Pozor na inflační iluzi!
+        </h3>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div>
+            <h4 class="font-bold text-lg text-gray-900 mb-3">Nominální výnosy (co vidíte)</h4>
+            <p class="text-gray-700 mb-4">
+              100 000 Kč investovaných před 30 lety při 10% ročním výnosu = <strong>1 745 000 Kč</strong> dnes.
+              Vypadá to skvěle! Nebo ne?
+            </p>
+          </div>
+          <div>
+            <h4 class="font-bold text-lg text-gray-900 mb-3">Reálné výnosy (kupní síla)</h4>
+            <p class="text-gray-700 mb-4">
+              Po inflaci ~3% ročně = reálný výnos ~<strong>7% ročně</strong>.
+              100k Kč → <strong>~761 000 Kč reálné kupní síly</strong>. Stále skvělé, ale realističtější.
+            </p>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl p-6 mt-6 border-l-4 border-orange-500">
+          <p class="text-gray-900 font-medium">
+            <strong>Závěr:</strong> Očekávejte <strong>7% reálný výnos dlouhodobě</strong> (po inflaci), ne 10% nominální.
+            Pro příštích 30 let může být průměr dokonce nižší (4-7% reálně) kvůli vyšším valuacím dnes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: Brutal Honesty About Risks -->
+  <section id="brutalni-rizika" class="py-16 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+        Brutální upřímnost: Co může jít špatně
+      </h2>
+      <p class="text-xl text-gray-700 mb-12 text-center max-w-3xl mx-auto">
+        Než investujete, musíte vědět, <strong>jak hluboké a dlouhé mohou být poklesy</strong>
+      </p>
+
+      <!-- Historical Drawdowns WITH Recovery Times -->
+      <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-red-300">
+          <h3 class="font-bold text-lg text-gray-900 mb-2">2007-2009 Finanční krize</h3>
+          <p class="text-4xl font-bold text-red-600 mb-2">-57%</p>
+          <p class="text-sm text-gray-700 mb-3">
+            <strong>Čas obnovy:</strong> 5,5 let (březen 2013)
+          </p>
+          <p class="text-sm text-gray-600 italic">1M Kč → 430k Kč. Bolestivé. Spousta investorů prodala ve ztrátě.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-orange-300">
+          <h3 class="font-bold text-lg text-gray-900 mb-2">2000-2002 Dot-com crash</h3>
+          <p class="text-4xl font-bold text-orange-600 mb-2">-49%</p>
+          <p class="text-sm text-gray-700 mb-3">
+            <strong>Čas obnovy:</strong> 7 let (říjen 2007)
+          </p>
+          <p class="text-sm text-gray-600 italic">1M Kč → 510k Kč. Nejdelší čekání na obnovu v historii.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-yellow-300">
+          <h3 class="font-bold text-lg text-gray-900 mb-2">2020 COVID-19 panic</h3>
+          <p class="text-4xl font-bold text-yellow-600 mb-2">-34%</p>
+          <p class="text-sm text-gray-700 mb-3">
+            <strong>Čas obnovy:</strong> 5 měsíců (srpen 2020)
+          </p>
+          <p class="text-sm text-gray-600 italic">1M Kč → 660k Kč. Rychlá obnova díky stimulům. Výjimka, ne pravidlo.</p>
+        </div>
+      </div>
+
+      <!-- Currency Risk with CORRECT Math -->
+      <div class="bg-white rounded-2xl p-8 mb-8 border-2 border-orange-300">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="text-3xl">💱</span>
+          Měnové riziko USD/CZK (často podceňováno)
+        </h3>
+        <p class="text-gray-700 mb-4 text-lg">
+          S&P 500 je denominován v USD. <strong>Kurz CZK/USD výrazně ovlivní váš výnos v korunách.</strong>
+        </p>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-green-50 rounded-xl p-6 border-l-4 border-green-500">
+            <h4 class="font-bold text-green-800 mb-3">Když CZK oslabí (výhoda)</h4>
+            <p class="text-sm text-gray-700 mb-2">
+              S&P roste o 10% v USD + CZK oslabí o 10% → váš výnos v CZK = <strong>+21%</strong>
+            </p>
+            <p class="text-xs text-gray-600 italic">Vzorec: (1,10 x 1,10) - 1 = 0,21 = 21%</p>
+          </div>
+          <div class="bg-red-50 rounded-xl p-6 border-l-4 border-red-500">
+            <h4 class="font-bold text-red-800 mb-3">Když CZK posílí (nevýhoda)</h4>
+            <p class="text-sm text-gray-700 mb-2">
+              S&P roste o 10% v USD, ale CZK posílí o 15% → váš výnos v CZK = <strong>-4,3%</strong>
+            </p>
+            <p class="text-xs text-gray-600 italic">Vzorec: (1,10 / 1,15) - 1 = -0,043 = -4,3%</p>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 mt-4 italic">
+          Historicky USD/CZK kolísá +-10-20% ročně. Dlouhodobě se vyhlazuje, ale krátkodobě může bolet.
+        </p>
+      </div>
+
+      <!-- Concentration Risk -->
+      <div class="bg-white rounded-2xl p-8 border-2 border-purple-300">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="text-3xl">🎯</span>
+          Koncentrační riziko: Top 10 = 30% indexu
+        </h3>
+        <p class="text-gray-700 mb-6">
+          Přestože S&P 500 obsahuje 500 firem, <strong>top 10 společností tvoří ~30% celého indexu</strong>.
+          Pokud Apple, Microsoft, Amazon, Nvidia a další tech giganti selhají, pocítíte to výrazně.
+        </p>
+        <div class="grid md:grid-cols-5 gap-4">
+          <div class="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
+            <p class="font-bold text-gray-900">Apple</p>
+            <p class="text-2xl font-bold text-purple-600">~7%</p>
+          </div>
+          <div class="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
+            <p class="font-bold text-gray-900">Microsoft</p>
+            <p class="text-2xl font-bold text-purple-600">~6,5%</p>
+          </div>
+          <div class="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
+            <p class="font-bold text-gray-900">Amazon</p>
+            <p class="text-2xl font-bold text-purple-600">~3,5%</p>
+          </div>
+          <div class="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
+            <p class="font-bold text-gray-900">Nvidia</p>
+            <p class="text-2xl font-bold text-purple-600">~3%</p>
+          </div>
+          <div class="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
+            <p class="font-bold text-gray-900">Meta</p>
+            <p class="text-2xl font-bold text-purple-600">~2,5%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: Step-by-Step First Purchase -->
+  <section id="prvni-nakup" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+        Jak nakoupit první S&P 500 ETF akcii (krok za krokem)
+      </h2>
+
+      <!-- Broker Selection -->
+      <div class="mb-12">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Krok 1: Vyberte brokera</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-300">
+            <h4 class="text-xl font-bold text-gray-900 mb-4">DEGIRO</h4>
+            <div class="mb-4">
+              <p class="font-bold text-green-700 mb-2">✅ Výhody:</p>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>• Nejpopulárnější v ČR</li>
+                <li>• Nulové poplatky za ETF v nabídce</li>
+                <li>• Jednoduchá registrace</li>
+              </ul>
+            </div>
+            <div class="mb-4">
+              <p class="font-bold text-orange-700 mb-2">⚠️ Nevýhody:</p>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>• Minimální nákup = celá akcie (~11 500 Kč pro CSPX)</li>
+              </ul>
+            </div>
+            <a href="/kde-koupit-etf" class="text-blue-600 hover:underline text-sm font-medium">
+              Detailní recenze →
+            </a>
+          </div>
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-300">
+            <h4 class="text-xl font-bold text-gray-900 mb-4">XTB</h4>
+            <div class="mb-4">
+              <p class="font-bold text-green-700 mb-2">✅ Výhody:</p>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>• Zlomkové akcie (investice od ~500 Kč)</li>
+                <li>• Nulové poplatky do 100k EUR/měsíc</li>
+                <li>• Česká podpora</li>
+              </ul>
+            </div>
+            <div class="mb-4">
+              <p class="font-bold text-orange-700 mb-2">⚠️ Nevýhody:</p>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>• Menší výběr ETF než DEGIRO</li>
+              </ul>
+            </div>
+            <a href="/kde-koupit-etf" class="text-blue-600 hover:underline text-sm font-medium">
+              Detailní recenze →
+            </a>
+          </div>
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-300">
+            <h4 class="text-xl font-bold text-gray-900 mb-4">Interactive Brokers</h4>
+            <div class="mb-4">
+              <p class="font-bold text-green-700 mb-2">✅ Výhody:</p>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>• Nejnižší poplatky pro velké portfolio</li>
+                <li>• Přístup k 150+ burzám</li>
+                <li>• Profesionální platforma</li>
+              </ul>
+            </div>
+            <div class="mb-4">
+              <p class="font-bold text-orange-700 mb-2">⚠️ Nevýhody:</p>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>• Složitější UI pro začátečníky</li>
+              </ul>
+            </div>
+            <a href="/kde-koupit-etf" class="text-blue-600 hover:underline text-sm font-medium">
+              Detailní recenze →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step-by-Step Purchase Process -->
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-300 mb-8">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Kroky 2-5: První nákup</h3>
+        <div class="space-y-6">
+          <div class="bg-white rounded-xl p-6 border-l-4 border-purple-500">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                2
+              </div>
+              <div class="flex-1">
+                <h4 class="text-xl font-bold text-gray-900 mb-2">Registrace a ověření</h4>
+                <p class="text-gray-700 mb-2">Vyplňte registrační formulář u vybraného brokera. Připravte občanku a doklad o příjmu (výplatní páska). Ověření trvá 1-3 dny.</p>
+                <p class="text-sm text-purple-700 font-medium">⏱️ 15 minut + 1-3 dny na schválení</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-6 border-l-4 border-purple-500">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                3
+              </div>
+              <div class="flex-1">
+                <h4 class="text-xl font-bold text-gray-900 mb-2">Vložení peněz</h4>
+                <p class="text-gray-700 mb-2">Bankovní převod na účet brokera (IBAN najdete po přihlášení). Peníze dorazí do 1-2 dnů.</p>
+                <p class="text-sm text-purple-700 font-medium">⏱️ 1-2 dny</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-6 border-l-4 border-purple-500">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                4
+              </div>
+              <div class="flex-1">
+                <h4 class="text-xl font-bold text-gray-900 mb-2">Vyhledání ETF</h4>
+                <p class="text-gray-700 mb-2">Do vyhledávacího pole zadejte ISIN: IE00B5BMR087 (CSPX) nebo IE00B3YCGJ38 (SPXP). Zkontrolujte název a burzu (London Stock Exchange).</p>
+                <p class="text-sm text-purple-700 font-medium">⏱️ 2 minuty</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-6 border-l-4 border-purple-500">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                5
+              </div>
+              <div class="flex-1">
+                <h4 class="text-xl font-bold text-gray-900 mb-2">Potvrzení nákupu</h4>
+                <p class="text-gray-700 mb-2">Zvolte počet akcií (nebo částku u XTB), zkontrolujte spread, klikněte Koupit. Hotovo! První akcie ve vašem portfoliu.</p>
+                <p class="text-sm text-purple-700 font-medium">⏱️ 3 minuty</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Common Mistakes to Avoid -->
+      <div class="bg-yellow-50 rounded-2xl p-8 border-2 border-yellow-300">
+        <h3 class="text-xl font-bold text-yellow-900 mb-4 flex items-center gap-2">
+          <span class="text-2xl">⚠️</span>
+          Časté chyby začátečníků (vyvarujte se jim!)
+        </h3>
+        <ul class="space-y-3">
+          <li class="flex items-start gap-3">
+            <span class="text-yellow-700 font-bold mt-1">✗</span>
+            <span class="text-gray-800">Koupit špatný ticker (VUSA vs VUAA - distribuce vs akumulace)</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-yellow-700 font-bold mt-1">✗</span>
+            <span class="text-gray-800">Market order místo limit order → zaplatíte vyšší spread</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-yellow-700 font-bold mt-1">✗</span>
+            <span class="text-gray-800">Nákup v malých dávkách → poplatky sežerou výnos</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-yellow-700 font-bold mt-1">✗</span>
+            <span class="text-gray-800">Prodej během paniky (2020 COVID = nejhorší chyba)</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-yellow-700 font-bold mt-1">✗</span>
+            <span class="text-gray-800">Zapomenout na daňovou evidenci → problém za 3 roky</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: Czech Tax Mastery -->
+  <section id="dane-cr" class="py-16 bg-gradient-to-br from-indigo-50 via-blue-50 to-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+        České daně: Kompletní průvodce pro ETF investory
+      </h2>
+
+      <!-- 3-Year Rule -->
+      <div class="bg-white rounded-2xl p-8 mb-8 border-2 border-green-300 shadow-lg">
+        <h3 class="text-2xl font-bold text-green-800 mb-4 flex items-center gap-3">
+          <span class="text-3xl">🎁</span>
+          Zlaté pravidlo: 3 roky = 0% daň
+        </h3>
+        <p class="text-lg text-gray-700 mb-4">
+          Podle <strong>§ 4 odst. 1 písm. w) zákona o daních z příjmů</strong>:
+          Prodej cenných papírů po <strong>3+ letech držby je osvobozen od daně z kapitálového zisku</strong>.
+        </p>
+        <div class="grid md:grid-cols-2 gap-6 mt-6">
+          <div class="bg-green-50 rounded-xl p-6 border-l-4 border-green-500">
+            <h4 class="font-bold text-green-900 mb-3">✅ Prodej po 3+ letech</h4>
+            <p class="text-gray-700 mb-2">Nákup: 1. ledna 2022</p>
+            <p class="text-gray-700 mb-2">Nejdřívější prodej bez daně: <strong>2. ledna 2026</strong></p>
+            <p class="text-green-700 font-bold">Daň: 0%</p>
+          </div>
+          <div class="bg-orange-50 rounded-xl p-6 border-l-4 border-orange-500">
+            <h4 class="font-bold text-orange-900 mb-3">⚠️ Prodej před 3 lety</h4>
+            <p class="text-gray-700 mb-2">Nákup: 1. ledna 2022</p>
+            <p class="text-gray-700 mb-2">Prodej: 31. prosince 2024 (2 roky 365 dní)</p>
+            <p class="text-orange-700 font-bold">Daň: 15% ze zisku</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIFO Method -->
+      <div class="bg-white rounded-2xl p-8 mb-8 border-2 border-blue-300">
+        <h3 class="text-2xl font-bold text-blue-800 mb-4 flex items-center gap-3">
+          <span class="text-3xl">📅</span>
+          FIFO pravidlo: První nakoupené = první prodané
+        </h3>
+        <p class="text-lg text-gray-700 mb-4">
+          V ČR se používá <strong>FIFO (First In, First Out)</strong> metoda.
+          Když prodáváte, <strong>automaticky se počítá, že prodáváte nejstarší akcie</strong>.
+        </p>
+        <div class="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-500">
+          <h4 class="font-bold text-gray-900 mb-3">Příklad FIFO kalkulace:</h4>
+          <div class="space-y-2 text-sm text-gray-700">
+            <p>• <strong>15. 1. 2021:</strong> Nákup 10 akcií CSPX po 400 EUR</p>
+            <p>• <strong>1. 6. 2022:</strong> Nákup 10 akcií CSPX po 450 EUR</p>
+            <p>• <strong>20. 1. 2026:</strong> Prodej 10 akcií CSPX po 550 EUR</p>
+            <p class="mt-4 pt-4 border-t-2 border-blue-300">
+              <strong>Výpočet:</strong> Prodáváte nejstarší akcie (z 15. 1. 2021).
+              Od nákupu uplynuly 4+ roky → <strong class="text-green-600">Daň = 0%</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accumulating vs Distributing -->
+      <div class="bg-white rounded-2xl p-8 mb-8 border-2 border-purple-300">
+        <h3 class="text-2xl font-bold text-purple-800 mb-4 flex items-center gap-3">
+          <span class="text-3xl">💸</span>
+          Akumulační vs Distribuční ETF (daňový rozdíl)
+        </h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-purple-50 rounded-xl p-6 border-l-4 border-purple-500">
+            <h4 class="font-bold text-purple-900 mb-3">Akumulační (CSPX, VUAA)</h4>
+            <p class="text-sm text-gray-700 mb-4">
+              Dividendy se <strong>reinvestují automaticky</strong> uvnitř fondu.
+              Nedostanete je na účet → <strong>žádná srážková daň v ČR</strong>.
+            </p>
+            <p class="text-xs text-gray-600 italic">
+              USA strhne 15% dividendovou daň na úrovni fondu kvůli USA-Irsko smlouvě.
+              Zbytek se reinvestuje. Vy neplatíte nic navíc.
+            </p>
+            <p class="mt-4 font-bold text-green-700">✅ Daňově efektivnější!</p>
+          </div>
+          <div class="bg-orange-50 rounded-xl p-6 border-l-4 border-orange-500">
+            <h4 class="font-bold text-orange-900 mb-3">Distribuční (VUSA, IUSA)</h4>
+            <p class="text-sm text-gray-700 mb-4">
+              Dividendy se <strong>vyplácejí na váš účet</strong>.
+              USA strhne 15% → zbytek přijde vám → <strong>musíte přiznat v daňovém přiznání</strong>.
+            </p>
+            <p class="text-xs text-gray-600 italic">
+              USA daň (15%) si můžete odečíst jako „zahraniční daň" v ř. 63.
+              Obvykle neplatíte dodatečně, ale musíte to uvést v přiznání.
+            </p>
+            <p class="mt-4 font-bold text-orange-700">⚠️ Administrativní zátěž</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- W-8BEN Myth Busted -->
+      <div class="bg-red-50 rounded-2xl p-8 border-2 border-red-300">
+        <h3 class="text-2xl font-bold text-red-800 mb-4 flex items-center gap-3">
+          <span class="text-3xl">🚫</span>
+          Mýtus: „Musím vyplnit W-8BEN formulář"
+        </h3>
+        <p class="text-lg text-gray-700 mb-4">
+          <strong>NE.</strong> W-8BEN je formulář pro <strong>US-domiciled ETF</strong> (např. SPY, VOO).
+          Pro <strong>irské ETF</strong> (CSPX, VUAA, SPXP) W-8BEN vyplňuje <strong>správce fondu</strong>, ne vy jako investor.
+        </p>
+        <p class="text-gray-700">
+          Irsko má s USA daňovou smlouvu, která automaticky snižuje withholding tax na dividendy z 30% na 15%.
+          Jako retail investor v ČR kupující irské ETF <strong>nepotřebujete W-8BEN</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: DCA vs Lump Sum (Vanguard Study) -->
+  <section id="dca-lumpsum" class="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+        DCA vs Lump Sum: Co ukazuje Vanguard Research?
+      </h2>
+
+      <!-- Vanguard Study Results -->
+      <div class="bg-white rounded-2xl p-8 mb-8 border-2 border-purple-300 shadow-lg">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="text-3xl">📈</span>
+          Vanguard (2012): Lump sum vyhrává v 66% případů
+        </h3>
+        <p class="text-lg text-gray-700 mb-6">
+          Vanguard analyzoval historická data z USA, UK a Austrálie za posledních 90 let.
+          Zjištění: <strong>Lump sum investice (vše najednou) dosahuje vyššího výnosu v 66% případů</strong> oproti DCA (rozložení do 12 měsíců).
+        </p>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-green-50 rounded-xl p-6 border-l-4 border-green-500">
+            <h4 class="font-bold text-green-800 mb-3">Proč lump sum vyhrává?</h4>
+            <ul class="space-y-2 text-sm text-gray-700">
+              <li>• <strong>Time in market {'>'} timing the market</strong></li>
+              <li>• Akciové trhy rostou 70% času (mean reversion)</li>
+              <li>• Každý den čekání = ušlý compound growth</li>
+              <li>• Matematicky: vyšší průměrný výnos</li>
+            </ul>
+          </div>
+          <div class="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-500">
+            <h4 class="font-bold text-blue-800 mb-3">Kdy DCA dává smysl?</h4>
+            <ul class="space-y-2 text-sm text-gray-700">
+              <li>• <strong>Psychologická pohoda</strong> (strach z market timingu)</li>
+              <li>• Pravidelný příjem (mzda) → žádný velký kapitál</li>
+              <li>• Extrémní valuace (P/E 30+) → snížení vstupního rizika</li>
+              <li>• Disciplína: Eliminuje prokrastinaci</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hybrid Approach -->
+      <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border-2 border-indigo-300">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+          <span class="text-3xl">🎯</span>
+          Hybrid strategie: Best of both worlds
+        </h3>
+        <p class="text-lg text-gray-700 mb-6">
+          Máte 300 000 Kč na investici, ale bojíte se investovat vše najednou?
+          Zkuste <strong>50-75% immediate + zbytek DCA</strong> po 3-6 měsíců.
+        </p>
+        <div class="bg-white rounded-xl p-6 border-l-4 border-indigo-500">
+          <h4 class="font-bold text-gray-900 mb-3">Příklad: 300k Kč investice</h4>
+          <div class="space-y-3 text-sm text-gray-700">
+            <p><strong>Den 1:</strong> Investujte 200k Kč (67%) do CSPX</p>
+            <p><strong>Měsíc 2-5:</strong> Zbylých 100k Kč rozložte po 25k Kč měsíčně</p>
+            <p class="mt-4 pt-4 border-t border-gray-300">
+              <strong>Výhody:</strong> Většina peněz okamžitě pracuje (compound growth),
+              ale máte rezervu pro průměrování během prvních měsíců (psychological comfort).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: E-E-A-T Footer - Data Sources & Disclaimer -->
+  <section id="eeat-footer" class="py-16 bg-gradient-to-br from-gray-50 to-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-2xl p-8 border-2 border-gray-300 shadow-lg">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+          <span class="text-4xl">📚</span>
+          Zdroje dat, metodologie a disclaimer
+        </h2>
+
+        <!-- Data Sources -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Finanční data</h3>
+            <ul class="space-y-3 text-sm text-gray-700">
+              <li class="flex items-start gap-2">
+                <span class="text-blue-600 font-bold mt-1">→</span>
+                <span><strong>justETF.com</strong> - ETF databáze, TER, velikost fondů, tracking error, performance data</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-blue-600 font-bold mt-1">→</span>
+                <span><strong>S&P Dow Jones Indices</strong> - Oficiální S&P 500 historická data, složení indexu, drawdown analýzy</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-blue-600 font-bold mt-1">→</span>
+                <span><strong>Česká národní banka (ČNB)</strong> - USD/CZK měnové kurzy pro currency conversion</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-blue-600 font-bold mt-1">→</span>
+                <span><strong>European Central Bank (ECB)</strong> - EUR/USD měnové kurzy</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Legislativa a výzkum</h3>
+            <ul class="space-y-3 text-sm text-gray-700">
+              <li class="flex items-start gap-2">
+                <span class="text-blue-600 font-bold mt-1">→</span>
+                <span><strong>Zákon č. 586/1992 Sb.</strong> - Zákon o daních z příjmů (§ 4 odst. 1 písm. w) - 3letá osvobození</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-blue-600 font-bold mt-1">→</span>
+                <span><strong>Vanguard Research (2012)</strong> - "Dollar-cost averaging vs. lump-sum investing: How investors should approach portfolio allocation strategies"</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-blue-600 font-bold mt-1">→</span>
+                <span><strong>USA-Ireland Tax Treaty</strong> - Dividendová srážková daň 15% pro irské ETF</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Update Frequency -->
+        <div class="bg-blue-50 rounded-xl p-6 mb-8 border-l-4 border-blue-600">
+          <h3 class="text-xl font-bold text-gray-900 mb-4">Frekvence aktualizací</h3>
+          <div class="grid md:grid-cols-3 gap-6 text-sm text-gray-700">
+            <div>
+              <p class="font-bold text-blue-700 mb-2">ETF ceny & výnosy</p>
+              <p>Automatická aktualizace z databáze při každém načtení stránky</p>
+            </div>
+            <div>
+              <p class="font-bold text-blue-700 mb-2">TER & velikost fondů</p>
+              <p>Týdenní synchronizace s justETF.com databází</p>
+            </div>
+            <div>
+              <p class="font-bold text-blue-700 mb-2">Poslední update</p>
+              <p class="font-bold text-gray-900">{new Date(lastModified).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal Disclaimer -->
+        <div class="bg-orange-50 rounded-xl p-6 border-2 border-orange-300">
+          <h3 class="text-xl font-bold text-orange-900 mb-4 flex items-center gap-2">
+            <span class="text-2xl">⚠️</span>
+            Právní upozornění (YMYL content)
+          </h3>
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
+            <strong>Tento článek je pouze pro vzdělávací a informační účely.</strong> Nepředstavuje investiční doporučení, nabídku,
+            výzvu ani poradenství k nákupu nebo prodeji finančních nástrojů. Investování do ETF s sebou nese riziko ztráty části
+            nebo celého investovaného kapitálu.
+          </p>
+          <p class="text-sm text-gray-700 leading-relaxed mb-4">
+            <strong>Historická výkonnost nezaručuje budoucí výnosy.</strong> Všechna uvedená data jsou aktuální k datu publikace,
+            ale mohou se měnit. Hodnoty TER, velikosti fondů, výnosů a dalších metrik se mohou lišit podle zdroje a data měření.
+          </p>
+          <p class="text-sm text-gray-700 leading-relaxed">
+            Před investicí pečlivě zvažte své <strong>finanční cíle, investiční horizont, zkušenosti a rizikovou toleranci</strong>.
+            V případě potřeby konzultujte s <strong>nezávislým finančním poradcem nebo daňovým poradcem</strong> specializovaným na kapitálové trhy.
+            Autoři nejsou placeni žádným brokerem ani ETF poskytovatelem.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-purple-100 w-20 h-20 mx-auto mb-8 hover:bg-purple-200 transition-colors">
+          <span class="text-2xl">❓</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Často kladené otázky o S&P 500 ETF
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Odpovědi na nejčastější dotazy o investování do S&P 500 ETF
+        </p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-8 shadow-md">
+        <div class="max-w-4xl mx-auto space-y-6">
+          {faqItems.map((faq, index) => (
+            <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+              <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+                <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">{faq.question}</span>
+                <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+                {faq.answer}
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-green-100 w-20 h-20 mx-auto mb-8 hover:bg-green-200 transition-colors">
+          <svg class="w-10 h-10 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Připraveni investovat do S&P 500?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Najděte si ideálního brokera a začněte s investováním do nejlepších S&P 500 ETF
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <a href="/kde-koupit-etf" class="inline-flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-8 py-4 text-lg font-semibold rounded-xl transition-all">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            Najít brokera pro ETF
+          </a>
+          <a href="/srovnani-etf" class="inline-flex items-center justify-center border-2 border-blue-500 text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl transition-all">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            Srovnat všechny ETF
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CurrencyImpactAnalyzerContent from '../../components/tools/CurrencyImpactAnalyzerContent';
+---
+
+<Layout
+  title="Kurzový dopad ETF - Měnové riziko"
+  description="Analýza kurzového rizika ETF. Kalkulátor měnového dopadu a hedging strategií. Porovnání hedged vs unhedged ETF."
+  canonical="/kalkulacky/kurzovy-dopad-etf"
+  keywords="kurzové riziko, měnový dopad, hedged ETF, unhedged ETF, měnové zajištění, forex riziko, investice v cizí měně"
+  ogImage="/og-kurzovy-dopad-etf.jpg"
+  ogTitle="Kurzový dopad ETF - Měnové riziko | ETF průvodce"
+  ogDescription="Analýza kurzového rizika ETF. Kalkulátor měnového dopadu a hedging strategií."
+>
+  <CurrencyImpactAnalyzerContent client:load />
+</Layout>

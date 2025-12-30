@@ -1,0 +1,460 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ETFTable from '../../components/ETFTable.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-growth-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší Growth ETF 2026 - NASDAQ, tech růstové akcie`,
+  "description": `Srovnání nejlepších Growth ETF 2026. NASDAQ QQQ, růstové akcie, technologie - TER, velikost fondů.`,
+  "image": "https://www.etfpruvodce.cz/og-growth-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": "2026-01-15",
+  "dateModified": new Date().toISOString().split('T')[0],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-growth-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": "Growth ETF, růstové akcie, Russell Growth, growth investing, growth factor",
+  "wordCount": 2700,
+  "inLanguage": "cs-CZ"
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nejlepší Growth ETF v roce 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší Growth ETF jsou: Amundi Russell 1000 Growth UCITS ETF (RS1G, IE0005E8B9S4) největší pure growth factor ETF s 569 mil. EUR a TER 0,19%, iShares Russell 1000 Growth UCITS ETF (IUSG, IE000NITTFF2) s 414 mil. EUR, a JPMorgan Active US Growth UCITS ETF (JGRO, IE0005CH3U28) aktivně řízený growth ETF s 337 mil. EUR."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Co je Growth investing a jak fungují Growth ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Growth investing je strategie zaměřená na společnosti s nadprůměrným růstem tržeb, zisku a cash flow. Growth ETF automaticky vybírají akcie s vysokými růstovými metrikami, často z technologického sektoru. Mají vyšší potenciál výnosů, ale i vyšší volatilitu než value nebo dividendové ETF."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi Growth a Value ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Growth ETF investují do rychle rostoucích společností s vysokými oceněními (P/E, P/B) a reinvestují zisky do růstu. Value ETF se zaměřují na podhodnocené akcie s nízkými poměry a často vyšší dividendy. Growth má historicky vyšší volatilitu, ale i vyšší potenciál výnosů v bull trzích."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Který Growth ETF má nejnižší poplatky?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Amundi Russell 1000 Growth UCITS ETF (RS1G, IE0005E8B9S4) má nejnižší TER pouze 0,19% mezi našimi TOP 3 doporučeními. iShares Russell 1000 Growth (IUSG, IE000NITTFF2) a JPMorgan Active US Growth (JGRO, IE0005CH3U28) mají vyšší poplatky, ale stále konkurenceschopné pro růstové investice."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou Growth ETF vhodné pro začátečníky?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Growth ETF mohou být volatilnější než široké tržní ETF. Pro začátečníky doporučujeme začít s všetržními ETF a Growth ETF používat jako doplněk max 20-30% portfolia. Amundi Russell 1000 Growth (RS1G, IE0005E8B9S4) je dobrý vstupní bod díky diverzifikaci a nízkému TER."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Vyplácejí Growth ETF dividendy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Growth společnosti obvykle nevyplácejí dividendy nebo vyplácejí velmi nízké dividendy, protože reinvestují zisky do růstu. Naše TOP 3 Growth ETF (Amundi Russell Growth - RS1G, iShares Russell Growth - IUSG, JPMorgan Active Growth - JGRO) se zaměřují na kapitálový růst spíše než na dividendové příjmy."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší Growth ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-growth-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  {
+    title: "Nejlepší Value ETF",
+    href: "/nejlepsi-etf/nejlepsi-value-etf",
+    description: "Kompletní průvodce hodnotovými ETF fondy",
+    icon: "💎"
+  },
+  {
+    title: "Nejlepší technologické ETF",
+    href: "/nejlepsi-etf/nejlepsi-technologicke-etf",
+    description: "Srovnání nejlepších tech ETF",
+    icon: "💻"
+  },
+  {
+    title: "Srovnání ETF",
+    href: "/srovnani-etf",
+    description: "Porovnejte si ETF podle různých kritérií",
+    icon: "📊"
+  }
+];
+---
+
+<Layout
+  title={`Nejlepší Growth ETF 2026 | Srovnání`}
+  description={`✅ Srovnání nejlepších Growth ETF 2026. Russell Growth, růstové faktory, growth akcie - TER, velikost fondů. Aktuální data k ${currentDate}.`}
+  canonical={'/nejlepsi-etf/' + config.slug}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Modern Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-indigo-50/50"></div>
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-purple-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-indigo-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+        <!-- Left Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-blue-100 to-purple-100 text-purple-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-purple-200/50">
+            🚀 Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší
+            <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              Growth ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a
+              href="/o-nas"
+              class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+            >
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>
+              Aktualizováno: {new Date().toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších Growth ETF pro investice do rychle rostoucích společností.
+            Russell Growth, growth faktory a fundamentální analýza včetně praktických tipů.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-md h-12">
+              ⭐ Top 3 doporučení
+            </a>
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg font-semibold h-12 rounded-md">
+              📈 Růstové metriky
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Content - Growth Stats -->
+        <div class="relative mt-12">
+          <div class="bg-white rounded-2xl p-6 border border-gray-300 shadow-lg">
+
+            <!-- Simple Header -->
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-3">
+                🚀
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-1">
+                Growth investing v číslech
+              </h3>
+              <p class="text-sm text-gray-600">Klíčové metriky pro růstové akcie</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-blue-600">📈</span>
+                  <span class="text-xs text-gray-500 font-medium">NEJVYŠŠÍ RŮST</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">35%</div>
+                <div class="text-xs text-gray-600">ročně (tech)</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-purple-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-purple-600">🧠</span>
+                  <span class="text-xs text-gray-500 font-medium">RUSSELL GROWTH</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">569M</div>
+                <div class="text-xs text-gray-600">největší growth factor</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-blue-600">📊</span>
+                  <span class="text-xs text-gray-500 font-medium">P/E RATIO</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">28x</div>
+                <div class="text-xs text-gray-600">průměr growth</div>
+              </div>
+
+              <div class="bg-white rounded-lg p-4 border border-gray-200 hover:border-purple-200 transition-colors">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-purple-600">⚡</span>
+                  <span class="text-xs text-gray-500 font-medium">VOLATILITA</span>
+                </div>
+                <div class="text-2xl font-bold text-gray-900">22%</div>
+                <div class="text-xs text-gray-600">vyšší než market</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro Section -->
+  <section id="uvod" class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="flex items-center justify-center rounded-full bg-blue-100 w-20 h-20 mx-auto mb-8 hover:bg-blue-200 transition-colors">
+          <span class="text-4xl">🚀</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Co jsou Growth ETF?</h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          Investiční fondy zaměřené na rychle rostoucí společnosti s vysokým potenciálem růstu tržeb a zisků
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">📈</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-purple-800 transition-colors">
+            Vysoký růst tržeb
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            ETF vybírají společnosti s nadprůměrným růstem příjmů, často 15-30% ročně, hlavně z tech sektoru.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🧠</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-purple-800 transition-colors">
+            Inovace a technologie
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Zaměření na inovativní společnosti z oblasti AI, cloudu, biotech a dalších disruptivních odvětví.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <span class="text-2xl">🚀</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-purple-800 transition-colors">
+            Reinvestice zisků
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Společnosti obvykle nevyplácejí dividendy, ale reinvestují zisky do dalšího růstu a expanze.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Top 3 nejlepší Growth ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy růstových metrik a velikosti fondů
+        </p>
+      </div>
+
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Database Sections -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="Growth" />
+
+  <!-- FAQ Section -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Nejčastější otázky
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          Odpovědi na časté dotazy ohledně Growth ETF
+        </p>
+      </div>
+
+      <div class="space-y-6">
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaké jsou nejlepší Growth ETF v roce 2026?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            Nejlepší Growth ETF jsou: <strong>Amundi Russell 1000 Growth UCITS ETF</strong> (RS1G, IE0005E8B9S4)
+            největší pure growth factor ETF s 569 mil. EUR a TER 0,19%, <strong>iShares Russell 1000 Growth UCITS ETF</strong> (IUSG, IE000NITTFF2)
+            s 414 mil. EUR, a <strong>JPMorgan Active US Growth UCITS ETF</strong>
+            (JGRO, IE0005CH3U28) aktivně řízený growth ETF s 337 mil. EUR.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Co je Growth investing a jak fungují Growth ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Growth investing</strong> je strategie zaměřená na společnosti s nadprůměrným růstem tržeb, zisku a cash flow.
+            Growth ETF automaticky vybírají akcie s vysokými růstovými metrikami pomocí kvantitativních modelů,
+            často z technologického sektoru. Mají vyšší potenciál výnosů, ale i vyšší volatilitu než value nebo dividendové ETF.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jaký je rozdíl mezi Growth a Value ETF?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Growth ETF</strong> investují do rychle rostoucích společností s vysokými oceněními (P/E, P/B)
+            a reinvestují zisky do růstu namísto dividend. <strong>Value ETF</strong> se zaměřují na podhodnocené akcie
+            s nízkými poměry a často vyšší dividendy. Growth má historicky vyšší volatilitu, ale i vyšší potenciál výnosů
+            v bull trzích, zatímco value může být defensivnější v bear trzích.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Který Growth ETF má nejnižší poplatky?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Amundi Russell 1000 Growth UCITS ETF</strong> (RS1G, IE0005E8B9S4) má nejnižší TER pouze 0,19% mezi našimi TOP 3 doporučeními.
+            iShares Russell 1000 Growth (IUSG, IE000NITTFF2) a JPMorgan Active US Growth (JGRO, IE0005CH3U28)
+            mají vyšší poplatky, ale stále konkurenceschopné pro růstové investice.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Jsou Growth ETF vhodné pro začátečníky?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Growth ETF</strong> mohou být volatilnější než široké tržní ETF. Pro začátečníky doporučujeme začít s všetržními ETF
+            a Growth ETF používat jako doplněk max 20-30% portfolia. <strong>Amundi Russell 1000 Growth</strong> (RS1G, IE0005E8B9S4)
+            je dobrý vstupní bod díky diverzifikaci a nízkému TER.
+          </div>
+        </details>
+
+        <details class="group border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+          <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-blue-50 rounded-lg group-open:rounded-b-none transition-colors">
+            <span class="font-semibold text-lg text-gray-900 group-hover:text-blue-800">Vyplácejí Growth ETF dividendy?</span>
+            <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+            <strong>Growth společnosti</strong> obvykle nevyplácejí dividendy nebo vyplácejí velmi nízké dividendy, protože reinvestují zisky do růstu.
+            Naše TOP 3 Growth ETF (Amundi Russell Growth - RS1G, iShares Russell Growth - IUSG, JPMorgan Active Growth - JGRO)
+            se zaměřují na kapitálový růst spíše než na dividendové příjmy.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>

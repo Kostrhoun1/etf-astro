@@ -1,0 +1,632 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AllWeatherPortfolioPerformanceWrapper from '../../components/portfolio/AllWeatherPortfolioPerformanceWrapper';
+
+const portfolioSchema = {
+  "@context": "https://schema.org",
+  "@type": "FinancialProduct",
+  "name": "Ray Dalio All-Weather Portfolio",
+  "description": "Kompletní průvodce All-Weather strategií Ray Dalia z Bridgewater. 40% dlouhodobé dluhopisy + 30% akcie + 15% střednědobé dluhopisy + 7.5% komodity + 7.5% zlato s očekávaným výnosem 5-8% ročně.",
+  "category": "Investment Strategy",
+  "provider": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "url": "https://www.etfpruvodce.cz"
+  },
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Conservative Investors"
+  },
+  "feesAndCommissionsSpecification": "TER 0.15-0.60% ročně",
+  "interestRate": "5-8% očekávaný výnos ročně",
+  "riskRating": "Konzervativní",
+  "creator": {
+    "@type": "Person",
+    "name": "Ray Dalio",
+    "jobTitle": "Founder of Bridgewater Associates"
+  }
+};
+
+const faqData = [
+  {
+    question: "Proč All-Weather Portfolio obsahuje 55% dluhopisů?",
+    answer: "Ray Dalio navrhuje vysoký podíl dluhopisů (40% dlouhodobé + 15% střednědobé), protože poskytují stabilitu a rostou během deflace a recese. Dluhopisy s dlouhou dobou splatnosti jsou velmi citlivé na úrokové sazby a mohou dosáhnout velkých zisků během krizí. Toto 'risk parity' vyváží volatilitu všech složek portfolia."
+  },
+  {
+    question: "Jak funguje Risk Parity přístup v praxi?",
+    answer: "Risk Parity znamená, že každá třída aktiv přispívá stejným dílem k celkovému riziku portfolia, ne k hodnotě. Akcie jsou volatilní, takže tvoří jen 30%. Dluhopisy jsou stabilnější, takže jich je více (55%). Komodity a zlato (15%) poskytují ochranu při inflaci. Výsledek je portfolio odolné vůči všem ekonomickým scénářům."
+  },
+  {
+    question: "Je All-Weather příliš složité pro běžné investory?",
+    answer: "Ano, vyžaduje 5 různých ETF a čtvrtletní rebalancing. Pro zjednodušení můžete použít 3-ETF verzi: 50% IGLT (dlouhé dluhopisy), 40% VWCE (akcie), 10% zlato. Zachováte základní principy, ale s jednodušší správou. Pokud chcete ještě jednodušší řešení, zvolte Permanent Portfolio s 4 aktivy po 25%."
+  },
+  {
+    question: "Proč má All-Weather nižší výnos než jiné strategie?",
+    answer: "All-Weather obětuje část výnosu pro stabilitu. Cílem není maximalizovat výnos, ale minimalizovat riziko při zachování slušného růstu. 5-8% ročně s minimální volatilitou je lepší než 10% s možností ztráty 50%. Pro konzervativní investory je předvídatelnost důležitější než maximální růst."
+  },
+  {
+    question: "Jak se All-Weather chová během inflace?",
+    answer: "Velmi dobře. Komodity a zlato (15%) přímo těží z inflace. Akcie (30%) dlouhodobě překonávají inflaci. Pouze dluhopisy trpí, ale jejich velký podíl je kompenzován ostatními složkami. All-Weather je jedna z mála strategií skutečně chráněných proti inflaci, na rozdíl od tradičního 60/40 portfolia."
+  },
+  {
+    question: "Jaké ETF použít pro evropské investory?",
+    answer: "Doporučujeme: IGLT (dlouhé evropské dluhopisy), VWCE (světové akcie), IEAA (střednědobé dluhopisy), CMCX (komodity), SGLN (zlato). Alternativy: VGLT místo IGLT, AGGH místo IEAA. Klíčové je zachovat proporce a používat EUR denominované ETF pro snížení měnového rizika."
+  },
+  {
+    question: "Kdy rebalancovat a jak často?",
+    answer: "Ray Dalio doporučuje čtvrtletní rebalancing nebo při odchylce >3% od cíle. Používejte 'band rebalancing' - když dluhopisy klesnou pod 37% nebo vystoupí nad 43%, rebalancujte zpět na 40%. Častější rebalancing zvyšuje náklady, řidší snižuje efektivitu strategie."
+  },
+  {
+    question: "Funguje All-Weather i v Evropě nebo jen v USA?",
+    answer: "Principy fungují globálně, ale implementace se liší. V Evropě jsou nižší úrokové sazby, jiná inflační dynamika a odlišné komodity. Použijte evropské ETF a přizpůsobte komoditní složku (více energie, méně zemědělství). Základní logika 4 ekonomických scénářů platí univerzálně."
+  }
+];
+
+const relatedLinks = [
+  {
+    title: "Backtest portfolia",
+    href: "/kalkulacky/backtest-portfolia",
+    description: "Otestujte historickou výkonnost All-Weather Portfolia"
+  },
+  {
+    title: "Monte Carlo simulátor",
+    href: "/kalkulacky/monte-carlo-simulator",
+    description: "Prognóza budoucnosti s tisíci scénářů"
+  },
+  {
+    title: "Portfolio strategie přehled",
+    href: "/portfolio-strategie",
+    description: "Porovnejte všech 5 investičních strategií"
+  },
+  {
+    title: "Permanentní Portfolio",
+    href: "/portfolio-strategie/permanentni-portfolio",
+    description: "Jednodušší konzervativní alternativa"
+  },
+  {
+    title: "Srovnání ETF fondů",
+    href: "/srovnani-etf",
+    description: "Najděte nejlepší ETF pro vaši strategii"
+  }
+];
+---
+
+<Layout
+  title="Ray Dalio All-Weather Portfolio 2026 | 5% s ETF"
+  description="Kompletní průvodce All-Weather strategií Ray Dalia z Bridgewater. Očekávaný výnos 5% ročně s minimální volatilitou ve všech ekonomických podmínkách."
+  canonical="/portfolio-strategie/ray-dalio-all-weather"
+  keywords="Ray Dalio, All-Weather portfolio, Bridgewater, všepogodní strategie, risk parity, ETF investování, diverzifikace rizika, ekonomické cykly"
+  ogImage="/og-ray-dalio-all-weather.jpg"
+  ogTitle="Ray Dalio All-Weather Portfolio 2026 | 5% s ETF"
+  ogDescription="Kompletní průvodce All-Weather strategií Ray Dalia z Bridgewater. Očekávaný výnos 5% ročně s minimální volatilitou ve všech ekonomických podmínkách."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(portfolioSchema)} />
+
+  <div class="bg-white">
+    <!-- Modern Hero Section -->
+    <section class="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-slate-50/50 via-gray-50/30 to-slate-50/50"></div>
+      <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-slate-200 to-gray-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+      <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-gray-200 to-slate-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-slate-300 to-gray-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+
+          <!-- Left Content -->
+          <div class="space-y-8">
+            <div class="inline-flex items-center bg-gradient-to-r from-slate-100 to-gray-100 text-slate-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-slate-200/50">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+              </svg>
+              All-Weather Portfolio
+            </div>
+
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+              Ray Dalio
+              <span class="bg-gradient-to-r from-slate-600 via-gray-600 to-slate-600 bg-clip-text text-transparent">
+                All-Weather
+              </span>
+            </h1>
+
+            <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+              Pokročilá strategie od legendárního Ray Dalia s <strong>5-8% očekávaným výnosem</strong> a minimální volatilitou ve všech ekonomických podmínkách.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4">
+              <a
+                href="#allocation"
+                class="bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2 h-12"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Zobrazit složení
+              </a>
+              <a
+                href="#vykonnost"
+                class="bg-white/80 backdrop-blur-sm border-2 border-slate-300 text-slate-700 hover:bg-slate-50 px-8 py-3 text-lg font-semibold rounded-lg transition-all hover:shadow-lg flex items-center justify-center gap-2 h-12"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                Aktuální výnos
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Content - Visual Element -->
+          <div class="relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-400/20 to-gray-400/20 rounded-3xl transform rotate-3"></div>
+            <div class="relative bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 shadow-xl">
+              <h3 class="text-2xl font-bold text-gray-900 mb-6">Klíčové údaje</h3>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Očekávaný výnos</span>
+                  <span class="text-2xl font-bold text-slate-600">5-8%</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Složení</span>
+                  <span class="font-semibold text-gray-900">40/30/15/7.5/7.5</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Riziko</span>
+                  <span class="font-semibold text-slate-600">Konzervativní</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Rebalancing</span>
+                  <span class="font-semibold text-gray-900">Čtvrtletně</span>
+                </div>
+              </div>
+              <div class="mt-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg border border-slate-200">
+                <p class="text-sm font-semibold text-slate-800">
+                  🌦️ Funguje ve všech ekonomických podmínkách
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4 py-12">
+
+      <!-- Portfolio Složení -->
+      <div id="allocation">
+        <div class="bg-white rounded-lg border shadow-sm mb-12">
+          <div class="flex flex-col space-y-1.5 p-6">
+            <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-3">
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Složení All-Weather Portfolia
+            </h3>
+          </div>
+          <div class="p-6 pt-0">
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold">Dlouhodobé státní dluhopisy</span>
+                  <span class="text-lg font-bold">40%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                  <div class="bg-blue-600 h-3 rounded-full" style="width: 40%"></div>
+                </div>
+                <p class="text-sm text-gray-600"><a href="/etf/IE00BSKRJZ44" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">SXRC</a> - iShares USD Treasury Bond 20+yr UCITS ETF USD (Acc)</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold">Akcie</span>
+                  <span class="text-lg font-bold">30%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                  <div class="bg-green-600 h-3 rounded-full" style="width: 30%"></div>
+                </div>
+                <p class="text-sm text-gray-600"><a href="/etf/IE00BK5BQT80" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">VWCE</a> - Vanguard FTSE All-World</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold">Střednědobé státní dluhopisy</span>
+                  <span class="text-lg font-bold">15%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                  <div class="bg-purple-600 h-3 rounded-full" style="width: 15%"></div>
+                </div>
+                <p class="text-sm text-gray-600"><a href="/etf/LU1681040652" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">EGOV7</a> - Amundi Euro Government Bond 7-10Y UCITS ETF Acc</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold">Komodity</span>
+                  <span class="text-lg font-bold">7.5%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                  <div class="bg-yellow-500 h-3 rounded-full" style="width: 7.5%"></div>
+                </div>
+                <p class="text-sm text-gray-600"><a href="/etf/IE00BD6FTQ80" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">COMM</a> - Invesco Bloomberg Commodity UCITS ETF Acc</p>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-semibold">Zlato</span>
+                  <span class="text-lg font-bold">7.5%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-1">
+                  <div class="bg-orange-500 h-3 rounded-full" style="width: 7.5%"></div>
+                </div>
+                <p class="text-sm text-gray-600"><a href="/etf/IE00B4ND3602" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">SGLN</a> - iShares Physical Gold ETC</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filosofie Ray Dalia -->
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div class="bg-white rounded-lg border shadow-sm">
+          <div class="flex flex-col space-y-1.5 p-6">
+            <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-3">
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              Filozofie Ray Dalia
+            </h3>
+          </div>
+          <div class="p-6 pt-0 space-y-4">
+            <div class="bg-slate-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">🌍 Ekonomické prostředí</h4>
+              <p class="text-sm">Čtyři možné scénáře: růst/pokles × inflace/deflace</p>
+            </div>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">⚖️ Risk Parity</h4>
+              <p class="text-sm">Vyvážení podle rizika, ne podle hodnoty investice</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">🔄 Uncorrelated Returns</h4>
+              <p class="text-sm">Kombinace aktiv reagujících různě na ekonomické podmínky</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-2">📊 Diverzifikace</h4>
+              <p class="text-sm">Jediný "free lunch" v investování</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg border shadow-sm">
+          <div class="flex flex-col space-y-1.5 p-6">
+            <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-3">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Výhody strategie
+            </h3>
+          </div>
+          <div class="p-6 pt-0">
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Funguje ve všech ekonomických cyklech</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Nejnižší volatilita ze všech portfolií</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Ochrana proti inflaci i deflaci</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Prověřeno největším hedge fondem světa</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Vysoká diverzifikace napříč třídami aktiv</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Minimální drawdowny</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aktuální výkonnost -->
+      <div id="vykonnost">
+        <AllWeatherPortfolioPerformanceWrapper client:load />
+      </div>
+
+      <!-- 4 ekonomické scénáře -->
+      <div class="bg-white rounded-lg border shadow-sm mb-12">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-3">
+            <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+            </svg>
+            Čtyři ekonomické scénáře
+          </h3>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="bg-green-50 p-6 rounded-lg">
+                <h4 class="font-semibold text-green-700 mb-3">🚀 Růst + Nízká inflace</h4>
+                <div class="text-sm">
+                  <div class="font-semibold mb-2">Výherce:</div>
+                  <div>• Akcie (hlavní driver)</div>
+                  <div>• Korporátní dluhopisy</div>
+                  <div class="font-semibold mb-2 mt-3">Alokace: 30% akcií</div>
+                </div>
+              </div>
+
+              <div class="bg-blue-50 p-6 rounded-lg">
+                <h4 class="font-semibold text-blue-700 mb-3">❄️ Pokles + Deflace</h4>
+                <div class="text-sm">
+                  <div class="font-semibold mb-2">Výherce:</div>
+                  <div>• Dlouhodobé státní dluhopisy</div>
+                  <div>• Hotovost</div>
+                  <div class="font-semibold mb-2 mt-3">Alokace: 55% dluhopisů</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="bg-red-50 p-6 rounded-lg">
+                <h4 class="font-semibold text-red-700 mb-3">🔥 Růst + Vysoká inflace</h4>
+                <div class="text-sm">
+                  <div class="font-semibold mb-2">Výherce:</div>
+                  <div>• Komodity</div>
+                  <div>• TIPS (inflační dluhopisy)</div>
+                  <div class="font-semibold mb-2 mt-3">Alokace: 15% komodit + TIPS</div>
+                </div>
+              </div>
+
+              <div class="bg-orange-50 p-6 rounded-lg">
+                <h4 class="font-semibold text-orange-700 mb-3">📉 Pokles + Inflace (Stagflace)</h4>
+                <div class="text-sm">
+                  <div class="font-semibold mb-2">Výherce:</div>
+                  <div>• TIPS</div>
+                  <div>• Komodity (zlato)</div>
+                  <div class="font-semibold mb-2 mt-3">Nejhorší scénář pro většinu portfolií</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Implementace -->
+      <div class="bg-white rounded-lg border shadow-sm mb-12">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-3">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Praktická implementace
+          </h3>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 class="font-semibold mb-4">🎯 Přesná alokace</h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span><a href="/etf/IE00BSKRJZ44" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">IGLT</a> (dlouhé dluhopisy):</span>
+                  <span class="font-semibold">40%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span><a href="/etf/IE00BK5BQT80" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">VWCE</a> (světové akcie):</span>
+                  <span class="font-semibold">30%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span><a href="/etf/IE00BDBRDM35" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">IEGA</a> (střední dluhopisy):</span>
+                  <span class="font-semibold">15%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span><a href="/etf/IE00BD6FTQ80" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">CMDY</a> (komodity):</span>
+                  <span class="font-semibold">7.5%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span><a href="/etf/IE00B4ND3602" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">ITIP</a> (inflační dluhopisy):</span>
+                  <span class="font-semibold">7.5%</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-semibold mb-4">⚖️ Rebalancing pravidla</h4>
+              <ul class="space-y-2 text-sm">
+                <li>• <strong>Frekvence:</strong> Čtvrtletně</li>
+                <li>• <strong>Práh:</strong> Při odchylce &gt;3%</li>
+                <li>• <strong>Metoda:</strong> Band rebalancing</li>
+                <li>• <strong>Priority:</strong> Dlouhé dluhopisy first</li>
+                <li>• <strong>Náklady:</strong> Započítejte transakční poplatky</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="mt-6 bg-slate-50 p-4 rounded-lg">
+            <h4 class="font-semibold mb-2">💡 Zjednodušená varianta pro začátečníky</h4>
+            <div class="text-sm">
+              <div>• <strong>50%</strong> <a href="/etf/IE00BSKRJZ44" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">IGLT</a> (dlouhé dluhopisy)</div>
+              <div>• <strong>40%</strong> <a href="/etf/IE00BK5BQT80" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">VWCE</a> (světové akcie)</div>
+              <div>• <strong>10%</strong> <a href="/etf/IE00B4ND3602" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-medium">SGLN</a> (zlato jako commodity proxy)</div>
+              <p class="text-xs text-gray-500 mt-2">Jednodušší implementace se zachováním základní filozofie</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rizika a nevýhody -->
+      <div class="bg-white rounded-lg border border-orange-200 shadow-sm mb-12">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-3 text-orange-700">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Rizika a nevýhody
+          </h3>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="bg-orange-50 p-6 rounded-lg">
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span><strong>Komplexnost:</strong> Vyžaduje 5 různých ETF a častý rebalancing</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span><strong>Nízký očekávaný výnos:</strong> Pouze 5% ročně</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span><strong>Úrokové riziko:</strong> 55% v dluhopisech citlivých na sazby</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span><strong>Náklady na rebalancing:</strong> Častější transakce = vyšší poplatky</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-orange-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span><strong>Opportunity cost:</strong> V dlouhých bull trzích zaostává</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pro koho je vhodné -->
+      <div class="bg-white rounded-lg border shadow-sm mb-12">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-3">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            Pro koho je All-Weather Portfolio vhodné?
+          </h3>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 class="font-semibold text-green-600 mb-4">✅ Ideální pro:</h4>
+              <ul class="space-y-2 text-sm">
+                <li>• Velmi konzervativní investory</li>
+                <li>• Ty, kdo chtějí minimální volatilitu</li>
+                <li>• Investory blízko/v důchodu</li>
+                <li>• Ty, kdo se bojí krizí</li>
+                <li>• Pokročilé investory</li>
+                <li>• Lidi s velkým kapitálem (100k+ Kč)</li>
+                <li>• Ty, kdo chtějí "všepogodní" strategii</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 class="font-semibold text-red-600 mb-4">❌ Méně vhodné pro:</h4>
+              <ul class="space-y-2 text-sm">
+                <li>• Mladé investory (pod 40)</li>
+                <li>• Ty, kdo hledají vysoké výnosy</li>
+                <li>• Začátečníky</li>
+                <li>• Investory s malým kapitálem</li>
+                <li>• Ty, kdo preferují jednoduchost</li>
+                <li>• Aktivní obchodníky</li>
+                <li>• Investory s vysokou tolerancí k riziku</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <section class="py-16">
+        <div class="text-center mb-12">
+          <div class="inline-flex items-center bg-gradient-to-r from-slate-100 to-gray-100 text-slate-700 px-6 py-3 rounded-full text-sm font-medium mb-6">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+            </svg>
+            Často kladené otázky
+          </div>
+          <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Vše o All-Weather Strategii
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Odpovědi na nejčastější dotazy o pokročilé strategii od Ray Dalia pro všechny ekonomické podmínky
+          </p>
+        </div>
+
+        <div class="max-w-4xl mx-auto space-y-4">
+          {faqData.map((faq) => (
+            <details class="group border border-gray-200 rounded-xl hover:border-slate-300 transition-all duration-300 bg-white hover:shadow-lg">
+              <summary class="flex justify-between items-center w-full px-8 py-6 text-left cursor-pointer group-hover:bg-gradient-to-r group-hover:from-slate-50 group-hover:to-gray-50 rounded-xl group-open:rounded-b-none transition-all">
+                <span class="font-semibold text-lg text-gray-900 group-hover:text-slate-800 pr-4">{faq.question}</span>
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-gradient-to-r from-slate-100 to-gray-100 rounded-full flex items-center justify-center group-hover:from-slate-200 group-hover:to-gray-200 transition-all">
+                    <svg class="w-4 h-4 text-slate-600 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </summary>
+              <div class="px-8 py-6 text-gray-700 leading-relaxed bg-gradient-to-r from-gray-50 to-slate-50 rounded-b-xl border-t border-gray-100">
+                {faq.answer}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <div class="text-center bg-gradient-to-r from-slate-600 to-gray-600 text-white p-8 rounded-2xl">
+        <h2 class="text-2xl font-bold mb-4">Zajímá vás All-Weather strategie?</h2>
+        <p class="text-lg mb-6 opacity-90">
+          Naučte se implementovat pokročilou strategii od Ray Dalia krok za krokem.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/srovnani-etf" class="bg-white text-slate-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Najít vhodné ETF
+          </a>
+          <a href="/kalkulacky/investicni-kalkulacka" class="bg-slate-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-400 transition-colors">
+            Spočítat výnos
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Links -->
+    <div class="max-w-6xl mx-auto px-4 py-16">
+      <h3 class="text-2xl font-bold text-gray-900 mb-8">Související strategie a nástroje</h3>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {relatedLinks.map((link) => (
+          <a href={link.href} class="block p-6 bg-white rounded-xl border border-gray-200 hover:border-slate-300 hover:shadow-lg transition-all">
+            <h4 class="font-semibold text-gray-900 mb-2">{link.title}</h4>
+            <p class="text-sm text-gray-600">{link.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</Layout>

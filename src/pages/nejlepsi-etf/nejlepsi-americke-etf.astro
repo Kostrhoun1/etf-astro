@@ -1,0 +1,519 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-americke-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+const lastModified = new Date().toISOString().split('T')[0];
+
+// Enhanced structured data with FAQs and more products
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": `Nejlepší americké ETF 2026 - SUSA vs XMUSA vs SPXS`,
+  "description": `Srovnání nejlepších amerických ETF 2026. SUSA, XMUSA, SPXS - MSCI USA index, poplatky TER, výnosy.`,
+  "image": "https://www.etfpruvodce.cz/og-americke-etf.jpg",
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": `2026-01-25`,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-americke-etf"
+  },
+  "articleSection": "Investment Guides",
+  "keywords": `nejlepší americké ETF 2026, SUSA ETF recenze, XMUSA ETF analýza, SPXS ETF porovnání, MSCI USA ETF`,
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Americké ETF",
+      "description": "Exchange-traded funds tracking American stock market indices"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "iShares MSCI USA Screened UCITS ETF",
+      "identifier": "IE00BFNM3G45"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "Xtrackers MSCI USA UCITS ETF",
+      "identifier": "IE00BJ0KDR00"
+    },
+    {
+      "@type": "FinancialProduct",
+      "name": "Invesco MSCI USA UCITS ETF",
+      "identifier": "IE00B60SX170"
+    }
+  ]
+};
+
+// FAQ structured data for better search snippets
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi S&P 500 a MSCI USA ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "S&P 500 obsahuje 500 největších amerických firem. MSCI USA je širší - obsahuje ~630 firem včetně mid-cap akcií. MSCI USA poskytuje lepší pokrytí amerického trhu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Který americký ETF má nejnižší poplatky?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Invesco MSCI USA má nejnižší TER pouze 0,05%. Následují iShares MSCI USA Screened a Xtrackers MSCI USA s 0,07%. Všechny jsou výrazně levnější než aktivně řízené fondy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou americké ETF vhodné pro české investory?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, americké ETF poskytují expozici k největší světové ekonomice a jsou vhodné jako hlavní složka portfolia. Mají vysokou likviditu a nízké poplatky. Měnové riziko USD/CZK je třeba zvážit."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou historické výnosy amerických ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Americké akcie dosáhly průměrného ročního výnosu přibližně 10% za posledních 30 let. MSCI USA a S&P 500 indexy patří mezi nejvýnosnější akciové indexy na světě. Konkrétní aktuální výnosy najdete v našem žebříčku TOP 10 podle výkonu."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké sektory dominují v amerických ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Americké ETF jsou silně zastoupeny technologickým sektorem (Apple, Microsoft, Google, Amazon), který tvoří přibližně 30% indexu MSCI USA. Další významné sektory zahrnují zdravotnictví, finance a spotřební zboží."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit americké ETF v České republice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Americké ETF jako SUSA, XMUSA a SPXS můžete koupit u českých brokerů včetně Degiro, Interactive Brokers, XTB, Trading212, Portu nebo Fio e-Broker. Porovnejte si poplatky a dostupnost konkrétních ETF u jednotlivých brokerů."
+      }
+    }
+  ]
+};
+
+// Breadcrumb structured data
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ETF průvodce.cz",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší americké ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-americke-etf"
+    }
+  ]
+};
+
+const relatedLinks = [
+  { title: "Nejlepší S&P 500 ETF", href: "/nejlepsi-etf/nejlepsi-sp500-etf", description: "Specificky zaměřené na S&P 500 index", icon: "📈" },
+  { title: "Nejlepší světové ETF", href: "/nejlepsi-etf/nejlepsi-celosvetove-etf", description: "Globální ETF zahrnující americké trhy", icon: "🌍" },
+  { title: "Kde koupit americké ETF", href: "/kde-koupit-etf", description: "Srovnání brokerů pro americké investice", icon: "🏦" },
+  { title: "Portfolio strategie s americkými ETF", href: "/portfolio-strategie", description: "Jak začlenit USA do portfolia", icon: "📊" }
+];
+
+const faqItems = [
+  {
+    question: "Jaký je rozdíl mezi S&P 500 a MSCI USA ETF?",
+    answer: "S&P 500 obsahuje 500 největších amerických firem (large-cap). MSCI USA je širší - obsahuje ~630 firem včetně mid-cap akcií. MSCI USA poskytuje lepší pokrytí celého amerického trhu."
+  },
+  {
+    question: "Jaké jsou nejlepší americké ETF podle poplatků?",
+    answer: "Invesco MSCI USA ETF (SPXS, IE00B60SX170) má nejnižší TER 0,05%. iShares MSCI USA Screened (SUSA, IE00BFNM3G45) a Xtrackers MSCI USA (XMUSA, IE00BJ0KDR00) mají TER 0,07%. Tyto tři ETF nabízejí nejlepší poměr ceny a kvality pro americký trh."
+  },
+  {
+    question: "Jsou americké ETF vhodné pro české investory?",
+    answer: "Ano, americké ETF jsou vhodné jako hlavní složka portfolia. USA představuje největší světovou ekonomiku s vysokou likviditou a inovacemi. Měnové riziko USD/CZK je dlouhodobě řiditelné."
+  },
+  {
+    question: "Americké ETF vs světové ETF - co je lepší?",
+    answer: "Americké ETF poskytují čistou expozici k USA (~70% světa). Světové ETF jsou diversifikovanější napříč regiony. Pro začátečníky světové ETF, pro pokročilé kombinace amerických + ostatních regionů."
+  },
+  {
+    question: "Jaké jsou historické výnosy amerických ETF?",
+    answer: "Americké akcie dosáhly průměrného ročního výnosu ~10% za posledních 30 let. Konkrétní aktuální výnosy najdete v našem žebříčku 'Top 10 podle výkonu 1Y'."
+  },
+  {
+    question: "Jsou data o amerických ETF aktuální?",
+    answer: "Ano, všechna data o amerických ETF se načítají živě z naší databáze a jsou aktualizována denně. Žebříčky TOP 10 podle TER, velikosti a výkonu ukazují nejčerstvější informace."
+  }
+];
+---
+
+<Layout
+  title={`Nejlepší americké ETF 2026 - SUSA vs XMUSA vs SPXS`}
+  description={`Srovnání nejlepších amerických ETF 2026. SUSA, XMUSA, SPXS - MSCI USA index, poplatky TER, výnosy. Aktuální data k ${currentDate}.`}
+  canonical="/nejlepsi-etf/nejlepsi-americke-etf"
+>
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-red-50 to-blue-50 overflow-hidden">
+    <!-- Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-red-50/50 via-white/30 to-blue-50/50"></div>
+
+    <!-- Animated blobs -->
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-red-200 to-red-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-red-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <!-- Left Column - Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-red-100 to-blue-100 text-red-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-red-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path></svg>
+            Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-red-600 via-red-500 to-blue-600 bg-clip-text text-transparent">
+              americké ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a
+              href="/o-nas"
+              class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+            >
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>
+              Aktualizováno: {new Date(lastModified).toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších amerických ETF fondů. MSCI USA analýza, poplatky, výnosy a praktické tipy pro investice do amerického trhu.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              Top 3 doporučení
+            </a>
+
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-red-300 text-red-700 hover:bg-red-50 px-8 py-4 text-lg font-semibold rounded-lg transition-colors">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+              Srovnání všech
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column - Stats Box -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/60 to-red-50/60 backdrop-blur-sm rounded-3xl shadow-2xl"></div>
+
+          <div class="relative bg-gradient-to-br from-white/80 to-red-50/60 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+            <!-- Header -->
+            <div class="text-center mb-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">🇺🇸 Americké ETF Stats</h3>
+              <p class="text-gray-600">Klíčové informace o americkém trhu</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-6 mb-6">
+              <div class="text-center p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border border-red-200">
+                <div class="text-3xl font-bold text-red-600 mb-1">630+</div>
+                <div class="text-sm text-gray-600">Firem MSCI USA</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                <div class="text-3xl font-bold text-blue-600 mb-1">70%</div>
+                <div class="text-sm text-gray-600">Světového trhu</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-red-100 to-blue-100 rounded-xl border border-red-200">
+                <div class="text-3xl font-bold text-red-500 mb-1">~10%</div>
+                <div class="text-sm text-gray-600">Ročně za 30 let</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-blue-100 to-red-100 rounded-xl border border-blue-200">
+                <div class="text-3xl font-bold text-blue-500 mb-1">0,05%</div>
+                <div class="text-sm text-gray-600">Nejnižší TER</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center pt-6 border-t border-red-200/50">
+              <p class="text-sm text-gray-600 mb-3">Největší světová ekonomika</p>
+              <a href="#pruvodce" class="inline-flex items-center justify-center border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+                Průvodce výběrem
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Co jsou americké ETF?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          Americké ETF sledují akciové indexy amerického trhu jako MSCI USA nebo Russell indexy.
+          Poskytují expozici k největší světové ekonomice a nejlikvidnějším trhům.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.2s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Největší světový trh
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            USA představuje ~70% světové tržní kapitalizace. Americké ETF poskytují expozici k nejlikvidnějším a nejinovativnějším společnostem světa.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.3s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            MSCI USA vs S&P 500
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            MSCI USA pokrývá ~630 firem včetně mid-cap. S&P 500 má pouze 500 largest-cap firem. MSCI USA poskytuje širší americké pokrytí.
+          </p>
+        </div>
+
+        <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6 card-hover animate-fade-in" style="animation-delay: 0.4s">
+          <div class="flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-blue-600 w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+            Technologické giganty
+          </h3>
+          <p class="text-gray-600 leading-relaxed text-center">
+            Americké ETF obsahují Apple, Microsoft, Amazon, Google, Tesla a další tech giganty, kteří vedou globální inovace a růst.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations - Server-side rendered with real data -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          🏆 Top 3 nejlepší americké ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy všech dostupných amerických ETF
+        </p>
+      </div>
+
+      <Top3ETF etfs={etfs.slice(0, 3)} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections - by TER, AUM, Performance -->
+  <Top10Sections etfs={etfs} currency="EUR" categoryName="americké" />
+
+  <!-- Selection Guide -->
+  <section id="pruvodce" class="py-20 bg-gradient-to-br from-red-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-red-600 to-blue-600 rounded-full mb-6">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          💡 Jak vybrat správný americký ETF?
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-red-50 to-red-50 border border-red-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-red-400 to-red-500 flex items-center justify-center text-white font-bold text-sm">
+            1
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            MSCI USA vs S&P 500
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            S&P 500 = 500 největších firem. MSCI USA = ~630 firem včetně mid-cap. Pro širší americkou expozici volte MSCI USA, pro blue-chip S&P 500.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-50 border border-blue-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+            2
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Sledujte TER a velikost
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            Ideální TER 0,05-0,15%. Velikost fondu min. 5 mld. EUR. Invesco má nejnižší TER 0,05%, iShares největší velikost fondů pro americké ETF.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-red-50 to-blue-50 border border-red-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-red-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+            3
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Screened vs Standard
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            Screened verze vylučují kontroverzní sektory (zbraně, tabák). Standard verze obsahují všechny sektory. Pro ESG investory volte Screened.
+          </p>
+        </div>
+
+        <div class="relative p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-red-50 border border-blue-200 hover:shadow-lg transition-all duration-300">
+          <div class="absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-red-500 flex items-center justify-center text-white font-bold text-sm">
+            4
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+            Měnové riziko USD
+          </h3>
+          <p class="text-gray-700 leading-relaxed">
+            Americké ETF jsou v USD. Posílení CZK vůči USD snižuje výnosy, oslabení je zvyšuje. Dlouhodobě USD měnové riziko není kritické.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          ❓ Často kladené otázky
+        </h2>
+      </div>
+
+      <div class="space-y-8">
+        {faqItems.map((faq, index) => (
+          <details class="group border border-gray-200 rounded-lg hover:border-red-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-red-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-red-800">{faq.question}</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-red-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-red-600 to-blue-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+        Připraveni investovat do amerických ETF?
+      </h2>
+      <p class="text-xl text-red-100 mb-8 leading-relaxed">
+        Vyberte si brokera a začněte budovat své americké portfolio ještě dnes
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center bg-white text-red-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold rounded-lg transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+          Najít brokera pro ETF
+        </a>
+
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-red-600 px-8 py-4 text-lg font-semibold rounded-lg transition-colors">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-red-50">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>
+
+<style>
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+</style>

@@ -1,0 +1,594 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InternalLinking from '../../components/InternalLinking.astro';
+import Top3ETF from '../../components/etf/Top3ETF.astro';
+import Top10Sections from '../../components/etf/Top10Sections.astro';
+import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
+
+const config = categoryConfigs['nejlepsi-emerging-markets-etf'];
+const etfs = await getTopETFsForCategory(config);
+const currentYear = new Date().getFullYear();
+const currentDate = new Date().toLocaleDateString('cs-CZ', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+// SEO optimalizované datum
+const lastModified = new Date().toISOString();
+const publishedDate = `2026-01-18`;
+
+const title = `Nejlepší emerging markets ETF 2026 - EIMI vs C9EM vs HMEF`;
+const description = `Srovnání nejlepších emerging markets ETF 2026. EIMI, C9EM, HMEF - rozvíjející se trhy, poplatky TER, výnosy. Analýza EM k ${currentDate}.`;
+const canonical = 'https://www.etfpruvodce.cz/nejlepsi-etf/nejlepsi-emerging-markets-etf';
+const ogImage = 'https://www.etfpruvodce.cz/og-emerging-markets-etf.jpg';
+
+const keywords = [
+  `nejlepší emerging markets ETF 2026`,
+  'EIMI ETF recenze',
+  'C9EM ETF analýza',
+  'HMEF ETF porovnání',
+  'MSCI Emerging Markets ETF',
+  'emerging markets investice',
+  'rozvíjející se trhy ETF',
+  'EM ETF srovnání',
+  'iShares Core emerging',
+  'Amundi emerging markets',
+  'HSBC emerging markets',
+  'nejlevnější emerging ETF',
+  'největší emerging ETF',
+  'ETF TER poplatky EM',
+  'Čína Indie Korea ETF',
+  'Taiwan Brazílie emerging'
+].join(', ');
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "image": ogImage,
+  "author": {
+    "@type": "Person",
+    "name": "Tomáš Kostrhoun",
+    "url": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.etfpruvodce.cz/logo.png"
+    }
+  },
+  "datePublished": publishedDate,
+  "dateModified": lastModified,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": canonical
+  },
+  "articleSection": "Investment Guides",
+  "keywords": keywords
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Které země zahrnují emerging markets ETF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MSCI Emerging Markets zahrnuje 24 zemí včetně Číny (~30%), Taiwanu, Indie, Korey, Brazílie, Saúdské Arábie a dalších. Největší podíly mají Čína, Taiwan, Indie a Korea."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jsou emerging markets ETF rizikovější než světové?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano, emerging markets ETF mají vyšší volatilitu a politické riziko. Dlouhodobě ale mohou dosahovat vyšších výnosů díky rychlejšímu ekonomickému růstu rozvíjejících se zemí."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký podíl emerging markets v portfoliu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Obvykle 10-20% portfolia. Začátečníci mohou začít s 10%, pokročilí investoři až 20%. Emerging markets doplňují vyspělé trhy pro lepší diverzifikaci."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou nejlepší emerging markets ETF v roce 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nejlepší EM ETF jsou: iShares Core MSCI Emerging Markets IMI ETF (EIMI, IE00BKM4GZ66) s největší velikostí přes 25 mld. EUR, Amundi Core MSCI Emerging Markets ETF (C9EM, LU2573966905) s nejnižším TER 0,14%, a HSBC MSCI Emerging Markets ETF (HMEF, IE00B5SSQT16) s vynikajícím poměrem TER 0,15% a velikostí 2,4 mld. EUR."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaký je rozdíl mezi MSCI EM a FTSE Emerging Markets?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MSCI Emerging Markets zahrnuje přibližně 1400 akcií z 24 zemí, zatímco FTSE Emerging Markets obsahuje více než 2000 akcií z 25 zemí včetně Polska. FTSE má mírně širší pokrytí, ale výkonnostní rozdíly jsou minimální. MSCI je populárnější mezi ETF poskytovateli."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kde koupit emerging markets ETF v České republice?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Emerging markets ETF jako EIMI, C9EM nebo HMEF můžete koupit u většiny českých brokerů včetně Degiro, Interactive Brokers, XTB, Trading212, Portu nebo Fio e-Broker. Porovnejte si transakční poplatky a dostupnost konkrétních ETF u jednotlivých brokerů."
+      }
+    }
+  ]
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "ETF průvodce.cz",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Nejlepší ETF",
+      "item": "https://www.etfpruvodce.cz/nejlepsi-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Nejlepší emerging markets ETF",
+      "item": canonical
+    }
+  ]
+};
+
+const relatedLinks = [
+  {
+    title: "Nejlepší světové ETF",
+    description: "Kompletní světové ETF zahrnující i emerging markets",
+    href: "/nejlepsi-etf/nejlepsi-celosvetove-etf",
+    icon: "🌍"
+  },
+  {
+    title: "Nejlepší evropské ETF",
+    description: "Evropské ETF na vyspělé evropské trhy",
+    href: "/nejlepsi-etf/nejlepsi-evropske-etf",
+    icon: "🇪🇺"
+  },
+  {
+    title: "Kde koupit emerging markets ETF",
+    description: "Srovnání brokerů pro investice do EM",
+    href: "/kde-koupit-etf",
+    icon: "🏦"
+  },
+  {
+    title: "Portfolio strategie s EM ETF",
+    description: "Jak začlenit emerging markets do portfolia",
+    href: "/portfolio-strategie",
+    icon: "📈"
+  }
+];
+
+const faqs = [
+  {
+    question: "Jaké jsou nejlepší emerging markets ETF pro rok 2026?",
+    answer: "Naše TOP 3 doporučení: iShares Core MSCI Emerging Markets IMI ETF (EIMI, IE00BKM4GZ66) největší s 25+ mld. EUR, Amundi Core MSCI Emerging Markets ETF (C9EM, LU2573966905) s nejnižším TER 0,14%, a HSBC MSCI Emerging Markets ETF (HMEF, IE00B5SSQT16) s vynikajícím poměrem TER 0,15% a velikostí 2,4 mld. EUR."
+  },
+  {
+    question: "Které země zahrnují emerging markets ETF?",
+    answer: "MSCI Emerging Markets zahrnuje 24 zemí s největšími podíly: Čína (~30%), Taiwan (~15%), Indie (~14%), Korea (~12%), Brazílie (~5%), Saúdská Arábie (~4%) a další. Složení se mění podle růstu ekonomik."
+  },
+  {
+    question: "Jsou emerging markets ETF rizikovější?",
+    answer: "Ano, EM ETF mají vyšší volatilitu (15-25% ročně vs 12-18% u vyspělých trhů), politické riziko a měnové riziko. Dlouhodobě ale mohou dosahovat vyšších výnosů díky rychlejšímu ekonomickému růstu."
+  },
+  {
+    question: "Jaký podíl emerging markets v portfoliu?",
+    answer: "Začátečníci: 5-10%, pokročilí: 10-20% portfolia. EM doplňují vyspělé trhy pro lepší diverzifikaci. Nikdy nevkládejte více než můžete ztratit kvůli vyšší volatilitě."
+  },
+  {
+    question: "MSCI EM vs FTSE Emerging Markets - jaký rozdíl?",
+    answer: "MSCI EM má 1400+ akcií z 24 zemí, FTSE Emerging má 2000+ akcií z 25 zemí včetně Polska. FTSE má mírně širší pokrytí, ale rozdíly jsou minimální. MSCI je populárnější."
+  },
+  {
+    question: "Kdy investovat do emerging markets?",
+    answer: "EM jsou cyklické. Nejlepší časy: po krizích při pessimismu, silný dolar už oslabuje, Fed snižuje sazby. Nejhorší: při euforii, posilující dolar, Fed zvyšuje sazby."
+  },
+  {
+    question: "Jsou data o EM ETF aktuální?",
+    answer: "Ano, všechna data o emerging markets ETF se načítají živě z naší databáze. Žebříčky TOP 10 podle TER, velikosti a výkonu jsou aktualizovány denně."
+  }
+];
+
+const selectionGuide = [
+  {
+    number: "1",
+    title: "Pro začátečníky do EM",
+    description: "Začněte s největšími fondy jako EIMI nebo HMEF. Volte broad MSCI Emerging Markets, ne specializované země. Investujte max 10% portfolia do EM.",
+    colorFrom: "from-emerald-400",
+    colorTo: "to-emerald-500",
+    bgFrom: "from-emerald-50",
+    bgTo: "to-emerald-50",
+    borderColor: "border-emerald-200"
+  },
+  {
+    number: "2",
+    title: "Sledujte TER a velikost",
+    description: "TER by měl být pod 0,20%. Minimální velikost fondu 1 mld. EUR pro dobrou likviditu. Amundi má nejnižší TER 0,14%, iShares největší velikost.",
+    colorFrom: "from-teal-400",
+    colorTo: "to-teal-500",
+    bgFrom: "from-teal-50",
+    bgTo: "to-teal-50",
+    borderColor: "border-teal-200"
+  },
+  {
+    number: "3",
+    title: "Geographical exposure",
+    description: "Standardní EM má 30% Čínu. Pro menší čínské riziko volte 'ex-China' varianty. Pro širší pokrytí volte IMI verze s small-cap akciemi.",
+    colorFrom: "from-cyan-400",
+    colorTo: "to-cyan-500",
+    bgFrom: "from-cyan-50",
+    bgTo: "to-cyan-50",
+    borderColor: "border-cyan-200"
+  },
+  {
+    number: "4",
+    title: "Timing a alokace",
+    description: "EM jsou cyklické - koupě při pessimismu, prodej při optimismu. Ideálně 10-20% portfolia. Dollar-cost averaging snižuje volatilitu.",
+    colorFrom: "from-blue-400",
+    colorTo: "to-blue-500",
+    bgFrom: "from-blue-50",
+    bgTo: "to-blue-50",
+    borderColor: "border-blue-200"
+  }
+];
+
+const introFeatures = [
+  {
+    title: "24 rozvíjejících se zemí",
+    description: "MSCI Emerging Markets pokrývá největší rozvíjející se ekonomiky včetně Číny (30%), Taiwanu, Indie, Korey, Brazílie a Saúdské Arábie.",
+    icon: "globe",
+    colorFrom: "from-emerald-500",
+    colorTo: "to-teal-600"
+  },
+  {
+    title: "Rychlejší ekonomický růst",
+    description: "Emerging markets rostou rychleji než vyspělé ekonomiky díky industrializaci, urbanizaci a rostoucí střední třídě.",
+    icon: "rocket",
+    colorFrom: "from-teal-500",
+    colorTo: "to-cyan-600"
+  },
+  {
+    title: "Vyšší riziko i výnos",
+    description: "EM ETF mají vyšší volatilitu než vyspělé trhy, ale dlouhodobě mohou dosahovat vyšších výnosů.",
+    icon: "trending",
+    colorFrom: "from-cyan-500",
+    colorTo: "to-blue-600"
+  }
+];
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonical={'/nejlepsi-etf/nejlepsi-emerging-markets-etf'}
+>
+  <script type="application/ld+json" set:html={JSON.stringify([articleSchema, faqSchema, breadcrumbSchema])} />
+
+  <!-- Hero Section -->
+  <section class="relative py-16 md:py-24 bg-gradient-to-br from-emerald-50 to-teal-50 overflow-hidden">
+    <!-- Gradient Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-cyan-50/50"></div>
+
+    <!-- Animated blobs -->
+    <div class="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-emerald-200 to-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-teal-200 to-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-gradient-to-br from-cyan-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center w-full">
+        <!-- Left Column - Content -->
+        <div class="space-y-8">
+          <div class="inline-flex items-center bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-emerald-200/50">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Aktuální k {currentDate}
+          </div>
+
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+            Nejlepší{' '}
+            <span class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+              emerging markets ETF
+            </span>
+          </h1>
+
+          <!-- Author byline - E-E-A-T signal -->
+          <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Autor: </span>
+            <a
+              href="/o-nas"
+              class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+            >
+              Tomáš Kostrhoun
+            </a>
+            <span class="text-gray-400">•</span>
+            <span>
+              Aktualizováno: {new Date().toLocaleDateString('cs-CZ', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric'
+              })}
+            </span>
+          </div>
+
+          <p class="text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Kompletní srovnání nejlepších ETF fondů na rozvíjející se trhy. MSCI Emerging Markets analýza, poplatky, výnosy a praktické tipy pro investice do EM.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="#top3" class="inline-flex items-center justify-center bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all rounded-lg">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+              </svg>
+              Top 3 doporučení
+            </a>
+
+            <a href="#srovnani" class="inline-flex items-center justify-center border-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50 px-8 py-4 text-lg font-semibold rounded-lg transition-all">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+              Srovnání všech
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column - Stats Box -->
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/60 to-emerald-50/60 backdrop-blur-sm rounded-3xl shadow-2xl"></div>
+
+          <div class="relative bg-gradient-to-br from-white/80 to-emerald-50/60 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20">
+            <!-- Header -->
+            <div class="text-center mb-8">
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">🚀 Emerging Markets Stats</h3>
+              <p class="text-gray-600">Klíčové informace o rozvíjejících se trzích</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-6 mb-6">
+              <div class="text-center p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
+                <div class="text-3xl font-bold text-emerald-600 mb-1">24</div>
+                <div class="text-sm text-gray-600">Zemí EM</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl border border-teal-200">
+                <div class="text-3xl font-bold text-teal-600 mb-1">30%</div>
+                <div class="text-sm text-gray-600">Podíl Číny</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl border border-cyan-200">
+                <div class="text-3xl font-bold text-cyan-600 mb-1">1400+</div>
+                <div class="text-sm text-gray-600">Akcií v MSCI EM</div>
+              </div>
+
+              <div class="text-center p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl border border-blue-200">
+                <div class="text-3xl font-bold text-blue-600 mb-1">~15%</div>
+                <div class="text-sm text-gray-600">Vyšší volatilita</div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center pt-6 border-t border-emerald-200/50">
+              <p class="text-sm text-gray-600 mb-3">Rychle rostoucí ekonomiky</p>
+              <a href="#pruvodce" class="inline-flex items-center justify-center border border-emerald-200 text-emerald-600 hover:bg-emerald-50 px-4 py-2 text-sm rounded-lg transition-all">
+                Průvodce výběrem
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Co jsou emerging markets ETF?
+        </h2>
+        <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          Emerging markets ETF sledují akciové trhy rozvíjejících se ekonomik jako Čína, Indie, Korea, Taiwan, Brazílie.
+          Nabízejí vyšší růstový potenciál s vyšším rizikem.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {introFeatures.map((item, index) => (
+          <div class="border-transparent shadow-none hover:shadow-md transition-shadow duration-200 group bg-white rounded-lg p-6">
+            <div class={`flex items-center justify-center rounded-full bg-gradient-to-r ${item.colorFrom} ${item.colorTo} w-16 h-16 mx-auto mb-6 group-hover:scale-110 transition-transform`}>
+              {item.icon === 'globe' && (
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              )}
+              {item.icon === 'rocket' && (
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              )}
+              {item.icon === 'trending' && (
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                </svg>
+              )}
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3 text-center group-hover:text-gray-800 transition-colors">
+              {item.title}
+            </h3>
+            <p class="text-gray-600 leading-relaxed text-center">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Top 3 Recommendations -->
+  <section id="top3" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          🏆 Top 3 nejlepší emerging markets ETF
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Naše doporučení na základě analýzy {etfs.length} dostupných EM ETF
+        </p>
+      </div>
+
+      <Top3ETF etfs={etfs} currency="EUR" />
+    </div>
+  </section>
+
+  <!-- Top 10 Sections -->
+  <section id="srovnani" class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <Top10Sections etfs={etfs} currency="EUR" categoryName="Emerging Markets" />
+    </div>
+  </section>
+
+  <!-- Selection Guide -->
+  <section id="pruvodce" class="py-20 bg-gradient-to-br from-emerald-50 to-teal-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full mb-6">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          💡 Jak vybrat správný emerging markets ETF?
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {selectionGuide.map((item) => (
+          <div class={`relative p-8 rounded-2xl bg-gradient-to-br ${item.bgFrom} ${item.bgTo} border ${item.borderColor} hover:shadow-lg transition-all duration-300`}>
+            <div class={`absolute -top-4 left-8 w-8 h-8 rounded-full bg-gradient-to-r ${item.colorFrom} ${item.colorTo} flex items-center justify-center text-white font-bold text-sm`}>
+              {item.number}
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4 mt-4">
+              {item.title}
+            </h3>
+            <p class="text-gray-700 leading-relaxed">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          ❓ Často kladené otázky
+        </h2>
+      </div>
+
+      <div class="space-y-8">
+        {faqs.map((faq) => (
+          <details class="group border border-gray-200 rounded-lg hover:border-emerald-200 transition-colors">
+            <summary class="flex justify-between items-center w-full px-6 py-4 text-left bg-gray-50 cursor-pointer hover:bg-emerald-50 rounded-lg group-open:rounded-b-none transition-colors">
+              <span class="font-semibold text-lg text-gray-900 group-hover:text-emerald-800">{faq.question}</span>
+              <svg class="w-5 h-5 text-gray-500 group-hover:text-emerald-600 transition-all group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-emerald-600 to-teal-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+        Připraveni investovat do emerging markets ETF?
+      </h2>
+      <p class="text-xl text-emerald-100 mb-8 leading-relaxed">
+        Vyberte si brokera a začněte budovat své EM portfolio ještě dnes
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/kde-koupit-etf" class="inline-flex items-center justify-center bg-white text-emerald-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold rounded-lg transition-all">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+          Najít brokera pro ETF
+        </a>
+
+        <a href="/srovnani-etf" class="inline-flex items-center justify-center border-2 border-white text-white hover:bg-white hover:text-emerald-600 px-8 py-4 text-lg font-semibold rounded-lg transition-all">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Srovnat všechny ETF
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Internal Linking -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-emerald-50">
+    <InternalLinking links={relatedLinks} title="Související články" />
+  </div>
+</Layout>
+
+<style>
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+</style>

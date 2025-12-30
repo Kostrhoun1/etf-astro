@@ -1,0 +1,624 @@
+---
+import Layout from '../layouts/Layout.astro';
+import InternalLinking from '../components/InternalLinking.astro';
+import BrokerRatingGrid from '../components/broker/BrokerRatingGrid';
+
+const currentYear = new Date().getFullYear();
+
+const reviewSchema = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  "itemReviewed": {
+    "@type": "FinancialService",
+    "name": "DEGIRO",
+    "description": "Online broker pro obchodování s ETF, akciemi a dalšími finančními instrumenty",
+    "url": "https://www.degiro.cz",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Rembrandt Tower, Amstelplein 1",
+      "addressLocality": "Amsterdam",
+      "postalCode": "1096 HA",
+      "addressCountry": "NL"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "79",
+      "bestRating": "100",
+      "worstRating": "0",
+      "reviewCount": "1"
+    }
+  },
+  "reviewRating": {
+    "@type": "Rating",
+    "ratingValue": "79",
+    "bestRating": "100"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ETF průvodce.cz"
+  },
+  "datePublished": "2026-09-26",
+  "dateModified": "2026-09-26",
+  "reviewBody": "DEGIRO je populární evropský online broker s nízkými poplatky a širokou nabídkou ETF fondů. Součást flatexDEGIRO Bank AG s více než 3 miliony klientů. Hodnocení 79/100 bodů."
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://www.etfpruvodce.cz"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kde koupit ETF",
+      "item": "https://www.etfpruvodce.cz/kde-koupit-etf"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": `DEGIRO recenze ${currentYear}`,
+      "item": "https://www.etfpruvodce.cz/degiro-recenze"
+    }
+  ]
+};
+
+const pros = [
+  "Dostupnost tisíců akcií, ETF, dluhopisů a derivátů",
+  "Vysoká míra finanční bezpečnosti díky začlenění do banky",
+  "Jednoduchá a intuitivní obchodní platforma WebTrader",
+  "Možnost vkladů a výběrů v českých korunách",
+  "Nulový minimální vklad",
+  "Core Selection ETF za 0 EUR + 1 EUR manipulační poplatek",
+  "Přístup na 31 světových burz"
+];
+
+const cons = [
+  "Absence demo účtu",
+  "Zdanění českých dividend 35% sazbou",
+  "Chybí pokročilé obchodní nástroje",
+  "Nedostupnost CFD",
+  "Velmi omezené možnosti prodeje nakrátko"
+];
+
+const categories = [
+  { name: 'Poplatky', score: 70, description: 'Nízké pro Core ETF' },
+  { name: 'Platforma', score: 80, description: 'Funkční web i mobilní app' },
+  { name: 'Nabídka', score: 85, description: 'Široký výběr UCITS ETF' },
+  { name: 'Podpora', score: 80, description: 'Částečně česká podpora' },
+  { name: 'Důvěryhodnost', score: 95, description: 'EU regulace, silná značka' },
+  { name: 'Vzdělání', score: 80, description: 'Základní materiály a návody' }
+];
+
+const relatedLinks = [
+  { title: "Kde koupit ETF - přehled brokerů", href: "/kde-koupit-etf#porovnani", description: "Zpět na kompletní přehled a srovnání všech brokerů" },
+  { title: "Srovnání brokerů 2026", href: "/srovnani-brokeru", description: "Porovnejte DEGIRO s dalšími populárními brokery" },
+  { title: "XTB recenze", href: "/xtb-recenze", description: "Alternativa s vyšším hodnocením a 24/7 podporou" },
+  { title: "Trading 212 recenze", href: "/trading212-recenze", description: "Zcela bezpoplatkový broker pro začátečníky" },
+  { title: "Nejlepší ETF 2026", href: "/nejlepsi-etf/nejlepsi-etf-2026", description: "Doporučené ETF pro investování přes DEGIRO" },
+  { title: "Jak začít investovat", href: "/co-jsou-etf/jak-zacit-investovat", description: "Kompletní průvodce pro začátečníky" },
+  { title: "Portfolio strategie", href: "/portfolio-strategie", description: "Vytvořte si optimální investiční portfolio" },
+  { title: "Investiční kalkulačka", href: "/kalkulacky/investicni-kalkulacka", description: "Spočítejte si budoucí hodnotu investic" },
+  { title: "FIRE kalkulačka", href: "/kalkulacky/fire-kalkulacka", description: "Kdy dosáhnete finanční nezávislosti?" }
+];
+---
+
+<Layout
+  title={`DEGIRO recenze ${currentYear} - Komplexní test a hodnocení brokera`}
+  description={`DEGIRO recenze ${currentYear} - hodnocení 79/100. Součást flatexDEGIRO Bank AG s 3+ miliony klientů. Přístup na 31 světových burz, nízké poplatky.`}
+  canonical="/degiro-recenze"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(reviewSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+      <div class="flex items-center justify-center gap-4 mb-6">
+        <img
+          src="/lovable-uploads/f9bacf3b-7b11-4c31-917d-e16803dc0887.png"
+          alt="DEGIRO logo"
+          class="w-20 h-20 object-contain"
+        />
+        <div>
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+            DEGIRO recenze {currentYear}
+          </h1>
+          <div class="flex items-center justify-center gap-2">
+            <div class="flex text-yellow-400">
+              {'★'.repeat(4)}{'☆'.repeat(1)}
+            </div>
+            <span class="text-lg font-semibold text-gray-700">79/100 bodů</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Summary -->
+    <div class="mb-8 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-6">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+          DEGIRO - součást flatexDEGIRO Bank AG
+        </h2>
+        <p class="text-gray-600 text-lg">
+          Německo-nizozemský broker s více než 3 miliony klientů, přístupem na 31 světových burz a integrací do banky
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-green-800 mb-3 flex items-center">
+            <span class="mr-2 text-green-600">✓</span>
+            Hlavní výhody
+          </h3>
+          <ul class="space-y-2 text-sm">
+            {pros.map((pro) => (
+              <li class="flex items-center gap-2">
+                <span class="text-green-600 flex-shrink-0">✓</span>
+                <span>{pro}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-amber-800 mb-3 flex items-center">
+            <span class="mr-2 text-amber-600">⚠</span>
+            Na co si dát pozor
+          </h3>
+          <ul class="space-y-2 text-sm">
+            {cons.map((con) => (
+              <li class="flex items-center gap-2">
+                <span class="text-red-500 flex-shrink-0">✕</span>
+                <span>{con}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Rating -->
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+      <h2 class="text-center text-2xl font-bold text-gray-900 mb-2">Detailní hodnocení</h2>
+      <p class="text-center text-gray-600 mb-6">
+        Náš verdikt založený na důkladné analýze všech aspektů brokera
+      </p>
+      <BrokerRatingGrid
+        client:load
+        overallRating={79}
+        overallDescription="Komplexní hodnocení brokera"
+        categories={categories}
+      />
+    </div>
+
+    <!-- About DEGIRO -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">🌍</span>
+        O společnosti DEGIRO
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Historie a pozadí</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              DEGIRO byla založena v roce 2008, služby pro drobné investory poskytuje od roku 2013.
+              Je součástí flatexDEGIRO Bank AG, což zajišťuje vysokou úroveň finanční bezpečnosti
+              díky začlenění do bankovní struktury.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Regulace a licence</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Regulováno v Německu a Nizozemsku pod dohledem BaFin, DNB a AFM. Jako součást banky
+              podléhá přísnějším regulatorním požadavkům než samostatní brokeři.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Velikost a dosah</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              S více než 3 miliony klientů patří mezi největší evropské brokery.
+              Poskytuje přístup na 31 světových burz v Evropě, Severní Americe a Asii.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-2 text-gray-900">Bezpečnost prostředků</h4>
+            <p class="text-gray-600 text-sm leading-relaxed">
+              Jako součást flatexDEGIRO Bank AG poskytuje vyšší úroveň ochrany než běžní brokeři.
+              Prostředky klientů jsou plně segregovány a chráněny evropskými garančními schématy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trading Platform -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-green-600">📱</span>
+        Obchodní platforma WebTrader
+      </h2>
+      <div class="mb-6">
+        <p class="text-gray-600 leading-relaxed">
+          DEGIRO nabízí proprietární platformu WebTrader dostupnou jako webová aplikace
+          i mobilní aplikace. Platforma je známá svou jednoduchostí a intuitivním ovládáním,
+          vhodným především pro začátečníky a střední investory.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Klíčové funkce</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Jednoduchá a přehledná
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Základní charting
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Portfolio přehled
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Watchlist
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-amber-600">⚠</span>
+              Omezené analytické nástroje
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Dostupnost</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Webová verze
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Mobilní aplikace (iOS/Android)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-600">✓</span>
+              Částečná česká lokalizace
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-red-500">✕</span>
+              Bez demo účtu
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Omezení</h4>
+          <div class="bg-amber-50 p-4 rounded-lg">
+            <p class="text-sm text-amber-800 mb-2">
+              <strong>Chybějící pokročilé funkce:</strong>
+            </p>
+            <ul class="text-xs text-amber-700 space-y-1">
+              <li>• Pokročilé obchodní nástroje</li>
+              <li>• Demo účet pro testování</li>
+              <li>• CFD obchodování</li>
+              <li>• Algoritmické obchodování</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instruments & Markets -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-purple-600">📈</span>
+        Nabídka instrumentů
+      </h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h4 class="font-semibold mb-4 text-gray-900">Dostupné instrumenty</h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">📈 Akcie</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">Desetitisíce</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">🏛️ ETF</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">Tisíce</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">🏦 Dluhopisy</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">Dostupné</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <span class="font-medium">📊 Deriváty</span>
+              <span class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm">Opce, warranty</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+              <span class="font-medium">❌ CFD</span>
+              <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">Nedostupné</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-4 text-gray-900">Trhy a burzy</h4>
+          <div class="space-y-4">
+            <div class="border-l-4 border-blue-500 pl-4">
+              <h5 class="font-medium text-blue-800">31 světových burz</h5>
+              <p class="text-sm text-gray-600 mt-1">
+                Evropa, Severní Amerika, Asie včetně NYSE, NASDAQ, LSE, Xetra,
+                Euronext, Burza cenných papírů Praha a další.
+              </p>
+            </div>
+
+            <div class="border-l-4 border-green-500 pl-4">
+              <h5 class="font-medium text-green-800">České koruny</h5>
+              <p class="text-sm text-gray-600 mt-1">
+                Možnost vkladů a výběrů přímo v českých korunách,
+                což usnadňuje správu účtu pro české investory.
+              </p>
+            </div>
+
+            <div class="border-l-4 border-orange-500 pl-4">
+              <h5 class="font-medium text-orange-800">Omezení prodeje nakrátko</h5>
+              <p class="text-sm text-gray-600 mt-1">
+                Velmi omezené možnosti prodeje nakrátko, což může být
+                nevýhodou pro pokročilé obchodníky.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fees Structure -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        <span class="text-green-600">💰</span>
+        Struktura poplatků
+      </h2>
+      <p class="text-gray-600 mb-6">
+        Detailní přehled všech poplatků podle aktuálních sazeb
+      </p>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b-2 border-gray-200">
+              <th class="text-left py-3 px-4 font-semibold text-gray-900">Typ transakce</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-900">Poplatek</th>
+              <th class="text-left py-3 px-4 font-semibold text-gray-900">Poznámka</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Vklady/výběry</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">Zdarma</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Bankovní převody</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Americké akcie</td>
+              <td class="py-3 px-4 text-orange-700 font-semibold">2 EUR</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Poplatek za transakci</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">České akcie</td>
+              <td class="py-3 px-4 text-orange-700 font-semibold">40 CZK</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Poplatek za transakci</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Evropské akcie</td>
+              <td class="py-3 px-4 text-orange-700 font-semibold">4,90 EUR</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Poplatek za transakci</td>
+            </tr>
+            <tr class="hover:bg-gray-50 bg-green-50">
+              <td class="py-3 px-4 font-medium">ETF Core Selection</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">0 EUR + 1 EUR manipulační</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">200+ vybraných ETF zdarma</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">ETF ostatní</td>
+              <td class="py-3 px-4 text-orange-700 font-semibold">3 EUR + manipulační</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Podle burzy a ETF</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Konverze měn</td>
+              <td class="py-3 px-4 text-amber-700 font-semibold">0,25%</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Při směně měn</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Real-time data</td>
+              <td class="py-3 px-4 text-amber-700 font-semibold">5-10 EUR/měs.</td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Podle burzy</td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-4 font-medium">Minimální vklad</td>
+              <td class="py-3 px-4">
+                <span class="bg-green-100 text-green-800 font-semibold px-3 py-1 rounded-full text-sm">0 EUR</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm">Žádný povinný minimální vklad</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+        <h4 class="font-semibold text-blue-800 mb-2">💡 Tip pro úsporu nákladů</h4>
+        <p class="text-sm text-blue-700">
+          <strong>Vybírejte ETF z Core Selection</strong> (200+ fondů) - platíte pouze 1 EUR manipulační poplatek,
+          žádné transakční poplatky! Využívejte také vklady a výběry v českých korunách zdarma
+          a konverzi měn provádějte v co největších objemech.
+        </p>
+      </div>
+    </div>
+
+    <!-- Taxation -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-amber-600">🛡</span>
+        Zdanění pro české investory
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Zdanění dividend</h4>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+              <span class="text-sm">🇨🇿 České akcie</span>
+              <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">35 %</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+              <span class="text-sm">🇺🇸 Americké akcie</span>
+              <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">15 %</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+              <span class="text-sm">🇪🇺 EU akcie</span>
+              <span class="bg-yellow-600 text-white px-3 py-1 rounded-full text-sm font-semibold">Různě</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3 text-gray-900">Kapitálové zisky</h4>
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-700 leading-relaxed">
+              Kapitálové zisky z prodeje akcií a ETF podléhají české daňové povinnosti.
+              Akcie držené déle než 3 roky jsou osvobozené od daně z kapitálových zisků
+              (test času).
+            </p>
+          </div>
+
+          <div class="mt-4 p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+            <p class="text-xs text-red-800">
+              <strong>Pozor:</strong> Vysoké zdanění českých dividend (35% místo standardních 15%)
+              je výrazná nevýhoda pro investory zaměřené na české akcie.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Support -->
+    <div class="bg-white rounded-xl shadow p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <span class="text-blue-600">👥</span>
+        Zákaznická podpora
+      </h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-2xl">📞</span>
+          </div>
+          <h4 class="font-semibold mb-2">Telefonní podpora</h4>
+          <p class="text-sm text-gray-600 mb-2">Pracovní dny</p>
+          <p class="text-xs text-gray-500">Částečně česky</p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-2xl">✉️</span>
+          </div>
+          <h4 class="font-semibold mb-2">Email podpora</h4>
+          <p class="text-sm text-gray-600 mb-2">Odpověď do 24h</p>
+          <p class="text-xs text-gray-500">Vícejazyčná</p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-2xl">📚</span>
+          </div>
+          <h4 class="font-semibold mb-2">Vzdělávací materiály</h4>
+          <p class="text-sm text-gray-600 mb-2">Základní návody</p>
+          <p class="text-xs text-gray-500">Online centrum</p>
+        </div>
+      </div>
+
+      <div class="mt-6 p-4 bg-orange-50 rounded-lg">
+        <p class="text-sm text-orange-800">
+          <strong>Naše zkušenost:</strong> Zákaznická podpora je na solidní úrovni,
+          ale neposkytuje tak rozsáhlé služby jako specializovaní brokeři.
+          Částečná česká lokalizace usnadňuje základní orientaci.
+        </p>
+      </div>
+    </div>
+
+    <!-- Final Verdict -->
+    <div class="mb-8 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl p-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-6">Závěrečné hodnocení</h2>
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2 bg-orange-100 text-orange-800 px-6 py-3 rounded-full text-lg font-semibold">
+          <span>🏆</span>
+          79/100 bodů - DOBRÁ
+        </div>
+      </div>
+
+      <p class="text-gray-700 leading-relaxed mb-6 text-left max-w-4xl mx-auto">
+        <strong>DEGIRO je solidní volbou pro investory hledající jednoduchost a bezpečnost.</strong>
+        Jako součást flatexDEGIRO Bank AG poskytuje vyšší úroveň finanční bezpečnosti než běžní brokeři.
+        Přístup na 31 světových burz a možnost vkladů v českých korunách jsou významné výhody.
+      </p>
+
+      <p class="text-gray-700 leading-relaxed mb-6 text-left max-w-4xl mx-auto">
+        Jednoduchost WebTrader platformy ocení především začátečníci, ale pokročilí investoři
+        mohou postrádat analytické nástroje. Tisíce dostupných ETF a akcií pokryjí potřeby
+        většiny dlouhodobých investorů.
+      </p>
+
+      <p class="text-gray-700 leading-relaxed mb-8 text-left max-w-4xl mx-auto">
+        Hlavními nevýhodami jsou absence demo účtu, vysoké zdanění českých dividend (35%)
+        a chybějící pokročilé obchodní funkce jako CFD či algoritmické obchodování.
+      </p>
+
+      <div class="bg-blue-50 p-6 rounded-lg mb-6 max-w-4xl mx-auto">
+        <h4 class="font-semibold text-blue-800 mb-2">🎯 Pro koho je DEGIRO ideální?</h4>
+        <ul class="text-sm text-blue-700 text-left space-y-1">
+          <li>• Začátečníci hledající jednoduchou a bezpečnou platformu</li>
+          <li>• Investoři do zahraničních akcií a ETF</li>
+          <li>• Ti, kdo preferují součást banky před samostatným brokerem</li>
+          <li>• Investoři využívající vklady v českých korunách</li>
+          <li>• Dlouhodobí investoři nevyžadující pokročilé nástroje</li>
+        </ul>
+      </div>
+
+      <div class="text-center">
+        <a
+          href="https://www.degiro.cz"
+          target="_blank"
+          rel="nofollow noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Otevřít účet u DEGIRO
+          <span>→</span>
+        </a>
+
+        <p class="text-xs text-gray-500 mt-3">
+          * Investování je spojeno s rizikem. Hodnota vašich investic může klesnout i vzrůst.
+        </p>
+      </div>
+    </div>
+
+    <InternalLinking links={relatedLinks} title="Související články a nástroje" />
+  </div>
+</Layout>
