@@ -7,6 +7,8 @@ Sitemap: https://www.etfpruvodce.cz/sitemap.xml
 # Crawl-delay for polite crawling
 Crawl-delay: 1
 
-# Block admin/api routes if any
+# Block API routes (server-side only)
 Disallow: /api/
-Disallow: /_astro/
+
+# Allow CSS and JS assets for proper rendering
+# DO NOT block /_astro/ - contains critical CSS and JS files!
