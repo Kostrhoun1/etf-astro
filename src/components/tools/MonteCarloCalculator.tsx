@@ -543,7 +543,7 @@ export function MonteCarloCalculator() {
         <button
           onClick={runSimulation}
           disabled={loading || totalWeight !== 100 || selectedETFs.length === 0}
-          className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-lg font-semibold rounded-xl hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] disabled:transform-none"
+          className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-violet-600 text-white text-lg font-semibold rounded-xl hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] disabled:transform-none"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-3">

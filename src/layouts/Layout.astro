@@ -158,9 +158,14 @@ const currentPath = Astro.url.pathname;
             id="mobile-menu-btn"
             class="md:hidden p-3 min-h-[44px] min-w-[44px] rounded-md text-gray-600 hover:text-violet-600 hover:bg-violet-50 transition-colors"
             aria-label="Otevřít menu"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -174,26 +179,63 @@ const currentPath = Astro.url.pathname;
           className="w-full"
         />
       </div>
-
-      <!-- Mobile Navigation -->
-      <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100">
-        <nav class="px-4 py-4 space-y-2">
-          {navigation.map((item) => (
-            <a
-              href={item.href}
-              class:list={[
-                'block px-4 py-3 rounded-md text-base font-medium transition-colors',
-                currentPath === item.href || currentPath.startsWith(item.href + '/')
-                  ? 'text-violet-600 bg-violet-100'
-                  : 'text-gray-600 hover:text-violet-600 hover:bg-violet-50'
-              ]}
-            >
-              {item.name}
-            </a>
-          ))}
-        </nav>
-      </div>
     </header>
+
+    <!-- Mobile Menu Overlay (scrim) -->
+    <div
+      id="mobile-menu-overlay"
+      class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300 md:hidden"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Mobile Menu Panel (slide-in from right) -->
+    <div
+      id="mobile-menu"
+      class="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white z-50 transform translate-x-full transition-transform duration-300 ease-out shadow-xl md:hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Hlavní menu"
+    >
+      <!-- Close button inside panel -->
+      <div class="flex justify-between items-center p-4 border-b border-gray-100">
+        <span class="font-semibold text-gray-900">Menu</span>
+        <button
+          id="mobile-menu-close"
+          class="p-2 min-h-[44px] min-w-[44px] rounded-md text-gray-600 hover:text-violet-600 hover:bg-violet-50 transition-colors"
+          aria-label="Zavřít menu"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        {navigation.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              'block px-4 py-4 min-h-[44px] rounded-lg text-lg font-medium transition-colors',
+              currentPath === item.href || currentPath.startsWith(item.href + '/')
+                ? 'text-violet-600 bg-violet-100'
+                : 'text-gray-700 hover:text-violet-600 hover:bg-violet-50'
+            ]}
+          >
+            {item.name}
+          </a>
+        ))}
+      </nav>
+
+      <!-- Quick links in mobile menu -->
+      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-gray-50">
+        <a
+          href="/srovnani-etf"
+          class="block w-full bg-violet-600 hover:bg-violet-700 text-white text-center px-4 py-3 rounded-lg font-semibold transition-colors"
+        >
+          Porovnat ETF fondy
+        </a>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <main id="main-content">
@@ -280,10 +322,64 @@ const currentPath = Astro.url.pathname;
     <!-- Mobile Menu Script -->
     <script>
       const menuBtn = document.getElementById('mobile-menu-btn');
+      const menuClose = document.getElementById('mobile-menu-close');
       const mobileMenu = document.getElementById('mobile-menu');
+      const overlay = document.getElementById('mobile-menu-overlay');
+      const iconOpen = document.getElementById('menu-icon-open');
+      const iconClose = document.getElementById('menu-icon-close');
 
-      menuBtn?.addEventListener('click', () => {
-        mobileMenu?.classList.toggle('hidden');
+      let isMenuOpen = false;
+
+      function openMenu() {
+        isMenuOpen = true;
+        // Show overlay
+        overlay?.classList.remove('hidden');
+        setTimeout(() => overlay?.classList.remove('opacity-0'), 10);
+        // Slide in menu
+        mobileMenu?.classList.remove('translate-x-full');
+        // Toggle icons
+        iconOpen?.classList.add('hidden');
+        iconClose?.classList.remove('hidden');
+        // Update aria
+        menuBtn?.setAttribute('aria-expanded', 'true');
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMenu() {
+        isMenuOpen = false;
+        // Fade out overlay
+        overlay?.classList.add('opacity-0');
+        setTimeout(() => overlay?.classList.add('hidden'), 300);
+        // Slide out menu
+        mobileMenu?.classList.add('translate-x-full');
+        // Toggle icons
+        iconOpen?.classList.remove('hidden');
+        iconClose?.classList.add('hidden');
+        // Update aria
+        menuBtn?.setAttribute('aria-expanded', 'false');
+        // Restore body scroll
+        document.body.style.overflow = '';
+      }
+
+      function toggleMenu() {
+        if (isMenuOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      }
+
+      // Event listeners
+      menuBtn?.addEventListener('click', toggleMenu);
+      menuClose?.addEventListener('click', closeMenu);
+      overlay?.addEventListener('click', closeMenu);
+
+      // Close on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isMenuOpen) {
+          closeMenu();
+        }
       });
     </script>
 

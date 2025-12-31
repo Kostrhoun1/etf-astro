@@ -6,21 +6,21 @@ import { BarChart3Icon, TargetIcon, AwardIcon } from '../ui/icons';
 export default function NobelPortfolioHero() {
   return (
     <section className="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-blue-50/50"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-violet-50/30 to-blue-50/50"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
           
           {/* Left Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-blue-200/50">
+            <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-violet-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium backdrop-blur-sm border border-blue-200/50">
               <AwardIcon className="w-4 h-4 mr-2" />
               Nobel Portfolio
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
               Strategie{' '}
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600 bg-clip-text text-transparent">
                 Nobelovy Nadace
               </span>
             </h1>
@@ -32,7 +32,7 @@ export default function NobelPortfolioHero() {
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="#allocation"
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2 h-12"
+                className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2 h-12"
               >
                 <BarChart3Icon className="w-5 h-5" />
                 Zobrazit složení
@@ -70,7 +70,7 @@ export default function NobelPortfolioHero() {
                   <span className="font-semibold text-gray-900">Ročně</span>
                 </div>
               </div>
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-violet-50 rounded-lg border border-blue-200">
                 <p className="text-sm font-semibold text-blue-800">
                   🏆 Strategie Nobelovy nadace
                 </p>

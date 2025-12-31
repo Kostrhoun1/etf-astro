@@ -122,7 +122,7 @@ export default function FeaturedETFSection({
 }: FeaturedETFSectionProps) {
   return (
     <section className="mb-12">
-      <div className="bg-gradient-to-r from-violet-50 to-indigo-50 rounded-2xl p-6 mb-8">
+      <div className="bg-gradient-to-r from-violet-50 to-violet-50 rounded-2xl p-6 mb-8">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-3xl">🏆</span>
           <h2 className="text-2xl font-bold text-gray-900">

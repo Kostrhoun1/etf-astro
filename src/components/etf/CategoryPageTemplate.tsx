@@ -133,12 +133,12 @@ export default function CategoryPageTemplate({
     green: "from-green-500 to-emerald-500",
     blue: "from-blue-500 to-cyan-500",
     purple: "from-purple-500 to-violet-500",
-    indigo: "from-indigo-500 to-blue-500"
+    indigo: "from-violet-500 to-blue-500"
   };
 
   const guideColorMap = {
     green: "from-green-500 to-emerald-600",
-    blue: "from-blue-500 to-indigo-600",
+    blue: "from-blue-500 to-violet-600",
     purple: "from-purple-500 to-violet-600"
   };
 
@@ -151,7 +151,7 @@ export default function CategoryPageTemplate({
 
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-violet-50/30 to-purple-50/50"></div>
         <div className="absolute top-20 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
         <div className="absolute top-40 right-1/4 w-72 h-72 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
 
@@ -159,14 +159,14 @@ export default function CategoryPageTemplate({
           <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
             {/* Left Content */}
             <div className="space-y-8">
-              <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium border border-blue-200/50">
+              <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-violet-100 text-blue-700 px-6 py-3 rounded-full text-sm font-medium border border-blue-200/50">
                 <FlagIcon className="w-4 h-4 mr-2" />
                 Aktuální k {currentDate}
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                 {title}{' '}
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
                   {currentYear}
                 </span>
               </h1>
@@ -185,7 +185,7 @@ export default function CategoryPageTemplate({
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold shadow-lg h-12">
+                <Button asChild className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg font-semibold shadow-lg h-12">
                   <a href="#top3">
                     <StarIcon className="w-5 h-5 mr-2" />
                     Top 3 doporučení
@@ -263,7 +263,7 @@ export default function CategoryPageTemplate({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-12 border border-blue-100 shadow-xl">
               <div className="text-center mb-12">
-                <div className="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 w-20 h-20 mx-auto mb-6">
+                <div className="flex items-center justify-center rounded-full bg-gradient-to-r from-blue-100 to-violet-100 w-20 h-20 mx-auto mb-6">
                   <TargetIcon className="w-10 h-10 text-blue-600" />
                 </div>
                 <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">

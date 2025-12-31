@@ -109,7 +109,7 @@ const MonteCarloContent: React.FC = () => {
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <TargetIcon className="w-10 h-10 text-indigo-600 mx-auto mb-3" />
+                <TargetIcon className="w-10 h-10 text-violet-600 mx-auto mb-3" />
                 <h3 className="text-sm font-semibold mb-1">Percentily</h3>
                 <p className="text-gray-600 text-xs">
                   Pravděpodobnostní pásma
@@ -120,7 +120,7 @@ const MonteCarloContent: React.FC = () => {
         </div>
 
         {/* Jak funguje Monte Carlo */}
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-8 mb-12">
+        <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Jak funguje Monte Carlo simulace?</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
@@ -257,7 +257,7 @@ const MonteCarloContent: React.FC = () => {
         />
 
         {/* CTA sekce */}
-        <div className="mt-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 text-white">
+        <div className="mt-16 bg-gradient-to-r from-purple-600 to-violet-600 rounded-xl p-6 text-white">
           <div className="text-center">
             <h3 className="text-2xl font-bold mb-3">Otestujte i historickou výkonnost</h3>
             <p className="text-purple-100 mb-4">

@@ -107,7 +107,7 @@ const BrokerRatingGrid: React.FC<BrokerRatingGridProps> = ({
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Celkové hodnocení</h3>
                 <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold shadow-lg mb-2 ${
                   overallRating >= 91 ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white' :
-                  overallRating >= 81 ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white' :
+                  overallRating >= 81 ? 'bg-gradient-to-r from-blue-500 to-violet-500 text-white' :
                   overallRating >= 66 ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' :
                   overallRating >= 41 ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white' : 
                   'bg-gradient-to-r from-red-500 to-rose-500 text-white'
@@ -165,7 +165,7 @@ const BrokerRatingGrid: React.FC<BrokerRatingGridProps> = ({
                       <div 
                         className={`h-full rounded-full transition-all duration-1000 ease-out shadow-sm ${
                           category.score >= 91 ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-green-500' :
-                          category.score >= 81 ? 'bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500' :
+                          category.score >= 81 ? 'bg-gradient-to-r from-blue-400 via-blue-500 to-violet-500' :
                           category.score >= 66 ? 'bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500' :
                           category.score >= 41 ? 'bg-gradient-to-r from-orange-400 via-orange-500 to-red-500' : 
                           'bg-gradient-to-r from-red-400 via-red-500 to-rose-500'

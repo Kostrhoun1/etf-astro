@@ -169,7 +169,7 @@ const FireCalculator: React.FC = () => {
       </div>
 
 
-      <Button onClick={handleCalculate} className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 animate-fade-in [animation-delay:0.8s]">
+      <Button onClick={handleCalculate} className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 text-white font-semibold py-3 animate-fade-in [animation-delay:0.8s]">
         <CalculatorIcon className="mr-2 h-5 w-5" />
         Kdy dosáhnu FIRE? (Vypočítat detailní analýzu)
       </Button>

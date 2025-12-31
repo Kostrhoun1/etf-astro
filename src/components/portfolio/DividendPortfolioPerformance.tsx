@@ -169,7 +169,7 @@ const DividendPortfolioPerformance: React.FC = () => {
             <div className="text-sm text-gray-600 mt-1">Letošní výnos</div>
           </div>
           
-          <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+          <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-violet-50 rounded-lg border border-blue-200">
             <div className="text-2xl font-bold text-blue-600">
               {return1y !== null ? `${return1y.toFixed(1)}%` : 'N/A'}
             </div>

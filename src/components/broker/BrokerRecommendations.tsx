@@ -24,10 +24,10 @@ const BrokerRecommendations: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Top Rated Brokers */}
-      <Card className="border-0 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Card className="border-0 bg-gradient-to-br from-blue-50 to-violet-100">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-violet-600 rounded-lg text-white">
               <CrownIcon className="text-xl" />
             </div>
             <div>

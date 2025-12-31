@@ -157,7 +157,7 @@ export default function Top10SectionsServer({ etfs, currency = 'EUR', categoryNa
           </div>
 
           {/* Top 10 by AUM */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+          <div className="bg-gradient-to-br from-blue-50 to-violet-50 rounded-2xl p-6 border border-blue-200">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                 <BarChart3Icon className="w-5 h-5 text-blue-600" />

@@ -45,8 +45,8 @@ const colorSchemes = {
     border: "border-purple-200"
   },
   indigo: {
-    icon: "text-indigo-600",
-    bg: "bg-indigo-50",
+    icon: "text-violet-600",
+    bg: "bg-violet-50",
     border: "border-indigo-200"
   },
   gray: {
@@ -65,9 +65,9 @@ const colorSchemes = {
     border: "border-zinc-200"
   },
   teal: {
-    icon: "text-teal-600",
-    bg: "bg-teal-50",
-    border: "border-teal-200"
+    icon: "text-violet-600",
+    bg: "bg-violet-50",
+    border: "border-violet-200"
   },
   cyan: {
     icon: "text-cyan-600",

@@ -90,7 +90,7 @@ const TwitterVariant3: React.FC<TwitterVariantProps> = ({ title, subtitle, child
       style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
     >
       {/* Tmavý header */}
-      <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-6">
+      <div className="bg-gradient-to-r from-emerald-500 to-violet-600 text-white p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <CrownIcon className="w-10 h-10" />
@@ -160,13 +160,13 @@ const TwitterVariant5: React.FC<TwitterVariantProps> = ({ title, subtitle, child
       style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
     >
       {/* Animované pozadí s blobs */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-blue-50/50"></div>
-      <div className="absolute top-10 left-1/4 w-32 h-32 bg-gradient-to-br from-emerald-200 to-teal-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-violet-50/30 to-blue-50/50"></div>
+      <div className="absolute top-10 left-1/4 w-32 h-32 bg-gradient-to-br from-emerald-200 to-violet-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
       <div className="absolute top-20 right-1/4 w-32 h-32 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
-      <div className="absolute bottom-10 left-1/3 w-32 h-32 bg-gradient-to-br from-teal-200 to-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+      <div className="absolute bottom-10 left-1/3 w-32 h-32 bg-gradient-to-br from-violet-200 to-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
       
       {/* Moderní header s emerald gradientem */}
-      <div className="relative bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6">
+      <div className="relative bg-gradient-to-r from-emerald-600 to-violet-600 text-white p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="inline-flex items-center bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border border-emerald-200/50">
@@ -225,7 +225,7 @@ const TwitterOptimizedContent: React.FC<{ data: any[], mode: 'performance' | 'te
         {data.slice(0, 5).map((etf, index) => (
           <div key={etf.isin} className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-200 shadow-lg">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-lg">
+              <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-violet-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-lg">
                 {index + 1}
               </div>
               <div className="flex-1">

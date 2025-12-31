@@ -232,7 +232,7 @@ const MortgageCalculator: React.FC = () => {
 
           <Button 
             onClick={() => {}} 
-            className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 mt-4 animate-fade-in [animation-delay:0.6s]"
+            className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 text-white font-semibold py-3 mt-4 animate-fade-in [animation-delay:0.6s]"
           >
             <CalculatorIcon className="mr-2 h-5 w-5" />
             Spočítat hypotéku

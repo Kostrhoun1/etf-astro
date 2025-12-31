@@ -170,7 +170,7 @@ const RetirementResultsSummary: React.FC<RetirementResultsSummaryProps> = ({ res
                   <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     📈 Vliv měsíčního spoření na FIRE věk
                   </h4>
-                  <div className="h-80 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4">
+                  <div className="h-80 bg-gradient-to-br from-emerald-50 to-violet-50 rounded-xl p-4">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={savingsData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" strokeOpacity={0.8} />
@@ -225,7 +225,7 @@ const RetirementResultsSummary: React.FC<RetirementResultsSummaryProps> = ({ res
                   <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     💰 Vliv cílových výdajů na FIRE věk
                   </h4>
-                  <div className="h-80 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
+                  <div className="h-80 bg-gradient-to-br from-blue-50 to-violet-50 rounded-xl p-4">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={expensesData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" strokeOpacity={0.8} />
@@ -282,7 +282,7 @@ const RetirementResultsSummary: React.FC<RetirementResultsSummaryProps> = ({ res
 
       {/* Úspěšný plán - hero styl */}
       {(results.scenarios.realistic.fireAge && results.scenarios.realistic.yearsToFire && results.scenarios.realistic.yearsToFire <= 20) && (
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-500 to-violet-600 text-white rounded-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 to-transparent"></div>
           <div className="relative z-10 p-6 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">

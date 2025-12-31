@@ -100,7 +100,7 @@ const FeeCalculator: React.FC = () => {
             updateScenario={updateScenario}
           />
 
-          <Button onClick={handleCalculate} className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3">
+          <Button onClick={handleCalculate} className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 text-white font-semibold py-3">
             <PercentIcon className="mr-2 h-5 w-5" />
             Vypočítat dopad poplatků
           </Button>

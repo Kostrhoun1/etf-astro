@@ -34,25 +34,25 @@ interface MarketHeatmapProps {
 const MarketHeatmap: React.FC<MarketHeatmapProps> = ({ data }) => {
   const getPerformanceColor = (performance: number): { bg: string; text: string; border: string; shadow: string } => {
     if (performance >= 15) return { 
-      bg: 'bg-gradient-to-br from-emerald-500 to-teal-600', 
+      bg: 'bg-gradient-to-br from-emerald-500 to-violet-600', 
       text: 'text-white', 
       border: 'border-emerald-300',
       shadow: 'shadow-lg hover:shadow-emerald-300/30'
     };
     if (performance >= 10) return { 
-      bg: 'bg-gradient-to-br from-emerald-400 to-teal-500', 
+      bg: 'bg-gradient-to-br from-emerald-400 to-violet-500', 
       text: 'text-white', 
       border: 'border-emerald-200',
       shadow: 'shadow-md hover:shadow-emerald-200/30'
     };
     if (performance >= 5) return { 
-      bg: 'bg-gradient-to-br from-emerald-200 to-teal-300', 
+      bg: 'bg-gradient-to-br from-emerald-200 to-violet-300', 
       text: 'text-emerald-900', 
       border: 'border-emerald-200',
       shadow: 'shadow-sm hover:shadow-emerald-200/20'
     };
     if (performance >= 2) return { 
-      bg: 'bg-gradient-to-br from-emerald-50 to-teal-100', 
+      bg: 'bg-gradient-to-br from-emerald-50 to-violet-100', 
       text: 'text-emerald-800', 
       border: 'border-emerald-200',
       shadow: 'shadow-sm hover:shadow-emerald-100/20'

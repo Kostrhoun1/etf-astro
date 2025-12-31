@@ -352,7 +352,7 @@ const FireCalculatorBacktest: React.FC = () => {
       <Button
         onClick={handleCalculate}
         disabled={loading}
-        className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3"
+        className="w-full bg-gradient-to-r from-emerald-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 text-white font-semibold py-3"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">

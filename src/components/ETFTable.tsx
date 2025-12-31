@@ -11,6 +11,101 @@ import { ChevronUpIcon, ChevronDownIcon, LoaderIcon } from '@/components/ui/icon
 import { formatPercentage, formatTER } from '@/utils/csvParser';
 import { useCurrency } from '@/contexts/CurrencyContext';
 
+// Mobile card component for better touch experience
+interface ETFMobileCardProps {
+  etf: ETFListItem;
+  onSelect?: () => void;
+  isSelected?: boolean;
+  canAddMore?: boolean;
+  isLoading?: boolean;
+  getPerformanceValue: (etf: ETFListItem, period: string) => number | null;
+}
+
+const ETFMobileCard: React.FC<ETFMobileCardProps> = ({
+  etf,
+  onSelect,
+  isSelected,
+  canAddMore,
+  isLoading,
+  getPerformanceValue
+}) => {
+  const return1y = getPerformanceValue(etf, '1y');
+
+  const getReturnColor = (value: number | null) => {
+    if (value === null) return 'text-gray-500';
+    if (value > 0) return 'text-emerald-600';
+    if (value < 0) return 'text-red-600';
+    return 'text-gray-600';
+  };
+
+  const formatFundSize = (size: number) => {
+    if (!size) return '-';
+    if (size >= 1000) return `${(size / 1000).toFixed(1)} mld`;
+    return `${size.toFixed(0)} mil`;
+  };
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:border-violet-300 hover:shadow-md transition-all">
+      <div className="flex items-start gap-3">
+        {onSelect && (
+          <div className="pt-1">
+            {isSelected ? (
+              <Checkbox checked={true} disabled />
+            ) : (
+              <Checkbox
+                checked={false}
+                disabled={!canAddMore || isLoading}
+                onCheckedChange={onSelect}
+                aria-label="Porovnat fond"
+              />
+            )}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <a
+            href={`/etf/${etf.isin}`}
+            className="block"
+          >
+            <h3 className="font-semibold text-gray-900 line-clamp-2 leading-tight hover:text-violet-600 transition-colors">
+              {etf.name}
+            </h3>
+          </a>
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <span className="text-sm text-gray-500 font-mono">{etf.isin}</span>
+            {etf.primary_ticker && (
+              <span className="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded">
+                {etf.primary_ticker}
+              </span>
+            )}
+            {etf.degiro_free && (
+              <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-medium rounded border border-emerald-200">
+                DEGIRO Free
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-gray-100">
+        <div>
+          <p className="text-xs text-gray-500 mb-0.5">TER</p>
+          <p className="font-semibold text-gray-900">{formatTER(etf.ter_numeric)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 mb-0.5">Výnos 1R</p>
+          <p className={`font-semibold ${getReturnColor(return1y)}`}>
+            {return1y !== null ? formatPercentage(return1y) : '-'}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 mb-0.5">Velikost</p>
+          <p className="font-semibold text-gray-900">{formatFundSize(etf.fund_size_numeric)}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 interface ETFTableProps {
   etfs: ETFListItem[];
   onSelectETF?: (etf: ETFListItem) => Promise<boolean>;
@@ -209,7 +304,23 @@ const ETFTable: React.FC<ETFTableProps> = ({
         onSearchChange={handleSearch}
       />
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {/* Mobile: Card layout */}
+      <div className="md:hidden space-y-3">
+        {paginatedETFs.map((etf) => (
+          <ETFMobileCard
+            key={etf.isin}
+            etf={etf}
+            onSelect={onSelectETF ? () => handleSelectETF(etf) : undefined}
+            isSelected={isETFSelected?.(etf.isin)}
+            canAddMore={canAddMore}
+            isLoading={loadingETF === etf.isin}
+            getPerformanceValue={getPerformanceValue}
+          />
+        ))}
+      </div>
+
+      {/* Tablet/Desktop: Table layout */}
+      <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>

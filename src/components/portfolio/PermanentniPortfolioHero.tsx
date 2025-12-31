@@ -6,7 +6,7 @@ import { BarChart3Icon, TargetIcon, ShieldIcon } from '../ui/icons';
 export default function PermanentniPortfolioHero() {
   return (
     <section className="relative py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-teal-50/50"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-emerald-50/30 to-violet-50/50"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
@@ -20,7 +20,7 @@ export default function PermanentniPortfolioHero() {
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
               Bezpečné{' '}
-              <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-violet-600 bg-clip-text text-transparent">
                 Permanentní Portfolio
               </span>
             </h1>

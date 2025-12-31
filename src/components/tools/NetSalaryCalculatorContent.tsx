@@ -235,7 +235,7 @@ const NetSalaryCalculatorContent: React.FC = () => {
         />
 
         {/* CTA sekce */}
-        <div className="mt-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-6 text-white">
+        <div className="mt-16 bg-gradient-to-r from-blue-600 to-violet-600 rounded-xl p-6 text-white">
           <div className="text-center">
             <h3 className="text-2xl font-bold mb-3">💰 Máte vyšší čistou mzdu než očekáváte?</h3>
             <p className="text-blue-100 mb-4">

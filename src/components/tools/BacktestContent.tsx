@@ -109,7 +109,7 @@ const BacktestContent: React.FC = () => {
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <RefreshIcon className="w-10 h-10 text-teal-600 mx-auto mb-3" />
+                <RefreshIcon className="w-10 h-10 text-violet-600 mx-auto mb-3" />
                 <h3 className="text-sm font-semibold mb-1">Rebalancování</h3>
                 <p className="text-gray-600 text-xs">
                   Strategie vyvažování

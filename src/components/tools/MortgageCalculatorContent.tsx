@@ -206,7 +206,7 @@ const MortgageCalculatorContent: React.FC = () => {
         />
 
         {/* CTA sekce */}
-        <div className="mt-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-xl p-6 text-white">
+        <div className="mt-16 bg-gradient-to-r from-green-600 to-violet-600 rounded-xl p-6 text-white">
           <div className="text-center">
             <h3 className="text-2xl font-bold mb-3">💰 Chcete ušetřit na hypotéce?</h3>
             <p className="text-green-100 mb-4">

@@ -22,8 +22,10 @@ const GlobalETFSearch: React.FC<GlobalETFSearchProps> = ({
   const [results, setResults] = useState<ETFSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -81,14 +83,59 @@ const GlobalETFSearch: React.FC<GlobalETFSearchProps> = ({
     window.location.href = `/etf/${etf.isin}`;
   };
 
-  // Enter key handling
+  // Reset selected index when results change
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [results]);
+
+  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && results.length > 0) {
-      handleSelectETF(results[0]);
+    if (!isOpen || results.length === 0) {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        inputRef.current?.blur();
+      }
+      return;
     }
-    if (e.key === 'Escape') {
-      setIsOpen(false);
-      inputRef.current?.blur();
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => {
+          const next = prev < results.length - 1 ? prev + 1 : prev;
+          // Scroll selected item into view
+          const buttons = resultsRef.current?.querySelectorAll('button[role="option"]');
+          buttons?.[next]?.scrollIntoView({ block: 'nearest' });
+          return next;
+        });
+        break;
+
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => {
+          const next = prev > 0 ? prev - 1 : -1;
+          if (next >= 0) {
+            const buttons = resultsRef.current?.querySelectorAll('button[role="option"]');
+            buttons?.[next]?.scrollIntoView({ block: 'nearest' });
+          }
+          return next;
+        });
+        break;
+
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < results.length) {
+          handleSelectETF(results[selectedIndex]);
+        } else if (results.length > 0) {
+          handleSelectETF(results[0]);
+        }
+        break;
+
+      case 'Escape':
+        setIsOpen(false);
+        setSelectedIndex(-1);
+        inputRef.current?.blur();
+        break;
     }
   };
 
@@ -129,18 +176,26 @@ const GlobalETFSearch: React.FC<GlobalETFSearchProps> = ({
       {/* Dropdown with results */}
       {isOpen && results.length > 0 && (
         <div
+          ref={resultsRef}
           id="etf-search-results"
           role="listbox"
           aria-label="Výsledky vyhledávání ETF"
+          aria-activedescendant={selectedIndex >= 0 ? `etf-option-${selectedIndex}` : undefined}
           className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto min-w-full w-max max-w-2xl"
         >
           {results.map((etf, index) => (
             <button
               key={etf.isin}
+              id={`etf-option-${index}`}
               role="option"
-              aria-selected={index === 0}
+              aria-selected={index === selectedIndex}
               onClick={() => handleSelectETF(etf)}
-              className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors"
+              onMouseEnter={() => setSelectedIndex(index)}
+              className={`w-full px-4 py-3 text-left border-b border-gray-100 last:border-b-0 transition-colors ${
+                index === selectedIndex
+                  ? 'bg-violet-50 border-l-2 border-l-violet-500'
+                  : 'hover:bg-gray-50'
+              }`}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1 min-w-0 pr-4">

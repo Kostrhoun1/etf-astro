@@ -257,7 +257,7 @@ const EmergencyFundCalculator: React.FC = () => {
 
           <Button 
             onClick={handleCalculate} 
-            className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 mb-4 animate-fade-in [animation-delay:0.6s]"
+            className="w-full hover-scale bg-gradient-to-r from-emerald-500 to-violet-600 hover:from-emerald-600 hover:to-violet-700 text-white font-semibold py-3 mb-4 animate-fade-in [animation-delay:0.6s]"
           >
             <ShieldIcon className="mr-2 h-5 w-5" />
             Vypočítat nouzovou rezervu
@@ -266,7 +266,7 @@ const EmergencyFundCalculator: React.FC = () => {
           {/* VÝSLEDEK: Analýza rizika */}
           {results && (
             <Card className="bg-gradient-to-br from-slate-50 to-gray-100 border border-slate-200 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg pb-4">
+              <CardHeader className="bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-t-lg pb-4">
                 <CardTitle className="text-xl font-bold flex items-center gap-2">
                   <ShieldIcon className="h-6 w-6" />
                   Analýza vašeho rizikového profilu
@@ -290,10 +290,10 @@ const EmergencyFundCalculator: React.FC = () => {
                   ))}
                 </div>
                 
-                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-5 rounded-lg border border-purple-200">
+                <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-5 rounded-lg border border-purple-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-500 to-violet-500"></div>
                       <span className="text-lg font-bold text-gray-800">Celkové hodnocení rizika</span>
                     </div>
                     <div className="text-right">

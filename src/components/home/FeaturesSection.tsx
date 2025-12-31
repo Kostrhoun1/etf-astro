@@ -51,7 +51,7 @@ const features = [
 
 const FeaturesSection: React.FC = () => {
   return (
-    <section className="bg-gradient-to-br from-violet-50 to-indigo-100 py-16" aria-labelledby="features-heading">
+    <section className="bg-gradient-to-br from-violet-50 to-violet-100 py-16" aria-labelledby="features-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 id="features-heading" className="text-3xl font-bold text-gray-900 tracking-tight text-center mb-12">
           Co všechno u nás najdete?
