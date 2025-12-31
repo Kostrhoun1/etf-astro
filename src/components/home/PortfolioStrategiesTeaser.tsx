@@ -153,9 +153,9 @@ const PortfolioStrategiesTeaser: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-7xl mx-auto px-4 py-16" role="status" aria-live="polite" aria-busy="true">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600 mx-auto" aria-hidden="true"></div>
           <p className="mt-4 text-gray-600">Načítám portfolio strategie...</p>
         </div>
       </div>

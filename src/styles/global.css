@@ -205,6 +205,92 @@
   }
 }
 
+/* ============================================
+   SPACING SYSTEM (8px grid)
+   ============================================ */
+@layer base {
+  :root {
+    /* Spacing tokens */
+    --space-xs: 0.25rem;   /* 4px */
+    --space-sm: 0.5rem;    /* 8px */
+    --space-md: 1rem;      /* 16px */
+    --space-lg: 1.5rem;    /* 24px */
+    --space-xl: 2rem;      /* 32px */
+    --space-2xl: 3rem;     /* 48px */
+    --space-3xl: 4rem;     /* 64px */
+    --space-4xl: 6rem;     /* 96px */
+
+    /* Section spacing */
+    --section-padding-mobile: var(--space-2xl);
+    --section-padding-desktop: var(--space-4xl);
+
+    /* Container padding */
+    --container-padding-mobile: var(--space-md);
+    --container-padding-tablet: var(--space-lg);
+    --container-padding-desktop: var(--space-xl);
+  }
+}
+
+/* ============================================
+   FOCUS STATES (Accessibility)
+   ============================================ */
+@layer base {
+  /* Visible focus for keyboard navigation */
+  :focus-visible {
+    outline: 2px solid var(--color-violet-500);
+    outline-offset: 2px;
+  }
+
+  /* Remove default focus for mouse users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Enhanced focus for interactive elements */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-violet-500);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ============================================
+   TYPOGRAPHY SYSTEM
+   ============================================ */
+@layer base {
+  /* Ensure minimum readable font size on mobile */
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Prose content max-width for readability */
+  .prose-content {
+    max-width: 65ch;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.25;
+    font-weight: 600;
+  }
+
+  /* Body text */
+  p, li {
+    line-height: 1.625;
+  }
+
+  /* Small text - never smaller than 14px */
+  .text-small {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+  }
+}
+
 /* LCP Optimization - Defer rendering of below-fold content */
 @layer utilities {
   .content-auto {
