@@ -11,4 +11,4 @@ Crawl-delay: 1
 Disallow: /api/
 
 # Allow CSS and JS assets for proper rendering
-# DO NOT block /_astro/ - contains critical CSS and JS files!
+# IMPORTANT: DO NOT block /_astro/ - contains critical CSS and JS files for Google rendering!
