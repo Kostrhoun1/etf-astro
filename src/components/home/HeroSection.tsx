@@ -22,24 +22,26 @@ const HeroSection: React.FC<HeroSectionProps> = ({ totalCount }) => {
             Co je ETF a jak investovat? Srovnání {displayCount.toLocaleString()}+ ETF fondů pro české investory.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in w-full sm:w-auto">
+            {/* Primary CTA - always visible */}
             <a
               href="/srovnani-etf"
-              className="inline-flex items-center justify-center hover-scale bg-violet-600 hover:bg-violet-700 text-white px-8 py-3 text-lg font-medium rounded-md transition-colors"
+              className="inline-flex items-center justify-center bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 min-h-[48px] text-lg font-medium rounded-lg transition-colors w-full sm:w-auto"
             >
               Porovnat ETF fondy
             </a>
+            {/* Secondary CTA - hidden on mobile */}
             <a
               href="/co-jsou-etf"
-              className="inline-flex items-center justify-center border-white/70 text-gray-900 bg-white hover:bg-gray-100 hover:text-gray-900 hover-scale px-8 py-3 text-lg font-medium rounded-md transition-colors"
+              className="hidden sm:inline-flex items-center justify-center text-gray-900 bg-white hover:bg-gray-100 px-8 py-4 min-h-[48px] text-lg font-medium rounded-lg transition-colors"
             >
               Co jsou ETF?
             </a>
+            {/* Tertiary CTA - hidden on mobile and tablet */}
             <a
               href="/portfolio-strategie"
-              className="inline-flex items-center justify-center hover-scale bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold px-8 py-3 text-lg rounded-md transition-colors"
+              className="hidden md:inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-8 py-4 min-h-[48px] text-lg rounded-lg transition-colors"
             >
-              <span className="mr-2">📊</span>
               Vytvořit portfolio
             </a>
           </div>

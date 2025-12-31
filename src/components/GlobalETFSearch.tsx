@@ -102,13 +102,15 @@ const GlobalETFSearch: React.FC<GlobalETFSearchProps> = ({
         </span>
         <input
           ref={inputRef}
-          type="text"
+          type="search"
+          inputMode="search"
+          enterKeyHint="search"
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => query.length >= 2 && results.length > 0 && setIsOpen(true)}
-          className="w-full pl-10 pr-10 py-2 bg-white/90 border border-gray-200 rounded-md text-sm focus:border-violet-300 focus:ring-2 focus:ring-violet-200 focus:outline-none"
+          className="w-full pl-10 pr-10 py-3 md:py-2 min-h-[44px] md:min-h-0 bg-white/90 border border-gray-200 rounded-md text-base md:text-sm focus:border-violet-300 focus:ring-2 focus:ring-violet-200 focus:outline-none"
           aria-label="Vyhledávání ETF fondů"
           aria-autocomplete="list"
           aria-controls="etf-search-results"

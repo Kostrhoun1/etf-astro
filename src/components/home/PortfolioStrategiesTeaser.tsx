@@ -73,7 +73,17 @@ const PortfolioStrategiesTeaser: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Add timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.error('ETF data fetch timeout');
+        setLoading(false);
+      }
+    }, 10000); // 10 second timeout
+
     fetchETFData();
+
+    return () => clearTimeout(timeout);
   }, []);
 
   const fetchETFData = async () => {
