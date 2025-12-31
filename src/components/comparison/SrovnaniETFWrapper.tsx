@@ -6,7 +6,6 @@ import ETFDetailedComparison from '@/components/ETFDetailedComparison';
 import ETFComparisonContainer from '@/components/comparison/ETFComparisonContainer';
 import type { ETF } from '@/types/etf';
 import type { ETFBasicInfo } from '@/lib/etf-data';
-import { supabase } from '@/lib/supabase';
 
 interface SrovnaniETFWrapperProps {
   initialETFs?: ETFBasicInfo[];
@@ -52,48 +51,58 @@ function SrovnaniETFContent({ initialETFs, totalCount }: SrovnaniETFWrapperProps
 
     const loadETFsFromURL = async () => {
       try {
-        // If we got here and have ISINs, load them directly
+        // If we got here and have ISINs, load them directly via API
         if (hasISINs) {
-          const { data, error } = await supabase
-            .from('etf_funds')
-            .select('*')
-            .in('isin', preSelectedISINs);
+          const response = await fetch(`/api/etfs?isins=${preSelectedISINs.join(',')}`);
+
+          if (!response.ok) {
+            console.error('Error loading ETFs from ISINs:', response.statusText);
+            return;
+          }
+
+          const { data, error } = await response.json();
 
           if (error) {
             console.error('Error loading ETFs from ISINs:', error);
             return;
           }
 
-          const loadedETFs = data as unknown as ETF[];
+          const loadedETFs = data as ETF[];
           setSelectedETFsForComparison(loadedETFs);
           setShowDetailedComparison(true);
           return;
         }
 
-        // Find ETFs by tickers using all ticker fields
-        const tickerFields = [
-          'primary_ticker',
-          'exchange_1_ticker', 'exchange_2_ticker', 'exchange_3_ticker', 'exchange_4_ticker', 'exchange_5_ticker',
-          'exchange_6_ticker', 'exchange_7_ticker', 'exchange_8_ticker', 'exchange_9_ticker', 'exchange_10_ticker'
-        ];
+        // For tickers, we need to fetch all ETFs and filter client-side
+        // This is a fallback for non-ISIN lookups
+        const response = await fetch('/api/etfs?limit=5000');
 
-        const orConditions = preSelectedISINs.map(symbol =>
-          tickerFields.map(field => `${field}.eq.${symbol}`).join(',')
-        ).join(',');
+        if (!response.ok) {
+          console.error('Error looking up tickers:', response.statusText);
+          return;
+        }
 
-        const { data, error } = await supabase
-          .from('etf_funds')
-          .select('*')
-          .or(orConditions);
+        const { data, error } = await response.json();
 
         if (error) {
           console.error('Error looking up tickers:', error);
           return;
         }
 
-        const foundETFs = data as unknown as ETF[];
+        // Filter client-side by ticker fields
+        const tickerFields = [
+          'primary_ticker',
+          'exchange_1_ticker', 'exchange_2_ticker', 'exchange_3_ticker', 'exchange_4_ticker', 'exchange_5_ticker',
+          'exchange_6_ticker', 'exchange_7_ticker', 'exchange_8_ticker', 'exchange_9_ticker', 'exchange_10_ticker'
+        ];
 
-        if (foundETFs && foundETFs.length > 0) {
+        const foundETFs = (data as ETF[]).filter(etf => {
+          return preSelectedISINs.some(symbol =>
+            tickerFields.some(field => (etf as any)[field] === symbol)
+          );
+        });
+
+        if (foundETFs.length > 0) {
           setSelectedETFsForComparison(foundETFs);
           setShowDetailedComparison(true);
         }
