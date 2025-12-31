@@ -37,7 +37,7 @@ const staticPages = [
   { url: '/kalkulacky/fire-kalkulacka', priority: 0.8, changefreq: 'monthly' },
   { url: '/kalkulacky/monte-carlo-simulator', priority: 0.8, changefreq: 'monthly' },
   { url: '/kalkulacky/hypotecni-kalkulacka', priority: 0.8, changefreq: 'monthly' },
-  { url: '/kalkulacky/cisty-plat-2025', priority: 0.8, changefreq: 'monthly' },
+  { url: '/kalkulacky/cisty-plat-2026', priority: 0.8, changefreq: 'monthly' },
   { url: '/kalkulacky/uverova-kalkulacka', priority: 0.8, changefreq: 'monthly' },
   { url: '/kalkulacky/nouzova-rezerva', priority: 0.8, changefreq: 'monthly' },
   { url: '/kalkulacky/kalkulacka-poplatku-etf', priority: 0.8, changefreq: 'monthly' },
@@ -96,10 +96,13 @@ const staticPages = [
   { url: '/o-nas', priority: 0.7, changefreq: 'monthly' },
 ];
 
-// Nacist ETF ISINy ze sitemap-etf.xml
-const etfSitemapPath = path.join(__dirname, '../public/sitemap-etf.xml');
-const etfSitemap = fs.readFileSync(etfSitemapPath, 'utf-8');
-const etfUrls = etfSitemap.match(/<loc>([^<]+)<\/loc>/g) || [];
+// Nacist ETF ISINy z existujiciho sitemap.xml
+const existingSitemapPath = path.join(__dirname, '../public/sitemap.xml');
+let etfUrls = [];
+if (fs.existsSync(existingSitemapPath)) {
+  const existingSitemap = fs.readFileSync(existingSitemapPath, 'utf-8');
+  etfUrls = existingSitemap.match(/<loc>([^<]+)<\/loc>/g) || [];
+}
 
 let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

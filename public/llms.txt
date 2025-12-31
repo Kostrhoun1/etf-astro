@@ -5,7 +5,7 @@
 ## About This Site
 
 ETF pruvodce.cz offers:
-- Database of 2000+ ETF funds with detailed analysis
+- Database of 4300+ ETF funds with detailed analysis
 - ETF comparison tools and calculators
 - Broker reviews and comparisons
 - Educational content about ETF investing
@@ -15,7 +15,7 @@ ETF pruvodce.cz offers:
 
 - Homepage: https://www.etfpruvodce.cz/
 - ETF Comparison: https://www.etfpruvodce.cz/srovnani-etf
-- Best ETF 2025: https://www.etfpruvodce.cz/nejlepsi-etf
+- Best ETF 2026: https://www.etfpruvodce.cz/nejlepsi-etf
 - Where to Buy ETF: https://www.etfpruvodce.cz/kde-koupit-etf
 - Portfolio Strategies: https://www.etfpruvodce.cz/portfolio-strategie
 - Calculators: https://www.etfpruvodce.cz/kalkulacky
