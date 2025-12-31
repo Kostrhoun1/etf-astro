@@ -242,7 +242,7 @@ const CurrencyImpactAnalyzerContent: React.FC = () => {
             },
             {
               title: "Nejlepší ETF 2026",
-              href: "/tipy/nejlepsi-etf-na-americke-akcie",
+              href: "/nejlepsi-etf/nejlepsi-americke-etf",
               description: "Doporučené ETF fondy pro české investory"
             },
             {

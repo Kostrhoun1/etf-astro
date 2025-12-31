@@ -30,7 +30,7 @@ const features = [
     icon: BookOpenIcon,
     title: "Vzdělávací obsah a blog",
     description: "Tipy pro začátečníky i pokročilé. Průvodci, srovnávací články a odpovědi na nejčastější otázky o ETF investování.",
-    link: "/tipy",
+    link: "/co-jsou-etf",
     cta: "Číst články"
   },
   {

@@ -137,9 +137,9 @@ export const ToolsRelatedLinks: RelatedLink[] = [
     icon: <span className="text-green-600">📈</span>
   },
   {
-    title: "Investiční tipy",
-    description: "Užitečné články o investování do ETF fondů",
-    href: "/tipy",
+    title: "Nejlepší ETF 2026",
+    description: "Doporučené ETF fondy pro české investory",
+    href: "/nejlepsi-etf/nejlepsi-etf-2026",
     icon: <span className="text-purple-600">💡</span>
   }
 ];

@@ -198,7 +198,7 @@ const FIRECalculatorContent: React.FC = () => {
             },
             {
               title: "All Weather Portfolio",
-              href: "/tipy/all-weather-portfolio",
+              href: "/portfolio-strategie/ray-dalio-all-weather",
               description: "Diverzifikovaná strategie pro FIRE spoření"
             }
           ]}
