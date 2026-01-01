@@ -6,12 +6,8 @@ import { useETFData } from './useETFData';
 import type { ETFListItem } from '../types/etf';
 import type { ETFBasicInfo } from '../lib/etf-data';
 
-// Helper function to filter out 'Ostatní' category and sort remaining
-const sortCategories = (categories: string[]): string[] => {
-  return categories
-    .filter(category => category !== 'Ostatní') // Filter out 'Ostatní' as it only contains 1 ETF
-    .sort((a, b) => a.localeCompare(b)); // Regular alphabetical sort
-};
+// Static list of all categories - always show all tabs
+const ALL_CATEGORIES = ['Akcie', 'Dluhopisy', 'Komodity', 'Krypto', 'Nemovitosti'];
 
 // Convert ETFBasicInfo to ETFListItem format
 const convertToETFListItem = (etf: ETFBasicInfo): ETFListItem => ({
@@ -44,7 +40,7 @@ export const useETFSearchData = (options?: UseETFSearchDataOptions) => {
   const initialETFListItems = initialETFs?.map(convertToETFListItem) || [];
 
   const [etfs, setETFs] = useState<ETFListItem[]>(initialETFListItems);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories] = useState<string[]>(ALL_CATEGORIES); // Always show all categories
   const [maxTerFromData, setMaxTerFromData] = useState<number>(2);
   const [totalETFCount, setTotalETFCount] = useState<number>(initialTotalCount || 0);
   const [hasLoadedFull, setHasLoadedFull] = useState(false);
@@ -53,13 +49,7 @@ export const useETFSearchData = (options?: UseETFSearchDataOptions) => {
   // Show loading only if we don't have initial data
   const isLoading = !initialETFs?.length && isLoadingFromHook;
 
-  // Extract categories from initial data
-  useEffect(() => {
-    if (initialETFListItems.length > 0 && categories.length === 0) {
-      const initialCategories = Array.from(new Set(initialETFListItems.map(etf => etf.category).filter(Boolean)));
-      setCategories(sortCategories(initialCategories as string[]));
-    }
-  }, []);
+  // Categories are now static - no need to extract from data
 
   // Load full data in background
   useEffect(() => {
@@ -80,10 +70,6 @@ export const useETFSearchData = (options?: UseETFSearchDataOptions) => {
         // Spočítej celkový počet ETF
         const totalCount = await getETFCount();
         setTotalETFCount(totalCount);
-
-        // Extract všechny kategorie
-        const allCategories = Array.from(new Set(allETFsWithTicker.map(etf => etf.category).filter(Boolean)));
-        setCategories(sortCategories(allCategories));
 
         // Calculate max TER ze všech dat
         const allTerValues = allETFsWithTicker.map(etf => etf.ter_numeric).filter(ter => ter && ter > 0);
