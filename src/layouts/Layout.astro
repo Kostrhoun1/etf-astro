@@ -100,7 +100,16 @@ const currentPath = Astro.url.pathname;
     <link rel="preload" as="image" href="/logo.png" />
 
     <!-- Sitemap -->
-    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="sitemap" type="application/xml" href="/sitemap-0.xml" />
+
+    <!-- Google Analytics -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-JYJPWHLMZX"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JYJPWHLMZX');
+    </script>
 
     <!-- Font - Non-blocking load -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
