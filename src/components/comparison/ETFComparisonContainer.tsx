@@ -41,13 +41,12 @@ const ETFComparisonContainer: React.FC<ETFComparisonContainerProps> = ({
 
   const {
     filteredETFs,
-    categories: logicCategories,
     activeCategory,
     handleCategoryChange,
     handleAdvancedFilterChange,
     advancedFilters,
     ranges
-  } = useETFTableLogic(etfs);
+  } = useETFTableLogic(etfs, categories);
 
   const handleShowDetailedComparison = () => {
     onShowDetailedComparison(selectedETFs);
@@ -90,7 +89,7 @@ const ETFComparisonContainer: React.FC<ETFComparisonContainerProps> = ({
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
               <ETFCategoryTabs
-                categories={logicCategories}
+                categories={categories}
                 activeCategory={activeCategory}
                 onCategoryChange={handleCategoryChange}
               />

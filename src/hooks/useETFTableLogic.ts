@@ -23,7 +23,10 @@ export interface AdvancedFiltersState {
   hedgingType?: string;
 }
 
-export const useETFTableLogic = (etfs: ETFListItem[]) => {
+// Static list of all categories - always show all tabs
+const ALL_CATEGORIES = ['Akcie', 'Dluhopisy', 'Komodity', 'Krypto', 'Nemovitosti'];
+
+export const useETFTableLogic = (etfs: ETFListItem[], staticCategories?: string[]) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [sortBy, setSortBy] = useState<string>('ter_numeric');
@@ -60,16 +63,21 @@ export const useETFTableLogic = (etfs: ETFListItem[]) => {
     hedgingType: 'all',
   });
 
+  // Use static categories if provided, otherwise extract from data
   const categories = useMemo(() => {
+    if (staticCategories) {
+      return staticCategories;
+    }
+    // Fallback: extract from data (legacy behavior)
     const uniqueCategories = [...new Set(etfs.map(etf => etf.category).filter(Boolean))];
-    
+
     // Filter out 'Ostatní' category as it only contains 1 ETF
     return uniqueCategories
       .filter(category => category !== 'Ostatní')
       .sort((a, b) => a.localeCompare(b));
-  }, [etfs]);
+  }, [etfs, staticCategories]);
 
-  const activeCategory = selectedCategory ?? (categories.includes('Akciové') ? 'Akciové' : categories[0] ?? '');
+  const activeCategory = selectedCategory ?? (categories.includes('Akcie') ? 'Akcie' : categories[0] ?? '');
 
   useEffect(() => {
     if (etfs.length > 0) {
