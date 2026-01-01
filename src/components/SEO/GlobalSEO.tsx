@@ -80,10 +80,10 @@ const GlobalSEO: React.FC = () => {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "ETF průvodce.cz",
-        "url": "https://etfpruvodce.cz",
+        "url": "https://www.etfpruvodce.cz",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://etfpruvodce.cz/og-image.jpg"
+          "url": "https://www.etfpruvodce.cz/og-image.jpg"
         },
         "description": "Komplexní průvodce ETF fondy pro české investory. Srovnání, analýza a vzdělávací obsah o investování.",
         "foundingDate": "2024",
@@ -100,7 +100,7 @@ const GlobalSEO: React.FC = () => {
           "Index fondy"
         ],
         "sameAs": [
-          "https://etfpruvodce.cz"
+          "https://www.etfpruvodce.cz"
         ]
       };
       

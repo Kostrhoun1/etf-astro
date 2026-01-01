@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://etfpruvodce.cz',
+  site: 'https://www.etfpruvodce.cz',
   output: 'static',
   trailingSlash: 'never',
   adapter: vercel(),

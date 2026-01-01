@@ -15,7 +15,7 @@ export default function AuthorSchema() {
   const authorSchema = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "@id": "https://etfpruvodce.cz/o-nas#tomas-kostrhoun",
+    "@id": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun",
     "name": "Tomáš Kostrhoun",
     "givenName": "Tomáš",
     "familyName": "Kostrhoun",
@@ -32,9 +32,9 @@ export default function AuthorSchema() {
 
     "worksFor": {
       "@type": "Organization",
-      "@id": "https://etfpruvodce.cz#organization",
+      "@id": "https://www.etfpruvodce.cz#organization",
       "name": "ETF průvodce.cz",
-      "url": "https://etfpruvodce.cz"
+      "url": "https://www.etfpruvodce.cz"
     },
 
     // Credentials and expertise
@@ -87,7 +87,7 @@ export default function AuthorSchema() {
 
     // Contact and social proof
     "email": "info@etfpruvodce.cz",
-    "url": "https://etfpruvodce.cz/o-nas",
+    "url": "https://www.etfpruvodce.cz/o-nas",
     "sameAs": [
       "https://www.linkedin.com/in/tomas-kostrhoun-b34a6831",
       "https://x.com/ETFpruvodce"
@@ -108,13 +108,13 @@ export default function AuthorSchema() {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": ["Organization", "WebSite"],
-    "@id": "https://etfpruvodce.cz#organization",
+    "@id": "https://www.etfpruvodce.cz#organization",
     "name": "ETF průvodce.cz",
     "legalName": "ETF průvodce.cz",
-    "url": "https://etfpruvodce.cz",
+    "url": "https://www.etfpruvodce.cz",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://etfpruvodce.cz/logo.png",
+      "url": "https://www.etfpruvodce.cz/logo.png",
       "width": 200,
       "height": 60,
       "caption": "ETF průvodce.cz logo"
@@ -122,7 +122,7 @@ export default function AuthorSchema() {
     "description": "Největší český průvodce ETF fondy. Srovnání 4300+ ETF fondů, aktuální výkonnost přepočítaná do českých korun, nezávislé recenze brokerů. Jedinečná databáze ETF pro české investory.",
     "foundingDate": "2024",
     "founder": {
-      "@id": "https://etfpruvodce.cz/o-nas#tomas-kostrhoun"
+      "@id": "https://www.etfpruvodce.cz/o-nas#tomas-kostrhoun"
     },
     "sameAs": [
       "https://x.com/ETFpruvodce"

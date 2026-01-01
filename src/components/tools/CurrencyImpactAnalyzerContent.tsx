@@ -19,19 +19,19 @@ const CurrencyImpactAnalyzerContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://etfpruvodce.cz"
+        "item": "https://www.etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://etfpruvodce.cz/kalkulacky"
+        "item": "https://www.etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Analýza kurzového dopadu ETF",
-        "item": "https://etfpruvodce.cz/kalkulacky/kurzovy-dopad-etf"
+        "item": "https://www.etfpruvodce.cz/kalkulacky/kurzovy-dopad-etf"
       }
     ]
   };
@@ -41,7 +41,7 @@ const CurrencyImpactAnalyzerContent: React.FC = () => {
     "@type": "WebApplication",
     "name": "Analýza kurzového dopadu ETF 2026 - Currency Hedging",
     "description": "Analyzujte vliv kurzových změn na ETF portfolio. Měnové riziko, hedging strategie a optimalizace pro české investory.",
-    "url": "https://etfpruvodce.cz/kalkulacky/kurzovy-dopad-etf",
+    "url": "https://www.etfpruvodce.cz/kalkulacky/kurzovy-dopad-etf",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web Browser",
     "offers": {
