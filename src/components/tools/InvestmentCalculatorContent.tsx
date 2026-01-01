@@ -46,19 +46,19 @@ const InvestmentCalculatorContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://www.etfpruvodce.cz"
+        "item": "https://etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://www.etfpruvodce.cz/kalkulacky"
+        "item": "https://etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Investiční kalkulačka 2026",
-        "item": "https://www.etfpruvodce.cz/kalkulacky/investicni-kalkulacka"
+        "item": "https://etfpruvodce.cz/kalkulacky/investicni-kalkulacka"
       }
     ]
   };
@@ -68,7 +68,7 @@ const InvestmentCalculatorContent: React.FC = () => {
     "@type": "WebApplication",
     "name": "Investiční kalkulačka 2026 - Pravidelné investování",
     "description": "Bezplatná investiční kalkulačka pro výpočet výnosů z pravidelného měsíčního investování do ETF fondů. Včetně daní, inflace a složeného úročení.",
-    "url": "https://www.etfpruvodce.cz/kalkulacky/investicni-kalkulacka",
+    "url": "https://etfpruvodce.cz/kalkulacky/investicni-kalkulacka",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web Browser",
     "offers": {

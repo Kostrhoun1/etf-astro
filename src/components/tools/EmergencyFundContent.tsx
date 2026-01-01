@@ -17,19 +17,19 @@ const EmergencyFundContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://www.etfpruvodce.cz"
+        "item": "https://etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://www.etfpruvodce.cz/kalkulacky"
+        "item": "https://etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Kalkulačka nouzové rezervy 2026",
-        "item": "https://www.etfpruvodce.cz/kalkulacky/nouzova-rezerva"
+        "item": "https://etfpruvodce.cz/kalkulacky/nouzova-rezerva"
       }
     ]
   };
@@ -39,7 +39,7 @@ const EmergencyFundContent: React.FC = () => {
     "@type": "WebApplication",
     "name": "Kalkulačka nouzové rezervy 2026 - Emergency Fund",
     "description": "Spočítejte si optimální velikost nouzové rezervy podle rizikového profilu. Kde držet peníze a strategie spoření na emergency fund.",
-    "url": "https://www.etfpruvodce.cz/kalkulacky/nouzova-rezerva",
+    "url": "https://etfpruvodce.cz/kalkulacky/nouzova-rezerva",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web Browser",
     "offers": {

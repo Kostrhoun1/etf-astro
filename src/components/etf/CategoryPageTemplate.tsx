@@ -104,9 +104,9 @@ export default function CategoryPageTemplate({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Domů", "item": "https://www.etfpruvodce.cz" },
-      { "@type": "ListItem", "position": 2, "name": "Nejlepší ETF", "item": "https://www.etfpruvodce.cz/nejlepsi-etf" },
-      { "@type": "ListItem", "position": 3, "name": title, "item": `https://www.etfpruvodce.cz/nejlepsi-etf/${categorySlug}` }
+      { "@type": "ListItem", "position": 1, "name": "Domů", "item": "https://etfpruvodce.cz" },
+      { "@type": "ListItem", "position": 2, "name": "Nejlepší ETF", "item": "https://etfpruvodce.cz/nejlepsi-etf" },
+      { "@type": "ListItem", "position": 3, "name": title, "item": `https://etfpruvodce.cz/nejlepsi-etf/${categorySlug}` }
     ]
   };
 
@@ -116,12 +116,12 @@ export default function CategoryPageTemplate({
     "@type": "Article",
     "headline": `${title} ${currentYear}`,
     "description": description,
-    "image": `https://www.etfpruvodce.cz/og-${categorySlug}.jpg`,
-    "author": { "@type": "Person", "name": "Tomáš Kostrhoun", "url": "https://www.etfpruvodce.cz/o-nas" },
-    "publisher": { "@type": "Organization", "name": "ETF průvodce.cz", "logo": { "@type": "ImageObject", "url": "https://www.etfpruvodce.cz/logo.png" } },
+    "image": `https://etfpruvodce.cz/og-${categorySlug}.jpg`,
+    "author": { "@type": "Person", "name": "Tomáš Kostrhoun", "url": "https://etfpruvodce.cz/o-nas" },
+    "publisher": { "@type": "Organization", "name": "ETF průvodce.cz", "logo": { "@type": "ImageObject", "url": "https://etfpruvodce.cz/logo.png" } },
     "datePublished": `${currentYear}-01-01`,
     "dateModified": lastModified,
-    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://www.etfpruvodce.cz/nejlepsi-etf/${categorySlug}` },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://etfpruvodce.cz/nejlepsi-etf/${categorySlug}` },
     "about": etfs.slice(0, 5).map(etf => ({
       "@type": "FinancialProduct",
       "name": etf.name,

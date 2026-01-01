@@ -18,19 +18,19 @@ const MonteCarloContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://www.etfpruvodce.cz"
+        "item": "https://etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://www.etfpruvodce.cz/kalkulacky"
+        "item": "https://etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Monte Carlo simulátor",
-        "item": "https://www.etfpruvodce.cz/kalkulacky/monte-carlo-simulator"
+        "item": "https://etfpruvodce.cz/kalkulacky/monte-carlo-simulator"
       }
     ]
   };

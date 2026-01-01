@@ -18,19 +18,19 @@ const MortgageCalculatorContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://www.etfpruvodce.cz"
+        "item": "https://etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://www.etfpruvodce.cz/kalkulacky"
+        "item": "https://etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Hypoteční kalkulačka 2026",
-        "item": "https://www.etfpruvodce.cz/kalkulacky/hypotecni-kalkulacka"
+        "item": "https://etfpruvodce.cz/kalkulacky/hypotecni-kalkulacka"
       }
     ]
   };
@@ -40,7 +40,7 @@ const MortgageCalculatorContent: React.FC = () => {
     "@type": "WebApplication",
     "name": "Hypoteční kalkulačka 2026 - Výpočet hypotéky",
     "description": "Bezplatná hypoteční kalkulačka pro výpočet měsíčních splátek hypotéky. Spočítejte si celkové náklady na bydlení, vlastní kapitál a úročení.",
-    "url": "https://www.etfpruvodce.cz/kalkulacky/hypotecni-kalkulacka",
+    "url": "https://etfpruvodce.cz/kalkulacky/hypotecni-kalkulacka",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web Browser",
     "offers": {

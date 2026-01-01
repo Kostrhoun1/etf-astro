@@ -17,19 +17,19 @@ const FIRECalculatorContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://www.etfpruvodce.cz"
+        "item": "https://etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://www.etfpruvodce.cz/kalkulacky"
+        "item": "https://etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "FIRE kalkulačka",
-        "item": "https://www.etfpruvodce.cz/kalkulacky/fire-kalkulacka"
+        "item": "https://etfpruvodce.cz/kalkulacky/fire-kalkulacka"
       }
     ]
   };
@@ -39,7 +39,7 @@ const FIRECalculatorContent: React.FC = () => {
     "@type": "WebApplication",
     "name": "FIRE kalkulačka - Kdy dosáhnu finanční nezávislosti?",
     "description": "Spočítejte si kdy dosáhnete FIRE podle 4% pravidla. Trinity Study analýza s pravděpodobnostními scénáři a dlouhodobé plánování předčasného důchodu.",
-    "url": "https://www.etfpruvodce.cz/kalkulacky/fire-kalkulacka",
+    "url": "https://etfpruvodce.cz/kalkulacky/fire-kalkulacka",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web Browser",
     "offers": {
