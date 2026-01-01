@@ -18,19 +18,19 @@ const NetSalaryCalculatorContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://www.etfpruvodce.cz"
+        "item": "https://etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://www.etfpruvodce.cz/kalkulacky"
+        "item": "https://etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Kalkulačka čisté mzdy 2026",
-        "item": "https://www.etfpruvodce.cz/kalkulacky/cisty-plat-2026"
+        "item": "https://etfpruvodce.cz/kalkulacky/cisty-plat-2026"
       }
     ]
   };
@@ -40,7 +40,7 @@ const NetSalaryCalculatorContent: React.FC = () => {
     "@type": "WebApplication",
     "name": "Kalkulačka čisté mzdy 2026 - Výpočet čisté mzdy ČR",
     "description": "Bezplatná kalkulačka čisté mzdy podle aktuální české legislativy 2026. Výpočet pojistného, daní, slev na dani pro zaměstnance i důchodce.",
-    "url": "https://www.etfpruvodce.cz/kalkulacky/cisty-plat-2026",
+    "url": "https://etfpruvodce.cz/kalkulacky/cisty-plat-2026",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Web Browser",
     "offers": {

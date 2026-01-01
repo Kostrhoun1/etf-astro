@@ -24,8 +24,8 @@ export const OrganizationStructuredData: React.FC = () => {
     "@type": "FinancialService",
     "name": "ETF průvodce.cz",
     "description": "Komplexní průvodce ETF fondy pro české investory",
-    "url": "https://www.etfpruvodce.cz",
-    "logo": "https://www.etfpruvodce.cz/og-image.jpg",
+    "url": "https://etfpruvodce.cz",
+    "logo": "https://etfpruvodce.cz/og-image.jpg",
     "foundingDate": "2024",
     "areaServed": {
       "@type": "Country",
@@ -39,7 +39,7 @@ export const OrganizationStructuredData: React.FC = () => {
       "email": "info@etfpruvodce.cz"
     },
     "sameAs": [
-      "https://www.etfpruvodce.cz"
+      "https://etfpruvodce.cz"
     ]
   };
 

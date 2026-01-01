@@ -21,7 +21,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   description,
   canonical,
   keywords,
-  ogImage = 'https://www.etfpruvodce.cz/og-image.jpg',
+  ogImage = 'https://etfpruvodce.cz/og-image.jpg',
   ogType = 'website',
   publishedTime,
   modifiedTime,
@@ -71,7 +71,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     setMetaTag('og:image', ogImage, true);
     setMetaTag('og:type', ogType, true);
     // Always use www variant for canonical URL
-    const currentUrl = canonical || `https://www.etfpruvodce.cz${window.location.pathname}`;
+    const currentUrl = canonical || `https://etfpruvodce.cz${window.location.pathname}`;
     setMetaTag('og:url', currentUrl, true);
     setMetaTag('og:site_name', 'ETF průvodce.cz', true);
 

@@ -18,19 +18,19 @@ const BacktestContent: React.FC = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Domů",
-        "item": "https://www.etfpruvodce.cz"
+        "item": "https://etfpruvodce.cz"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Kalkulačky",
-        "item": "https://www.etfpruvodce.cz/kalkulacky"
+        "item": "https://etfpruvodce.cz/kalkulacky"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Backtest portfolia ETF 2026",
-        "item": "https://www.etfpruvodce.cz/kalkulacky/backtest-portfolia"
+        "item": "https://etfpruvodce.cz/kalkulacky/backtest-portfolia"
       }
     ]
   };

@@ -8,10 +8,10 @@
       "has": [
         {
           "type": "host",
-          "value": "etfpruvodce.cz"
+          "value": "www.etfpruvodce.cz"
         }
       ],
-      "destination": "https://www.etfpruvodce.cz/:path*",
+      "destination": "https://etfpruvodce.cz/:path*",
       "permanent": true
     }
   ]

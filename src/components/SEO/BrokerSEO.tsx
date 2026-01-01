@@ -30,11 +30,11 @@ const generateBrokerSchema = (brokerName?: string) => {
       "author": {
         "@type": "Organization",
         "name": "ETF průvodce.cz",
-        "url": "https://www.etfpruvodce.cz"
+        "url": "https://etfpruvodce.cz"
       },
       "itemReviewed": {
         "@type": "Service",
-        "@id": `https://www.etfpruvodce.cz/${brokerName.toLowerCase().replace(/\s+/g, '-').replace('interactive-brokers', 'interactive-brokers').replace('fio-e-broker', 'fio-ebroker').replace('trading-212', 'trading212')}-recenze`,
+        "@id": `https://etfpruvodce.cz/${brokerName.toLowerCase().replace(/\s+/g, '-').replace('interactive-brokers', 'interactive-brokers').replace('fio-e-broker', 'fio-ebroker').replace('trading-212', 'trading212')}-recenze`,
         "name": brokerName,
         "category": "Financial Service",
         "serviceType": "Investment Broker",
@@ -52,7 +52,7 @@ const generateBrokerSchema = (brokerName?: string) => {
       "publisher": {
         "@type": "Organization",
         "name": "ETF průvodce.cz",
-        "url": "https://www.etfpruvodce.cz"
+        "url": "https://etfpruvodce.cz"
       }
     };
   }
@@ -63,7 +63,7 @@ const generateBrokerSchema = (brokerName?: string) => {
     "@type": "ItemList",
     "name": `Srovnání brokerů pro ETF ${currentYear}`,
     "description": "Komplexní srovnání nejlepších brokerů pro investování do ETF fondů v České republice",
-    "url": "https://www.etfpruvodce.cz/kde-koupit-etf",
+    "url": "https://etfpruvodce.cz/kde-koupit-etf",
     "numberOfItems": 5,
     "itemListElement": [
       {
@@ -71,35 +71,35 @@ const generateBrokerSchema = (brokerName?: string) => {
         "position": 1,
         "name": "DEGIRO",
         "description": "Populární broker s nízkými poplatky a širokou nabídkou ETF",
-        "url": "https://www.etfpruvodce.cz/degiro-recenze"
+        "url": "https://etfpruvodce.cz/degiro-recenze"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "XTB",
         "description": "Polský broker s výbornou českou podporou a vzdělávacími materiály",
-        "url": "https://www.etfpruvodce.cz/xtb-recenze"
+        "url": "https://etfpruvodce.cz/xtb-recenze"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Trading 212",
         "description": "Zcela bezpoplatkový broker s moderní aplikací a frakčním investováním",
-        "url": "https://www.etfpruvodce.cz/trading212-recenze"
+        "url": "https://etfpruvodce.cz/trading212-recenze"
       },
       {
         "@type": "ListItem",
         "position": 4,
         "name": "Interactive Brokers",
         "description": "Globální broker s nejširší nabídkou trhů a pokročilými nástroji",
-        "url": "https://www.etfpruvodce.cz/interactive-brokers-recenze"
+        "url": "https://etfpruvodce.cz/interactive-brokers-recenze"
       },
       {
         "@type": "ListItem",
         "position": 5,
         "name": "Fio e-Broker",
         "description": "Český broker s lokální podporou a optimálním zdaněním českých dividend",
-        "url": "https://www.etfpruvodce.cz/fio-ebroker-recenze"
+        "url": "https://etfpruvodce.cz/fio-ebroker-recenze"
       }
     ]
   };
@@ -160,13 +160,13 @@ const generateBreadcrumbSchema = (brokerName?: string) => {
       "@type": "ListItem",
       "position": 1,
       "name": "Domů",
-      "item": "https://www.etfpruvodce.cz"
+      "item": "https://etfpruvodce.cz"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Kde koupit ETF",
-      "item": "https://www.etfpruvodce.cz/kde-koupit-etf"
+      "item": "https://etfpruvodce.cz/kde-koupit-etf"
     }
   ];
 
@@ -175,7 +175,7 @@ const generateBreadcrumbSchema = (brokerName?: string) => {
       "@type": "ListItem",
       "position": 3,
       "name": `${brokerName} recenze`,
-      "item": `https://www.etfpruvodce.cz/${brokerName.toLowerCase().replace(/\s+/g, '-').replace('interactive-brokers', 'interactive-brokers').replace('fio-e-broker', 'fio-ebroker').replace('trading-212', 'trading212')}-recenze`
+      "item": `https://etfpruvodce.cz/${brokerName.toLowerCase().replace(/\s+/g, '-').replace('interactive-brokers', 'interactive-brokers').replace('fio-e-broker', 'fio-ebroker').replace('trading-212', 'trading212')}-recenze`
     });
   }
 

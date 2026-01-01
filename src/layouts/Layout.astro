@@ -36,7 +36,7 @@ const finalOgDescription = ogDescription || description;
 const finalTwitterTitle = twitterTitle || title;
 const finalTwitterDescription = twitterDescription || description;
 
-const siteUrl = 'https://www.etfpruvodce.cz';
+const siteUrl = 'https://etfpruvodce.cz';
 const fullCanonical = canonical ? `${siteUrl}${canonical}` : siteUrl + Astro.url.pathname;
 const fullOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
 

@@ -13,10 +13,19 @@ const __dirname = path.dirname(__filename);
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://www.etfpruvodce.cz',
+  site: 'https://etfpruvodce.cz',
   output: 'static',
+  trailingSlash: 'never',
   adapter: vercel(),
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) => {
+        // Vyloučit ETF detail stránky ze sitemap - pouze hlavní obsahové stránky
+        return !page.includes('/etf/');
+      }
+    })
+  ],
 
   vite: {
     plugins: [tailwindcss()],
