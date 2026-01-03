@@ -33,7 +33,7 @@ const ETFComparisonContainer: React.FC<ETFComparisonContainerProps> = ({
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Use SSR data for initial render, then load full data in background
-  const { etfs, categories, maxTerFromData, totalETFCount, isLoading, isLoadingComplete, lastUpdated } = useETFSearchData({
+  const { etfs, categories, maxTerFromData, totalETFCount, isLoading, isLoadingComplete, isFullDataLoaded, lastUpdated } = useETFSearchData({
     initialETFs,
     initialTotalCount: totalCount,
   });

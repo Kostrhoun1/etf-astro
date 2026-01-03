@@ -49,6 +49,9 @@ export const useETFSearchData = (options?: UseETFSearchDataOptions) => {
   // Show loading only if we don't have initial data
   const isLoading = !initialETFs?.length && isLoadingFromHook;
 
+  // True when all data is loaded (not just initial SSR data)
+  const isFullDataLoaded = hasLoadedFull;
+
   // Categories are now static - no need to extract from data
 
   // Load full data in background

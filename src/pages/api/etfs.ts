@@ -53,11 +53,13 @@ const ETF_SELECT_FIELDS = `
   is_leveraged
 `;
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ request }) => {
   try {
+    const url = new URL(request.url);
     const limit = url.searchParams.get('limit');
     const offset = url.searchParams.get('offset');
     const isins = url.searchParams.get('isins');
+    const category = url.searchParams.get('category');
     const countOnly = url.searchParams.get('count') === 'true';
 
     // Count only request
@@ -106,21 +108,23 @@ export const GET: APIRoute = async ({ url }) => {
       });
     }
 
-    // Paginated fetch
+    // Paginated fetch - always use range() for proper pagination
     let query = supabase
       .from('etf_funds')
       .select(ETF_SELECT_FIELDS)
-      .order('fund_size_numeric', { ascending: false });
+      .order('fund_size_numeric', { ascending: false, nullsFirst: false });
 
-    if (limit) {
-      query = query.limit(parseInt(limit));
+    // Filter by category if specified
+    if (category) {
+      query = query.eq('category', category);
     }
 
-    if (offset) {
-      const off = parseInt(offset);
-      const lim = limit ? parseInt(limit) : 1000;
-      query = query.range(off, off + lim - 1);
-    }
+    // Parse pagination parameters
+    const off = offset ? parseInt(offset) : 0;
+    const lim = limit ? parseInt(limit) : 1000;
+
+    // Use range() for pagination (supports up to the Supabase limit per request)
+    query = query.range(off, off + lim - 1);
 
     const { data, error } = await query;
 

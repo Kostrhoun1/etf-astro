@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { useToast } from '../use-toast';
+import { supabase } from '../../lib/supabase';
 import type { ETFListItem } from '../../types/etf';
 
 export const useETFFetch = () => {
@@ -22,9 +23,9 @@ export const useETFFetch = () => {
     setIsLoading(true);
 
     try {
-      console.log('Starting to fetch ETFs from API...');
+      console.log('Starting to fetch ETFs from database...');
 
-      // If no limit specified, fetch all records in batches
+      // If no limit specified, fetch all records in batches to avoid Supabase limits
       if (!limit) {
         console.log('Fetching all ETFs without limit...');
         let allData: any[] = [];
@@ -34,24 +35,72 @@ export const useETFFetch = () => {
         const batchSize = 1000;
 
         while (hasMore) {
-          const response = await fetch(`/api/etfs?offset=${offset}&limit=${batchSize}`);
-
-          if (!response.ok) {
-            throw new Error(`Failed to fetch ETFs: ${response.statusText}`);
-          }
-
-          const { data, error } = await response.json();
+          const { data, error } = await supabase
+            .from('etf_funds')
+            .select(`
+              isin,
+              name,
+              fund_provider,
+              category,
+              ter_numeric,
+              return_1m,
+              return_3m,
+              return_6m,
+              return_1y,
+              return_3y,
+              return_5y,
+              return_ytd,
+              return_1m_czk,
+              return_3m_czk,
+              return_6m_czk,
+              return_1y_czk,
+              return_3y_czk,
+              return_5y_czk,
+              return_ytd_czk,
+              return_1m_usd,
+              return_3m_usd,
+              return_6m_usd,
+              return_1y_usd,
+              return_3y_usd,
+              return_5y_usd,
+              return_ytd_usd,
+              fund_size_numeric,
+              degiro_free,
+              primary_ticker,
+              distribution_policy,
+              index_name,
+              fund_currency,
+              replication,
+              region,
+              current_dividend_yield_numeric,
+              exchange_1_ticker,
+              exchange_2_ticker,
+              exchange_3_ticker,
+              exchange_4_ticker,
+              exchange_5_ticker,
+              exchange_6_ticker,
+              exchange_7_ticker,
+              exchange_8_ticker,
+              exchange_9_ticker,
+              exchange_10_ticker,
+              rating,
+              rating_score,
+              updated_at,
+              is_leveraged
+            `)
+            .order('fund_size_numeric', { ascending: false, nullsFirst: false })
+            .range(offset, offset + batchSize - 1);
 
           if (error) {
             console.error('Error fetching ETFs batch:', error);
-            throw new Error(`Failed to fetch ETFs: ${error}`);
+            throw new Error(`Failed to fetch ETFs: ${error.message}`);
           }
 
           if (data && data.length > 0) {
             allData = [...allData, ...data];
 
             // Track the latest update date
-            data.forEach((item: any) => {
+            data.forEach(item => {
               if (item.updated_at) {
                 const updateDate = new Date(item.updated_at);
                 if (!latestUpdate || updateDate > latestUpdate) {
@@ -73,28 +122,79 @@ export const useETFFetch = () => {
         }
 
         setLastUpdated(latestUpdate);
-        console.log('Successfully loaded', allData.length, 'ETFs from API (all records)');
+        console.log('Successfully loaded', allData.length, 'ETFs from database (all records)');
         console.log('Latest update date:', latestUpdate);
         return allData || [];
       } else {
-        // Fetch with limit
-        const response = await fetch(`/api/etfs?limit=${limit}`);
+        // Original logic for when limit is specified
+        let query = supabase
+          .from('etf_funds')
+          .select(`
+            isin,
+            name,
+            fund_provider,
+            category,
+            ter_numeric,
+            return_1m,
+            return_3m,
+            return_6m,
+            return_1y,
+            return_3y,
+            return_5y,
+            return_ytd,
+            return_1m_czk,
+            return_3m_czk,
+            return_6m_czk,
+            return_1y_czk,
+            return_3y_czk,
+            return_5y_czk,
+            return_ytd_czk,
+            return_1m_usd,
+            return_3m_usd,
+            return_6m_usd,
+            return_1y_usd,
+            return_3y_usd,
+            return_5y_usd,
+            return_ytd_usd,
+            fund_size_numeric,
+            degiro_free,
+            primary_ticker,
+            distribution_policy,
+            index_name,
+            fund_currency,
+            replication,
+            region,
+            current_dividend_yield_numeric,
+            exchange_1_ticker,
+            exchange_2_ticker,
+            exchange_3_ticker,
+            exchange_4_ticker,
+            exchange_5_ticker,
+            exchange_6_ticker,
+            exchange_7_ticker,
+            exchange_8_ticker,
+            exchange_9_ticker,
+            exchange_10_ticker,
+            rating,
+            rating_score,
+            updated_at,
+            is_leveraged
+          `)
+          .order('fund_size_numeric', { ascending: false, nullsFirst: false })
+          .limit(limit);
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ETFs: ${response.statusText}`);
-        }
-
-        const { data, error } = await response.json();
+        const { data, error } = await query;
 
         if (error) {
           console.error('Error fetching ETFs:', error);
-          throw new Error(`Failed to fetch ETFs: ${error}`);
+          throw new Error(`Failed to fetch ETFs: ${error.message}`);
         }
 
         // Track the latest update date
         let latestUpdate: Date | null = null;
         if (data) {
-          data.forEach((item: any) => {
+          data.forEach(item => {
+            // Use created_at since updated_at might not be available in all queries
             const updateDate = new Date(item.updated_at || '');
             if (updateDate && !isNaN(updateDate.getTime())) {
               if (!latestUpdate || updateDate > latestUpdate) {
@@ -105,7 +205,7 @@ export const useETFFetch = () => {
         }
 
         setLastUpdated(latestUpdate);
-        console.log('Successfully loaded', data?.length || 0, 'ETFs from API');
+        console.log('Successfully loaded', data?.length || 0, 'ETFs from database');
         console.log('Latest update date:', latestUpdate);
         return data || [];
       }
