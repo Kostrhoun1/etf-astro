@@ -206,6 +206,100 @@ export async function getInitialETFs(limit: number = 50): Promise<ETFBasicInfo[]
 }
 
 /**
+ * Calculate statistics from ETF array for hero sections
+ */
+export interface ETFStats {
+  largestFund: { name: string; size: string; sizeRaw: number } | null;
+  lowestTER: { name: string; ter: string; terRaw: number } | null;
+  highestReturn1Y: { name: string; return: string; returnRaw: number } | null;
+  avgTER: string;
+  avgReturn1Y: string;
+  totalFunds: number;
+  terRange: string;
+}
+
+export function calculateETFStats(etfs: ETFBasicInfo[]): ETFStats {
+  if (!etfs || etfs.length === 0) {
+    return {
+      largestFund: null,
+      lowestTER: null,
+      highestReturn1Y: null,
+      avgTER: 'N/A',
+      avgReturn1Y: 'N/A',
+      totalFunds: 0,
+      terRange: 'N/A',
+    };
+  }
+
+  // Find largest fund by size
+  const etfsWithSize = etfs.filter(e => e.fund_size_numeric != null);
+  const largestBySize = etfsWithSize.length > 0
+    ? etfsWithSize.reduce((max, e) => (e.fund_size_numeric! > max.fund_size_numeric! ? e : max))
+    : null;
+
+  // Find lowest TER
+  const etfsWithTER = etfs.filter(e => e.ter_numeric != null && e.ter_numeric > 0);
+  const lowestByTER = etfsWithTER.length > 0
+    ? etfsWithTER.reduce((min, e) => (e.ter_numeric! < min.ter_numeric! ? e : min))
+    : null;
+
+  // Find highest TER for range
+  const highestTER = etfsWithTER.length > 0
+    ? etfsWithTER.reduce((max, e) => (e.ter_numeric! > max.ter_numeric! ? e : max))
+    : null;
+
+  // Find highest 1Y return
+  const etfsWithReturn = etfs.filter(e => e.return_1y != null);
+  const highestByReturn = etfsWithReturn.length > 0
+    ? etfsWithReturn.reduce((max, e) => (e.return_1y! > max.return_1y! ? e : max))
+    : null;
+
+  // Calculate averages
+  const avgTER = etfsWithTER.length > 0
+    ? (etfsWithTER.reduce((sum, e) => sum + e.ter_numeric!, 0) / etfsWithTER.length).toFixed(2)
+    : 'N/A';
+
+  const avgReturn1Y = etfsWithReturn.length > 0
+    ? (etfsWithReturn.reduce((sum, e) => sum + e.return_1y!, 0) / etfsWithReturn.length).toFixed(1)
+    : 'N/A';
+
+  // Format fund size (in billions or millions)
+  const formatSize = (size: number): string => {
+    if (size >= 1000) {
+      return `${(size / 1000).toFixed(1)}B`;
+    }
+    return `${size.toFixed(0)}M`;
+  };
+
+  // Format TER range
+  const terRange = lowestByTER && highestTER
+    ? `${lowestByTER.ter_numeric!.toFixed(2)}% - ${highestTER.ter_numeric!.toFixed(2)}%`
+    : 'N/A';
+
+  return {
+    largestFund: largestBySize ? {
+      name: largestBySize.name.split(' UCITS')[0].split(' ETF')[0], // Shorten name
+      size: formatSize(largestBySize.fund_size_numeric!),
+      sizeRaw: largestBySize.fund_size_numeric!,
+    } : null,
+    lowestTER: lowestByTER ? {
+      name: lowestByTER.name.split(' UCITS')[0].split(' ETF')[0],
+      ter: `${lowestByTER.ter_numeric!.toFixed(2)}%`,
+      terRaw: lowestByTER.ter_numeric!,
+    } : null,
+    highestReturn1Y: highestByReturn ? {
+      name: highestByReturn.name.split(' UCITS')[0].split(' ETF')[0],
+      return: `${highestByReturn.return_1y! > 0 ? '+' : ''}${highestByReturn.return_1y!.toFixed(1)}%`,
+      returnRaw: highestByReturn.return_1y!,
+    } : null,
+    avgTER: avgTER !== 'N/A' ? `${avgTER}%` : avgTER,
+    avgReturn1Y: avgReturn1Y !== 'N/A' ? `${parseFloat(avgReturn1Y) > 0 ? '+' : ''}${avgReturn1Y}%` : avgReturn1Y,
+    totalFunds: etfs.length,
+    terRange,
+  };
+}
+
+/**
  * Get total ETF count
  */
 export async function getTotalETFCount(): Promise<number> {

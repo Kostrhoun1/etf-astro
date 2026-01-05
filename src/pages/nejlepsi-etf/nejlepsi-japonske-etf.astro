@@ -90,7 +90,7 @@ const faqSchema = {
       "name": `Jaké jsou nejlepší japonské ETF v roce ${currentYear}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Nejlepší japonské ETF jsou: iShares Core MSCI Japan IMI UCITS ETF (JPNA, IE00B4L5YX21) s TER 0,12% a velikostí 5,7 mld EUR, Amundi Core MSCI Japan UCITS ETF (AMJP, LU1781541252) s TER 0,12% a velikostí 4,2 mld EUR, a UBS MSCI Japan Climate Paris Aligned UCITS ETF (UBSJ, IE000JHYO4T6) s TER 0,15%."
+        "text": "Japonské ETF nabízejí expozici k třetí největší ekonomice světa s HDP přes 4 biliony USD a více než 230 společnostmi v MSCI Japan indexu. Vybírejte podle nízkého TER (ideálně pod 0,15%), velikosti fondu a typu indexu (MSCI Japan vs Nikkei 225). Aktuální TOP 3 doporučení najdete v tabulce na této stránce."
       }
     },
     {
@@ -114,7 +114,7 @@ const faqSchema = {
       "name": "Jaké jsou poplatky za japonské ETF?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "TER poplatky u nejlepších japonských ETF jsou velmi konkurenceschopné. iShares Core MSCI Japan IMI ETF (JPNA, IE00B4L5YX21) i Amundi Core MSCI Japan ETF (AMJP, LU1781541252) mají TER pouze 0,12%, zatímco UBS MSCI Japan Climate ETF (UBSJ, IE000JHYO4T6) má TER 0,15%."
+        "text": "TER poplatky u japonských ETF jsou velmi konkurenceschopné a pohybují se typicky od 0,12% do 0,25% ročně. Japonské ETF patří mezi nejlevnější regionální ETF díky velké konkurenci mezi poskytovateli. Aktuální nejnižší TER najdete v tabulce TOP 10 na této stránce."
       }
     },
     {
@@ -122,7 +122,7 @@ const faqSchema = {
       "name": "Jaká jsou rizika japonských ETF?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Hlavní rizika zahrnují měnové riziko při změnách kurzu JPY/EUR, demografické výzvy stárnoucí populace a ekonomickou stagnaci. Závislost na exportu činí japonské společnosti citlivé na globální růst. Naše TOP 3 ETF tato rizika diverzifikují investicí do širokého spektra japonských firem."
+        "text": "Hlavní rizika zahrnují měnové riziko při změnách kurzu JPY/EUR, demografické výzvy stárnoucí populace a ekonomickou stagnaci. Závislost na exportu činí japonské společnosti citlivé na globální růst. Široce diverzifikované ETF sledující MSCI Japan tato rizika zmírňují investicí do spektra japonských firem."
       }
     },
     {
@@ -130,7 +130,7 @@ const faqSchema = {
       "name": "Jak vybrat mezi různými japonskými ETF?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Klíčové faktory jsou sledovaný index (MSCI Japan IMI vs standard), velikost fondu a TER poplatky. Pro širokou expozici doporučujeme iShares Core MSCI Japan IMI (JPNA, IE00B4L5YX21) s nejširším pokrytiem 1000+ společností. Pro ESG investing volte UBS MSCI Japan Climate (UBSJ, IE000JHYO4T6)."
+        "text": "Klíčové faktory jsou sledovaný index (MSCI Japan IMI vs standard vs Nikkei 225), velikost fondu a TER poplatky. MSCI Japan IMI nabízí nejširší pokrytí 1000+ společností včetně small-cap. Pro ESG investing existují Climate Paris Aligned varianty. Aktuální srovnání najdete v tabulkách na této stránce."
       }
     }
   ]
@@ -375,10 +375,10 @@ const relatedLinks = [
             </svg>
           </summary>
           <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
-            Nejlepší japonské ETF jsou: <strong>iShares Core MSCI Japan IMI UCITS ETF</strong> (JPNA, IE00B4L5YX21)
-            s TER 0,12% a velikostí 5,7 mld EUR, <strong>Amundi Core MSCI Japan UCITS ETF</strong> (AMJP, LU1781541252)
-            s TER 0,12% a velikostí 4,2 mld EUR, a <strong>UBS MSCI Japan Climate Paris Aligned UCITS ETF</strong>
-            (UBSJ, IE000JHYO4T6) s TER 0,15%.
+            Japonské ETF nabízejí expozici k <strong>třetí největší ekonomice světa</strong> s HDP přes 4 biliony USD
+            a více než 230 společnostmi v MSCI Japan indexu. Vybírejte podle nízkého TER (ideálně pod 0,15%),
+            velikosti fondu a typu indexu (MSCI Japan vs Nikkei 225). <strong>Aktuální TOP 3 doporučení</strong>
+            najdete v tabulce výše na této stránce.
           </div>
         </details>
 
@@ -418,9 +418,9 @@ const relatedLinks = [
             </svg>
           </summary>
           <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
-            <strong>TER poplatky</strong> u nejlepších japonských ETF jsou velmi konkurenceschopné.
-            <strong>iShares Core MSCI Japan IMI ETF</strong> (JPNA, IE00B4L5YX21) i <strong>Amundi Core MSCI Japan ETF</strong> (AMJP, LU1781541252)
-            mají TER pouze 0,12%, zatímco <strong>UBS MSCI Japan Climate ETF</strong> (UBSJ, IE000JHYO4T6) má TER 0,15%.
+            <strong>TER poplatky</strong> u japonských ETF jsou velmi konkurenceschopné a pohybují se typicky
+            od 0,12% do 0,25% ročně. Japonské ETF patří mezi nejlevnější regionální ETF díky velké konkurenci
+            mezi poskytovateli. <strong>Aktuální nejnižší TER</strong> najdete v tabulce TOP 10 na této stránce.
           </div>
         </details>
 
@@ -435,7 +435,7 @@ const relatedLinks = [
             Hlavní rizika zahrnují <strong>měnové riziko</strong> při změnách kurzu JPY/EUR,
             <strong>demografické výzvy</strong> stárnoucí populace a <strong>ekonomickou stagnaci</strong>.
             <strong>Závislost na exportu</strong> činí japonské společnosti citlivé na globální růst.
-            Naše TOP 3 ETF tato rizika diverzifikují investicí do širokého spektra japonských firem.
+            Široce diverzifikované ETF sledující MSCI Japan tato rizika zmírňují investicí do spektra japonských firem.
           </div>
         </details>
 
@@ -447,9 +447,10 @@ const relatedLinks = [
             </svg>
           </summary>
           <div class="px-6 py-4 text-gray-700 leading-relaxed bg-white rounded-b-lg">
-            Klíčové faktory jsou <strong>sledovaný index</strong> (MSCI Japan IMI vs standard), <strong>velikost fondu</strong> a <strong>TER poplatky</strong>.
-            Pro širokou expozici doporučujeme <strong>iShares Core MSCI Japan IMI</strong> (JPNA, IE00B4L5YX21)
-            s nejširším pokrytím 1000+ společností. Pro ESG investing volte <strong>UBS MSCI Japan Climate</strong> (UBSJ, IE000JHYO4T6).
+            Klíčové faktory jsou <strong>sledovaný index</strong> (MSCI Japan IMI vs standard vs Nikkei 225),
+            <strong>velikost fondu</strong> a <strong>TER poplatky</strong>. MSCI Japan IMI nabízí nejširší
+            pokrytí 1000+ společností včetně small-cap. Pro ESG investing existují Climate Paris Aligned varianty.
+            <strong>Aktuální srovnání</strong> najdete v tabulkách na této stránce.
           </div>
         </details>
       </div>
