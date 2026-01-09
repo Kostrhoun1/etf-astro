@@ -1,0 +1,58 @@
+---
+interface Props {
+  metric: string; // Název metriky (např. "TER", "Fund Size")
+  value: number | string;
+  unit?: string; // Jednotka (%, EUR, atd.)
+  interpretation: string; // Lidské vysvětlení
+  comparison?: {
+    label: string;
+    value: number | string;
+  };
+  type?: 'positive' | 'neutral' | 'negative';
+}
+
+const {
+  metric,
+  value,
+  unit = '',
+  interpretation,
+  comparison,
+  type = 'neutral'
+} = Astro.props;
+
+const colorMap = {
+  positive: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-900', icon: '✅' },
+  neutral: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900', icon: '📊' },
+  negative: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-900', icon: '⚠️' }
+};
+
+const colors = colorMap[type];
+---
+
+<div class="{colors.bg} {colors.border} border-l-4 rounded-lg p-4 my-4">
+  <div class="flex items-start gap-3">
+    <span class="text-2xl">{colors.icon}</span>
+    <div class="flex-1">
+      <div class="font-bold {colors.text} mb-1">{metric}</div>
+      <div class="text-2xl font-bold text-gray-900 mb-2">
+        {value}{unit}
+      </div>
+      <p class="text-sm text-gray-700 leading-relaxed mb-3">
+        {interpretation}
+      </p>
+
+      {comparison && (
+        <div class="flex items-center gap-4 text-sm">
+          <div class="bg-white rounded px-3 py-2 border border-gray-200">
+            <span class="text-gray-600">Toto ETF: </span>
+            <strong class="text-gray-900">{value}{unit}</strong>
+          </div>
+          <div class="bg-white rounded px-3 py-2 border border-gray-200">
+            <span class="text-gray-600">{comparison.label}: </span>
+            <strong class="text-gray-900">{comparison.value}{unit}</strong>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</div>

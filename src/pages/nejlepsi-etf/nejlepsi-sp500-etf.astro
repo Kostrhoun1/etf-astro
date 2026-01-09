@@ -5,6 +5,11 @@ import Top3ETF from '../../components/etf/Top3ETF.astro';
 import Top10Sections from '../../components/etf/Top10Sections.astro';
 import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
 
+// 🇨🇿 Czech-context components for Gemini Strategy
+import CategorySpecificInsights from '../../components/czech-context/CategorySpecificInsights.astro';
+import CategoryBrokerComparison from '../../components/czech-context/CategoryBrokerComparison.astro';
+import CategoryTaxImpact from '../../components/czech-context/CategoryTaxImpact.astro';
+
 const config = categoryConfigs['nejlepsi-sp500-etf'];
 const etfs = await getTopETFsForCategory(config);
 const currentYear = new Date().getFullYear();
@@ -289,6 +294,12 @@ const faqItems = [
 
   <!-- Top 10 Sections - by TER, AUM, Performance -->
   <Top10Sections etfs={etfs} currency="EUR" categoryName="S&P 500" />
+
+  <!-- 🇨🇿 GEMINI STRATEGY: Czech-specific context components -->
+  <!-- These add unique Czech perspective that templated content doesn't have -->
+  <CategorySpecificInsights categoryKey="sp500" categoryName="S&P 500" />
+  <CategoryBrokerComparison categoryKey="sp500" categoryName="S&P 500" topETFs={etfs.slice(0, 3)} />
+  <CategoryTaxImpact categoryKey="sp500" categoryName="S&P 500" />
 
   <!-- SECTION 0: Co je S&P 500 Index? -->
   <section id="co-je-sp500" class="py-16 bg-gradient-to-br from-blue-50 via-violet-50 to-white">

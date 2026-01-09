@@ -1,0 +1,366 @@
+---
+// Unikátní expertní analýzy pro každou kategorii ETF z pohledu českých investorů
+// Gemini Strategy: Přidává specifický český kontext, který templated content nemá
+
+interface Props {
+  categoryKey: string; // např. 'sp500', 'nasdaq', 'msci-world'
+  categoryName: string; // např. 'S&P 500', 'NASDAQ 100'
+}
+
+const { categoryKey, categoryName } = Astro.props;
+
+// Definice insights pro každou kategorii
+const insights = {
+  'sp500': {
+    title: 'S&P 500 z pohledu českých investorů',
+    risks: [
+      {
+        emoji: '💱',
+        title: 'Měnové riziko USD/CZK',
+        description: 'S&P 500 je denominován v USD. Pokud CZK posílí vůči USD o 15%, můžete být v mínusu i při růstu indexu o 10%. Historicky USD/CZK kolísá ±10-20% ročně.',
+        severity: 'high'
+      },
+      {
+        emoji: '🇺🇸',
+        title: '100% expozice USA ekonomice',
+        description: 'Žádná geografická diverzifikace. Když USA ekonomika klesá (2008, 2022), nemáte kam utéct. Pro Čechy doporučujeme maximálně 60-70% portfolia v S&P 500.',
+        severity: 'medium'
+      },
+      {
+        emoji: '🎯',
+        title: 'Koncentrace top 10 firem (30%)',
+        description: 'Apple, Microsoft, Amazon, Nvidia a další tech giganti tvoří ~30% indexu. Pokud tech sektor padá, celý S&P 500 trpí.',
+        severity: 'medium'
+      }
+    ],
+    advantages: [
+      {
+        emoji: '📈',
+        title: 'Historicky nejlepší výkonnost',
+        description: '~10% ročně od roku 1957. Lepší než evropské indexy (STOXX 600 ~7%), zlatý standard pasivního investování.'
+      },
+      {
+        emoji: '💰',
+        title: 'Ultra nízké TER (0,05-0,07%)',
+        description: 'CSPX, SPXP, VUAA mají nejnižší poplatky na trhu. Ušetříte tisíce Kč na dlouhodobém horizontu.'
+      },
+      {
+        emoji: '🏛️',
+        title: 'Masivní likvidita',
+        description: 'Největší ETF na světě. Prodáte kdykoliv bez spreadu. Nulové riziko uzavření fondu.'
+      }
+    ],
+    czechSpecific: {
+      emoji: '🇨🇿',
+      title: 'Srovnání s českým PX indexem',
+      points: [
+        'PX index (Praha): ~8% ročně historicky, ale EXTRÉMNĚ koncentrovaný (5 firem = 80%)',
+        'S&P 500: Lepší diverzifikace (500 firem), ale měnové riziko',
+        'Doporučení: 70% S&P 500 + 20% MSCI World + 10% PX (domácí bias)'
+      ]
+    }
+  },
+
+  'nasdaq': {
+    title: 'NASDAQ 100 pro české investory',
+    risks: [
+      {
+        emoji: '💻',
+        title: 'Tech bubble riziko',
+        description: 'NASDAQ je 50%+ technologie (Apple, Microsoft, Nvidia, Tesla). Při tech correction (2022: -33%) padá brutálně. P/E ratio často 25-30.',
+        severity: 'high'
+      },
+      {
+        emoji: '📊',
+        title: 'Vyšší volatilita než S&P 500',
+        description: 'NASDAQ klesá více (-33% v 2022 vs -18% S&P 500), ale roste více (+43% v 2023 vs +26% S&P 500). Pro silné žaludky.',
+        severity: 'high'
+      },
+      {
+        emoji: '💱',
+        title: 'Dvojité měnové riziko',
+        description: 'USD/CZK + koncentrace na growth stocks = extrémní volatilita v CZK. V 2022 ztráta mohla být -40% v CZK.'
+      }
+    ],
+    advantages: [
+      {
+        emoji: '🚀',
+        title: 'Nejvyšší růstový potenciál',
+        description: 'NASDAQ roste rychleji než S&P 500 dlouhodobě díky tech dominanci. Vhodné pro mladé investory (20-40 let).'
+      },
+      {
+        emoji: '🧠',
+        title: 'Expozice k AI revoluci',
+        description: 'Nvidia, Microsoft, Amazon, Google = lídři AI. NASDAQ je "pure play" na technologický pokrok.'
+      },
+      {
+        emoji: '💸',
+        title: 'Akumulační ETF = daňová výhoda',
+        description: 'EQQQ, CNDX neplatí dividendy → žádná průběžná daň v ČR. Prodej po 3 letech = 0% daň.'
+      }
+    ],
+    czechSpecific: {
+      emoji: '🇨🇿',
+      title: 'Pro koho v ČR?',
+      points: [
+        '✅ Mladí investoři (20-40 let) s horizontem 15+ let',
+        '✅ Věříte v tech dominanci (AI, cloud, elektromobily)',
+        '❌ Konzervativní investoři nebo blízko důchodu',
+        'Doporučení: Maximálně 40% portfolia v NASDAQ, zbytek diverzifikovat'
+      ]
+    }
+  },
+
+  'msci-world': {
+    title: 'MSCI World: Globální diverzifikace pro Čechy',
+    risks: [
+      {
+        emoji: '🇺🇸',
+        title: 'Stále 70% USA',
+        description: 'MSCI World není tak diverzifikovaný, jak zní. USA tvoří ~70%, zbytek Evropa+Japonsko. Emerging markets chybí.',
+        severity: 'medium'
+      },
+      {
+        emoji: '📉',
+        title: 'Nižší výkonnost než S&P 500',
+        description: 'MSCI World ~8,5% ročně vs S&P 500 ~10%. Platíte za diverzifikaci nižším výnosem.',
+        severity: 'low'
+      }
+    ],
+    advantages: [
+      {
+        emoji: '🌍',
+        title: 'Geografická diverzifikace',
+        description: '23 zemí developed markets. Když USA klesá, Evropa/Japonsko můžou kompenzovat. Nižší volatilita než S&P 500.'
+      },
+      {
+        emoji: '🛡️',
+        title: 'Hedge proti CZK inflaci',
+        description: 'Expozice k EUR, JPY, GBP, CHF vedle USD. Když CZK slabne, celé portfolio roste v CZK hodnotě.'
+      },
+      {
+        emoji: '😴',
+        title: 'Set-and-forget portfolio',
+        description: '1 ETF = celý vyspělý svět. Ideální pro konzervativní investory, kteří chtějí klid.'
+      }
+    ],
+    czechSpecific: {
+      emoji: '🇨🇿',
+      title: 'MSCI World vs S&P 500 pro Čechy',
+      points: [
+        'S&P 500: Vyšší výnos (~10%), vyšší riziko (100% USA)',
+        'MSCI World: Nižší výnos (~8,5%), nižší volatilita (23 zemí)',
+        'Doporučení: 50% MSCI World + 30% S&P 500 + 20% Emerging Markets',
+        'Pro konzervativní: 80% MSCI World + 20% dluhopisy'
+      ]
+    }
+  },
+
+  'emerging-markets': {
+    title: 'Emerging Markets: Riziko vs příležitost',
+    risks: [
+      {
+        emoji: '🇨🇳',
+        title: 'Čínské riziko (30-40% indexu)',
+        description: 'MSCI EM je 30%+ Čína. Politické riziko (Xi Jinping), regulatory crackdown (Alibaba, Tencent), real-estate krize (Evergrande).',
+        severity: 'high'
+      },
+      {
+        emoji: '📊',
+        title: 'Extrémní volatilita',
+        description: 'EM klesá -50% v krizích (2008, 2022), roste +80% v bull runs. Pouze pro investory s železnými nervy.',
+        severity: 'high'
+      },
+      {
+        emoji: '💱',
+        title: 'Měnové riziko developing countries',
+        description: 'CNY, INR, BRL můžou devalvovat -20-30% za rok. USD/CZK riziko + emerging currencies = double whammy.'
+      }
+    ],
+    advantages: [
+      {
+        emoji: '📈',
+        title: 'Růstový potenciál',
+        description: 'Mladá populace, nízké mzdy, rostoucí střední třída. Asie může předhonit USA GDP za 20 let.'
+      },
+      {
+        emoji: '🔄',
+        title: 'Nízká korelace s USA',
+        description: 'Když S&P 500 padá, EM můžou růst (nebo naopak). Portfolio diversifier.'
+      }
+    ],
+    czechSpecific: {
+      emoji: '🇨🇿',
+      title: 'EM strategie pro české investory',
+      points: [
+        '⚠️ Maximálně 10-20% portfolia',
+        'Dollar-cost averaging povinnost (nevstupovat lump sum)',
+        'Kombinovat s S&P 500 nebo MSCI World (80-90%)',
+        'Timing market: Nakupovat při P/E < 12, prodávat při P/E > 18'
+      ]
+    }
+  },
+
+  'bonds': {
+    title: 'Dluhopisové ETF v prostředí vysokých sazeb',
+    risks: [
+      {
+        emoji: '📉',
+        title: 'Úrokové riziko',
+        description: 'Když ČNB/Fed zvyšuje sazby, ceny dluhopisů klesají. V 2022 dluhopisové ETF -15% ztráta.',
+        severity: 'medium'
+      },
+      {
+        emoji: '🔥',
+        title: 'Inflační eroze',
+        description: 'Výnos 3-4% vs inflace ČR 10% (2022) = reálná ztráta -6%. Dluhopisy nefungují při vysoké inflaci.',
+        severity: 'high'
+      }
+    ],
+    advantages: [
+      {
+        emoji: '🛡️',
+        title: 'Ochrana při recession',
+        description: 'Když akcie padají -30%, dluhopisy rostou +5-10%. Negativní korelace = portfolio stabilizátor.'
+      },
+      {
+        emoji: '💰',
+        title: 'Pravidelný příjem',
+        description: 'Vyplácejí kuponové platby 2-4x ročně. Vhodné pro důchodce s potřebou cash flow.'
+      }
+    ],
+    czechSpecific: {
+      emoji: '🇨🇿',
+      title: 'Dluhopisy pro Čechy v roce 2026',
+      points: [
+        'ČNB sazba: 4,25% (leden 2026) → Stavební spoření/Termínované vklady konkurují ETF',
+        'Fed sazba: ~4,5% → US Treasury ETF výnos ~4-5%',
+        'Doporučení: Přidat dluhopisy až při poklesu sazeb (2026-2027)',
+        'Alokace: 20-40% portfolia podle věku (60 let = 60% bonds)'
+      ]
+    }
+  },
+
+  'gold': {
+    title: 'Zlato jako hedge pro české investory',
+    risks: [
+      {
+        emoji: '📊',
+        title: 'Nulový výnos dlouhodobě',
+        description: 'Zlato neplatí dividendy, neroste organicky. Historický reálný výnos ~1-2% ročně. Pouze store of value.',
+        severity: 'medium'
+      },
+      {
+        emoji: '💱',
+        title: 'Denominace v USD',
+        description: 'Gold ETF jsou v USD. Pokud CZK posílí, zlato v CZK může klesat i při růstu v USD.',
+        severity: 'low'
+      }
+    ],
+    advantages: [
+      {
+        emoji: '🛡️',
+        title: 'Hedge proti CZK devalvaci',
+        description: 'Když CZK slabne (válka na Ukrajině 2022), zlato v CZK roste. Ochrana proti měnové krizi.'
+      },
+      {
+        emoji: '🔥',
+        title: 'Inflační hedge',
+        description: 'Zlato historicky roste při inflaci 5%+. ČR inflace 2022-2023 = zlato performance +15% v CZK.'
+      },
+      {
+        emoji: '😱',
+        title: 'Crisis alpha',
+        description: 'Při systémové krizi (2008, COVID) zlato roste, když akcie padají. Portfolio insurance.'
+      }
+    ],
+    czechSpecific: {
+      emoji: '🇨🇿',
+      title: 'Zlato v českém portfoliu',
+      points: [
+        'Alokace: 5-10% portfolia (ne více)',
+        'Physical gold (Zlatý slitek) vs Gold ETF: ETF lepší likvidita, nižší náklady',
+        'Timing: Nakupovat při geopolitických krizích (Ukrajina, Taiwan)',
+        'Kombinace: 70% S&P 500 + 20% Bonds + 10% Gold = All-Weather portfolio'
+      ]
+    }
+  }
+};
+
+const categoryInsights = insights[categoryKey as keyof typeof insights];
+
+if (!categoryInsights) {
+  // Fallback pro kategorie bez specifických insights
+  return null;
+}
+---
+
+<section class="py-16 bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Hlavní nadpis -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        {categoryInsights.title}
+      </h2>
+      <p class="text-xl text-gray-600">
+        Specifická rizika a příležitosti pro české investory
+      </p>
+    </div>
+
+    <!-- Rizika -->
+    <div class="mb-12">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+        <span class="text-3xl">⚠️</span>
+        Rizika, která musíte znát
+      </h3>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categoryInsights.risks.map((risk) => (
+          <div class={`rounded-2xl p-6 border-2 ${
+            risk.severity === 'high'
+              ? 'bg-red-50 border-red-300'
+              : risk.severity === 'medium'
+              ? 'bg-orange-50 border-orange-300'
+              : 'bg-yellow-50 border-yellow-300'
+          }`}>
+            <div class="text-4xl mb-3">{risk.emoji}</div>
+            <h4 class="text-lg font-bold text-gray-900 mb-2">{risk.title}</h4>
+            <p class="text-sm text-gray-700 leading-relaxed">{risk.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Výhody -->
+    <div class="mb-12">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+        <span class="text-3xl">✅</span>
+        Proč to dává smysl
+      </h3>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categoryInsights.advantages.map((advantage) => (
+          <div class="bg-green-50 rounded-2xl p-6 border-2 border-green-300">
+            <div class="text-4xl mb-3">{advantage.emoji}</div>
+            <h4 class="text-lg font-bold text-gray-900 mb-2">{advantage.title}</h4>
+            <p class="text-sm text-gray-700 leading-relaxed">{advantage.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- České specifika -->
+    <div class="bg-white rounded-2xl p-8 border-2 border-blue-300 shadow-lg">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+        <span class="text-3xl">{categoryInsights.czechSpecific.emoji}</span>
+        {categoryInsights.czechSpecific.title}
+      </h3>
+      <ul class="space-y-4">
+        {categoryInsights.czechSpecific.points.map((point) => (
+          <li class="flex items-start gap-3">
+            <span class="text-blue-600 text-xl mt-1">•</span>
+            <span class="text-gray-700 leading-relaxed">{point}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>

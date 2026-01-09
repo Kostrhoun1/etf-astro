@@ -5,6 +5,11 @@ import Top3ETF from '../../components/etf/Top3ETF.astro';
 import Top10Sections from '../../components/etf/Top10Sections.astro';
 import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
 
+// 🇨🇿 Czech-context components for Gemini Strategy
+import CategorySpecificInsights from '../../components/czech-context/CategorySpecificInsights.astro';
+import CategoryBrokerComparison from '../../components/czech-context/CategoryBrokerComparison.astro';
+import CategoryTaxImpact from '../../components/czech-context/CategoryTaxImpact.astro';
+
 const config = categoryConfigs['nejlepsi-nasdaq-etf'];
 const etfs = await getTopETFsForCategory(config);
 const currentYear = new Date().getFullYear();
@@ -406,6 +411,12 @@ const faqItems = [
 
   <!-- Top 10 Sections - by TER, AUM, Performance -->
   <Top10Sections etfs={etfs} currency="EUR" categoryName="Nasdaq" />
+
+  <!-- 🇨🇿 GEMINI STRATEGY: Czech-specific context components -->
+  <!-- These add unique Czech perspective that templated content doesn't have -->
+  <CategorySpecificInsights categoryKey="nasdaq" categoryName="NASDAQ 100" />
+  <CategoryBrokerComparison categoryKey="nasdaq" categoryName="NASDAQ 100" topETFs={etfs.slice(0, 3)} />
+  <CategoryTaxImpact categoryKey="nasdaq" categoryName="NASDAQ 100" />
 
   <!-- Selection Guide Section -->
   <section class="py-20">

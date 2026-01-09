@@ -1,0 +1,159 @@
+---
+interface Alternative {
+  isin: string;
+  name: string;
+  ticker: string;
+  ter: number;
+  fundSize: number;
+  return1y?: number | null;
+  rating?: number | null;
+  whyBetter?: string; // Proč je alternativa lepší
+}
+
+interface Props {
+  currentETF: {
+    isin: string;
+    name: string;
+    ticker: string;
+  };
+  alternatives: Alternative[];
+  reason?: string; // Proč uvádíme alternativy
+}
+
+const { currentETF, alternatives, reason } = Astro.props;
+---
+
+{alternatives && alternatives.length > 0 && (
+  <section class="bg-white rounded-xl p-6 md:p-8 my-8 border-2 border-gray-200">
+    <div class="flex items-start gap-3 mb-6">
+      <span class="text-3xl">🔄</span>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+          Nevyhovuje vám {currentETF.name}? Zvažte tyto alternativy
+        </h2>
+        {reason && (
+          <p class="text-gray-600 leading-relaxed">{reason}</p>
+        )}
+      </div>
+    </div>
+
+    <!-- Desktop tabulka -->
+    <div class="hidden md:block overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="text-left p-3 font-semibold text-gray-700">ETF</th>
+            <th class="text-left p-3 font-semibold text-gray-700">TER</th>
+            <th class="text-left p-3 font-semibold text-gray-700">Velikost</th>
+            <th class="text-left p-3 font-semibold text-gray-700">Výnos 1Y</th>
+            <th class="text-left p-3 font-semibold text-gray-700">Hodnocení</th>
+            <th class="text-left p-3 font-semibold text-gray-700"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {alternatives.map((alt) => (
+            <tr class="border-t border-gray-200 hover:bg-gray-50">
+              <td class="p-3">
+                <div>
+                  <div class="font-bold text-gray-900">{alt.ticker}</div>
+                  <div class="text-xs text-gray-600">{alt.name}</div>
+                </div>
+              </td>
+              <td class="p-3">
+                <span class="font-semibold text-gray-900">{(alt.ter * 100).toFixed(2)}%</span>
+              </td>
+              <td class="p-3 text-gray-600">
+                {alt.fundSize >= 1000 ? `${(alt.fundSize / 1000).toFixed(1)} mld €` : `${alt.fundSize} mil €`}
+              </td>
+              <td class="p-3">
+                {alt.return1y !== null && alt.return1y !== undefined ? (
+                  <span class={alt.return1y > 0 ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>
+                    {alt.return1y > 0 ? '+' : ''}{alt.return1y.toFixed(2)}%
+                  </span>
+                ) : (
+                  <span class="text-gray-400">-</span>
+                )}
+              </td>
+              <td class="p-3">
+                {alt.rating ? (
+                  <div class="flex items-center gap-1">
+                    <span class="text-yellow-500">★</span>
+                    <span class="font-semibold">{alt.rating.toFixed(1)}</span>
+                  </div>
+                ) : (
+                  <span class="text-gray-400">-</span>
+                )}
+              </td>
+              <td class="p-3">
+                <a
+                  href={`/etf/${alt.isin}`}
+                  class="text-violet-600 hover:text-violet-700 font-medium hover:underline"
+                >
+                  Detail →
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile cards -->
+    <div class="md:hidden space-y-4">
+      {alternatives.map((alt) => (
+        <div class="border border-gray-200 rounded-lg p-4 hover:border-violet-300 transition-colors">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <div class="font-bold text-gray-900">{alt.ticker}</div>
+              <div class="text-sm text-gray-600">{alt.name}</div>
+            </div>
+            {alt.rating && (
+              <div class="flex items-center gap-1 text-sm">
+                <span class="text-yellow-500">★</span>
+                <span class="font-semibold">{alt.rating.toFixed(1)}</span>
+              </div>
+            )}
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-sm mb-3">
+            <div>
+              <div class="text-gray-600">TER</div>
+              <div class="font-semibold text-gray-900">{(alt.ter * 100).toFixed(2)}%</div>
+            </div>
+            <div>
+              <div class="text-gray-600">Velikost</div>
+              <div class="font-semibold text-gray-900">
+                {alt.fundSize >= 1000 ? `${(alt.fundSize / 1000).toFixed(1)} mld €` : `${alt.fundSize} mil €`}
+              </div>
+            </div>
+          </div>
+
+          {alt.whyBetter && (
+            <div class="bg-blue-50 rounded p-3 border border-blue-200 mb-3">
+              <div class="text-xs font-semibold text-blue-900 mb-1">Proč je lepší:</div>
+              <div class="text-xs text-blue-800">{alt.whyBetter}</div>
+            </div>
+          )}
+
+          <a
+            href={`/etf/${alt.isin}`}
+            class="block text-center bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded font-medium text-sm"
+          >
+            Zobrazit detail
+          </a>
+        </div>
+      ))}
+    </div>
+
+    <!-- Další alternativy odkaz -->
+    <div class="mt-6 text-center">
+      <a
+        href="/srovnani-etf"
+        class="inline-flex items-center gap-2 text-violet-600 hover:text-violet-700 font-semibold hover:underline"
+      >
+        <span>🔍</span>
+        Najít další podobná ETF ve srovnávači
+      </a>
+    </div>
+  </section>
+)}

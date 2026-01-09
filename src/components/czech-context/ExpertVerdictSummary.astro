@@ -1,0 +1,90 @@
+---
+// Stručné expertní hodnocení - zobrazeno hned po hero sekci
+// Kompaktní verze pro rychlý přehled
+interface Props {
+  etfName: string;
+  rating: number | null;
+  suitableFor: string[];
+  notSuitableFor: string[];
+  personalOpinion: string;
+  whyNoRating?: string;
+}
+
+const { etfName, rating, suitableFor, notSuitableFor, personalOpinion, whyNoRating } = Astro.props;
+
+function getRatingEmoji(rating: number): string {
+  if (rating >= 4.5) return '🌟';
+  if (rating >= 4) return '✅';
+  if (rating >= 3.5) return '👍';
+  if (rating >= 3) return '👌';
+  if (rating >= 2) return '⚠️';
+  return '⛔';
+}
+
+function getRatingText(rating: number): string {
+  if (rating >= 4.5) return 'Vynikající ETF';
+  if (rating >= 4) return 'Velmi dobré ETF';
+  if (rating >= 3.5) return 'Dobré ETF';
+  if (rating >= 3) return 'Průměrné ETF';
+  if (rating >= 2) return 'Podprůměrné ETF';
+  return 'Nedoporučujeme';
+}
+---
+
+<section class="py-8 bg-gradient-to-br from-violet-50 to-blue-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+      <!-- Hlavní verdikt -->
+      <div class="flex items-start gap-4 mb-6">
+        <div class="text-5xl">{rating !== null ? getRatingEmoji(rating) : '⏳'}</div>
+        <div class="flex-1">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Naše hodnocení</h2>
+          {rating !== null ? (
+            <p class="text-xl font-semibold text-violet-600 mb-3">{getRatingText(rating)}</p>
+          ) : (
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-3">
+              <p class="text-sm font-semibold text-yellow-800 mb-1">⚠️ Zatím bez hodnocení</p>
+              <p class="text-xs text-yellow-700">{whyNoRating}</p>
+            </div>
+          )}
+          <p class="text-gray-700 leading-relaxed">{personalOpinion}</p>
+        </div>
+      </div>
+
+      <!-- Pro koho je vhodné / nevhodné -->
+      <div class="grid md:grid-cols-2 gap-6 pt-6 border-t border-gray-200">
+        <!-- Vhodné pro -->
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">✅</span>
+            <h3 class="font-bold text-gray-900">Vhodné pro</h3>
+          </div>
+          <ul class="space-y-2">
+            {suitableFor.slice(0, 3).map((item) => (
+              <li class="flex items-center gap-2">
+                <span class="text-emerald-500 text-lg leading-none">•</span>
+                <span class="text-gray-700 text-sm">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Nevhodné pro -->
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-2xl">⚠️</span>
+            <h3 class="font-bold text-gray-900">Nevhodné pro</h3>
+          </div>
+          <ul class="space-y-2">
+            {notSuitableFor.slice(0, 3).map((item) => (
+              <li class="flex items-center gap-2">
+                <span class="text-orange-500 text-lg leading-none">•</span>
+                <span class="text-gray-700 text-sm">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -5,6 +5,11 @@ import Top3ETFServer from '../../components/etf/Top3ETFServer';
 import Top10SectionsServer from '../../components/etf/Top10SectionsServer';
 import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
 
+// 🇨🇿 Czech-context components for Gemini Strategy
+import CategorySpecificInsights from '../../components/czech-context/CategorySpecificInsights.astro';
+import CategoryBrokerComparison from '../../components/czech-context/CategoryBrokerComparison.astro';
+import CategoryTaxImpact from '../../components/czech-context/CategoryTaxImpact.astro';
+
 const config = categoryConfigs['nejlepsi-msci-world-etf'];
 const etfs = await getTopETFsForCategory(config);
 const currentYear = new Date().getFullYear();
@@ -344,6 +349,12 @@ const faqItems = [
 
   <!-- Top 10 Sections - by TER, AUM, Performance -->
   <Top10SectionsServer etfs={etfs} currency="EUR" categoryName="MSCI World" client:load />
+
+  <!-- 🇨🇿 GEMINI STRATEGY: Czech-specific context components -->
+  <!-- These add unique Czech perspective that templated content doesn't have -->
+  <CategorySpecificInsights categoryKey="msci-world" categoryName="MSCI World" />
+  <CategoryBrokerComparison categoryKey="msci-world" categoryName="MSCI World" topETFs={etfs.slice(0, 3)} />
+  <CategoryTaxImpact categoryKey="msci-world" categoryName="MSCI World" />
 
   <!-- Selection Guide Section -->
   <section class="py-20 bg-gradient-to-br from-gray-50 to-white">

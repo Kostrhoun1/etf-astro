@@ -20,9 +20,11 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
+      // ✅ GEMINI STRATEGY: Include ALL pages in sitemap
+      // ETF pages are now high-value content with Czech context
       filter: (page) => {
-        // Vyloučit ETF detail stránky ze sitemap - pouze hlavní obsahové stránky
-        return !page.includes('/etf/');
+        // Only exclude API routes and Astro internal files
+        return !page.includes('/api/') && !page.includes('/_');
       }
     })
   ],

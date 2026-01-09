@@ -1,0 +1,257 @@
+---
+// Srovnání českých brokerů pro konkrétní kategorii ETF
+// Gemini Strategy: Praktický obsah pro české investory - který broker, kolik to stojí
+
+interface Props {
+  categoryKey: string;
+  categoryName: string;
+  topETFs: any[]; // Top 3 ETF z kategorie
+}
+
+const { categoryKey, categoryName, topETFs } = Astro.props;
+
+// České brokery s parametry
+const brokers = [
+  {
+    name: 'DEGIRO',
+    logo: '🇳🇱',
+    fee: 1.0, // EUR per transaction
+    feeType: 'fixed',
+    minInvestment: 'Celá akcie',
+    fractional: false,
+    freeETFs: true,
+    pros: ['Nulové poplatky za vybrané ETF', 'Nejpopulárnější v ČR', 'Jednoduché rozhraní'],
+    cons: ['Minimální nákup = celá akcie (~11 500 Kč)', 'Žádné zlomkové akcie'],
+    bestFor: 'Pravidelné větší investice (10k+ Kč měsíčně)'
+  },
+  {
+    name: 'XTB',
+    logo: '🇵🇱',
+    fee: 0,
+    feeType: 'free',
+    minInvestment: '~500 Kč',
+    fractional: true,
+    freeETFs: true,
+    pros: ['Zlomkové akcie od 500 Kč', 'Nulové poplatky do 100k EUR/měsíc', 'Česká podpora'],
+    cons: ['Menší výběr ETF než DEGIRO'],
+    bestFor: 'Začátečníky a malé pravidelné investice'
+  },
+  {
+    name: 'Interactive Brokers',
+    logo: '🇺🇸',
+    fee: 0.05, // % of trade
+    feeType: 'percentage',
+    minInvestment: 'Celá akcie',
+    fractional: false,
+    freeETFs: false,
+    pros: ['Nejnižší spreads', 'Přístup ke všem trhům', 'Pro pokročilé'],
+    cons: ['Složitější interface', 'Min. 2000 USD deposit (0,05% poplatek jinak)'],
+    bestFor: 'Velká portfolia (500k+ Kč) a pokročilé investory'
+  },
+  {
+    name: 'Portu',
+    logo: '🇨🇿',
+    fee: 0.6, // % annually from portfolio
+    feeType: 'portfolio',
+    minInvestment: 'Jakákoliv částka',
+    fractional: true,
+    freeETFs: false,
+    pros: ['Automatická diversifikace', 'Nulové transakční poplatky', 'Český broker'],
+    cons: ['0,6% ročně z portfolia', 'Drahé dlouhodobě'],
+    bestFor: 'Úplné začátečníky, kteří chtějí automatizaci'
+  }
+];
+
+// Simulace nákladů pro 10k, 20k, 30k měsíčně × 10 let
+function calculateTotalCost10Years(monthlyAmount: number, broker: typeof brokers[0]): number {
+  const years = 10;
+  const annualReturn = 0.07; // 7% annual return assumption
+  let portfolioValue = 0;
+  let totalBrokerFees = 0;
+
+  for (let year = 1; year <= years; year++) {
+    for (let month = 1; month <= 12; month++) {
+      // Transaction fees
+      let transactionFee = 0;
+      if (broker.name === 'Portu') {
+        transactionFee = 0; // No transaction fees
+      } else if (broker.name === 'DEGIRO' && broker.freeETFs) {
+        transactionFee = 0; // Free ETFs
+      } else if (broker.name === 'XTB') {
+        transactionFee = 0; // Free up to 100k EUR/month
+      } else if (broker.name === 'Interactive Brokers') {
+        transactionFee = monthlyAmount * 0.0005; // 0.05%
+      } else {
+        transactionFee = broker.fee * 25; // EUR to CZK
+      }
+
+      totalBrokerFees += transactionFee;
+      portfolioValue += monthlyAmount;
+    }
+
+    // Annual growth
+    portfolioValue *= (1 + annualReturn);
+
+    // Annual fees from portfolio (Portu)
+    if (broker.name === 'Portu') {
+      const annualPortfolioFee = portfolioValue * 0.006; // 0.6%
+      totalBrokerFees += annualPortfolioFee;
+      portfolioValue -= annualPortfolioFee;
+    }
+  }
+
+  return Math.round(totalBrokerFees);
+}
+
+// Příklady investic
+const investments = [
+  { label: '10k Kč/měsíc', amount: 10000 },
+  { label: '20k Kč/měsíc', amount: 20000 },
+  { label: '30k Kč/měsíc', amount: 30000 }
+];
+---
+
+<section class="py-16 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Hlavní nadpis -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        Kde koupit {categoryName} ETF v ČR?
+      </h2>
+      <p class="text-xl text-gray-600">
+        Srovnání českých brokerů a reálné náklady na 10 let
+      </p>
+    </div>
+
+    <!-- Broker comparison cards -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      {brokers.map((broker) => (
+        <div class="bg-gradient-to-br from-blue-50 to-violet-50 rounded-2xl p-6 border-2 border-blue-200 hover:border-blue-400 transition-colors">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-4xl">{broker.logo}</span>
+            <h3 class="text-xl font-bold text-gray-900">{broker.name}</h3>
+          </div>
+
+          <div class="mb-4">
+            <div class="text-sm text-gray-600 mb-1">Minimální investice:</div>
+            <div class="font-bold text-gray-900">{broker.minInvestment}</div>
+          </div>
+
+          <div class="mb-4">
+            <div class="text-sm text-gray-600 mb-1">Poplatky:</div>
+            <div class="font-bold text-gray-900">
+              {broker.feeType === 'free' && 'Zdarma'}
+              {broker.feeType === 'fixed' && `${broker.fee} EUR/transakce`}
+              {broker.feeType === 'percentage' && `${broker.fee}% z objemu`}
+              {broker.feeType === 'portfolio' && `${broker.fee}% ročně`}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="text-xs text-gray-700 italic">{broker.bestFor}</p>
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-xs font-bold text-green-700">✅ Výhody:</div>
+            <ul class="text-xs text-gray-700 space-y-1">
+              {broker.pros.map((pro) => (
+                <li>• {pro}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div class="space-y-2 mt-3">
+            <div class="text-xs font-bold text-orange-700">⚠️ Nevýhody:</div>
+            <ul class="text-xs text-gray-700 space-y-1">
+              {broker.cons.map((con) => (
+                <li>• {con}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Cost comparison table -->
+    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-300">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+        <span class="text-3xl">💰</span>
+        Celkové náklady za 10 let (včetně compound growth)
+      </h3>
+      <p class="text-gray-700 mb-6">
+        Předpoklad: 7% roční výnos, reinvestice dividend, žádné poplatky TER (ty jsou u všech stejné)
+      </p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b-2 border-purple-300">
+              <th class="text-left py-3 px-4 text-gray-900 font-bold">Broker</th>
+              {investments.map((inv) => (
+                <th class="text-right py-3 px-4 text-gray-900 font-bold">{inv.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {brokers.map((broker) => (
+              <tr class="border-b border-purple-200">
+                <td class="py-3 px-4 font-medium text-gray-900">{broker.name}</td>
+                {investments.map((inv) => {
+                  const cost = calculateTotalCost10Years(inv.amount, broker);
+                  return (
+                    <td class="py-3 px-4 text-right font-bold text-gray-900">
+                      {cost.toLocaleString('cs-CZ')} Kč
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 bg-white rounded-xl p-4 border-l-4 border-blue-500">
+        <p class="text-sm text-gray-700">
+          <strong>Pozn:</strong> Tento výpočet zahrnuje pouze poplatky brokera. TER (Total Expense Ratio) ETF je u všech brokerů stejný a činí 0,05-0,20% ročně navíc.
+          Například při portfoliu 1M Kč a TER 0,07% zaplatíte 700 Kč ročně navíc (automaticky strhává správce fondu).
+        </p>
+      </div>
+    </div>
+
+    <!-- Doporučení -->
+    <div class="mt-12 grid md:grid-cols-3 gap-6">
+      <div class="bg-green-50 rounded-xl p-6 border-2 border-green-300">
+        <div class="text-3xl mb-3">🎓</div>
+        <h4 class="font-bold text-gray-900 mb-2">Pro začátečníky</h4>
+        <p class="text-sm text-gray-700 mb-3">
+          <strong>XTB</strong> - Zlomkové akcie od 500 Kč, nulové poplatky, česká podpora
+        </p>
+        <a href="/kde-koupit-etf" class="text-blue-600 hover:underline text-sm font-medium">
+          Detailní návod →
+        </a>
+      </div>
+
+      <div class="bg-blue-50 rounded-xl p-6 border-2 border-blue-300">
+        <div class="text-3xl mb-3">💼</div>
+        <h4 class="font-bold text-gray-900 mb-2">Pro pravidelné investory</h4>
+        <p class="text-sm text-gray-700 mb-3">
+          <strong>DEGIRO</strong> - Nulové poplatky za ETF v nabídce, nejpopulárnější v ČR
+        </p>
+        <a href="/kde-koupit-etf" class="text-blue-600 hover:underline text-sm font-medium">
+          Srovnání brokerů →
+        </a>
+      </div>
+
+      <div class="bg-purple-50 rounded-xl p-6 border-2 border-purple-300">
+        <div class="text-3xl mb-3">🚀</div>
+        <h4 class="font-bold text-gray-900 mb-2">Pro pokročilé</h4>
+        <p class="text-sm text-gray-700 mb-3">
+          <strong>Interactive Brokers</strong> - Nejnižší spreads, přístup ke všem trhům
+        </p>
+        <a href="/kde-koupit-etf" class="text-blue-600 hover:underline text-sm font-medium">
+          Kompletní recenze →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

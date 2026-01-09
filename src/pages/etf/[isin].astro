@@ -3,6 +3,14 @@ import Layout from '../../layouts/Layout.astro';
 import InternalLinking from '../../components/InternalLinking.astro';
 import { supabase } from '../../lib/supabase';
 
+// 🇨🇿 Czech-context components for Gemini Strategy
+import ETFRatingDetailed from '../../components/czech-context/ETFRatingDetailed.astro';
+import CzechTaxContext from '../../components/czech-context/CzechTaxContext.astro';
+import CzechBrokerAvailability from '../../components/czech-context/CzechBrokerAvailability.astro';
+import ExpertVerdict from '../../components/czech-context/ExpertVerdict.astro';
+import ExpertVerdictSummary from '../../components/czech-context/ExpertVerdictSummary.astro';
+import AlternativesComparison from '../../components/czech-context/AlternativesComparison.astro';
+
 export async function getStaticPaths() {
   // Paginate to get ALL ETFs (Supabase has 1000 row limit)
   const allIsins: { isin: string }[] = [];
@@ -54,15 +62,21 @@ const { data: relatedETFs } = await supabase
   .order('fund_size_numeric', { ascending: false })
   .limit(6);
 
+// Safe number formatting - handles null/undefined gracefully
+function safeToFixed(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined || isNaN(value)) return '0';
+  return value.toFixed(decimals);
+}
+
 function formatPercent(value: number | null): string {
   if (value === null || value === undefined) return '-';
   // Database values are already in percent format (e.g., 2.57 means 2.57%)
-  return value.toFixed(2) + '%';
+  return safeToFixed(value, 2) + '%';
 }
 
 function formatSize(size: number | null): string {
-  if (size === null) return '-';
-  if (size >= 1000) return (size / 1000).toFixed(1) + ' mld €';
+  if (size === null || size === undefined) return '-';
+  if (size >= 1000) return safeToFixed(size / 1000, 1) + ' mld €';
   return Math.round(size) + ' mil €';
 }
 
@@ -148,6 +162,349 @@ function getCountryFlag(countryName: string): string {
   if (name.includes('korea')) return '🇰🇷';
   return '🏳️';
 }
+
+// === GEMINI STRATEGY: Generate Expert Verdict ===
+// This transforms our site from a database to an authoritative rating platform
+
+function generateSuitableFor(etf: any, topCountries: any[], topSectors: any[]): string[] {
+  const suitable = [];
+  const indexName = etf.index_name?.toLowerCase() || '';
+  const etfNameLower = etf.name?.toLowerCase() || '';
+
+  // === DETEKCE TYPU AKTIVA ===
+  const isRealEstate = indexName.includes('reit') || indexName.includes('real estate') || indexName.includes('property') ||
+                       etfNameLower.includes('reit') || etfNameLower.includes('property') || etfNameLower.includes('real estate') ||
+                       etf.category?.toLowerCase().includes('real estate') || etf.category?.toLowerCase().includes('property');
+  const isCrypto = indexName.includes('bitcoin') || indexName.includes('crypto') || indexName.includes('blockchain') || etfNameLower.includes('bitcoin') || etfNameLower.includes('crypto');
+  const isGold = indexName.includes('gold') || etfNameLower.includes('gold') || etfNameLower.includes('zlat');
+  const isCommodity = indexName.includes('commodity') || indexName.includes('commodities') || etfNameLower.includes('commodity') || etfNameLower.includes('komodit');
+  const isBond = etf.category?.includes('Bond') || indexName.includes('bond') || indexName.includes('treasury') || etfNameLower.includes('bond') || etfNameLower.includes('dluhopis');
+  const isDividend = indexName.includes('dividend') || etfNameLower.includes('dividend') || etfNameLower.includes('dividendov');
+  const isESG = indexName.includes('esg') || indexName.includes('sri') || indexName.includes('sustainable') || etfNameLower.includes('esg') || etfNameLower.includes('sustainable');
+  const isCleanEnergy = indexName.includes('clean energy') || indexName.includes('renewable') || etfNameLower.includes('clean energy') || etfNameLower.includes('renewable');
+  const isAI = indexName.includes('artificial intelligence') || indexName.includes('ai ') || etfNameLower.includes('artificial intelligence');
+  const isLeveraged = indexName.includes('2x') || indexName.includes('3x') || etfNameLower.includes('leveraged') || etfNameLower.includes('ultra');
+
+  // === ANALÝZA INDEXU A GEOGRAFIE ===
+  const isUSOnly = topCountries[0]?.name === 'United States' && topCountries[0]?.weight > 95;
+  const isUSHeavy = topCountries[0]?.name === 'United States' && topCountries[0]?.weight > 60;
+  const isGlobal = topCountries.length >= 5 && topCountries[0]?.weight < 70;
+  const isEmerging = indexName.includes('emerging') || etf.category?.includes('Emerging');
+  const isChina = indexName.includes('china') || etfNameLower.includes('china');
+  const isIndia = indexName.includes('india') || etfNameLower.includes('india');
+  const isJapan = indexName.includes('japan') || etfNameLower.includes('japan');
+  const isEurope = topCountries[0]?.name && ['Germany', 'France', 'United Kingdom'].includes(topCountries[0].name);
+  const isSP500 = indexName.includes('s&p 500');
+  const isMSCIWorld = indexName.includes('msci world') && !indexName.includes('emerging');
+  const isAllWorld = indexName.includes('ftse all-world') || indexName.includes('all world');
+  const isSmallCap = indexName.includes('small cap') || etfNameLower.includes('small cap');
+
+  // === 1. SPECIFICKÉ TŘÍDY AKTIV ===
+  if (isRealEstate) {
+    suitable.push('Diverzifikaci mimo akcie - nemovitosti historicky nízká korelace s akciemi');
+    suitable.push('Pasivní příjem - REITy vyplácejí 90%+ zisků jako dividendy');
+    suitable.push('Ochranu proti inflaci - nájmy rostou s inflací');
+  } else if (isCrypto) {
+    suitable.push('High-risk high-reward - Bitcoin jako spekulativní část portfolia (max 5%)');
+    suitable.push('Hedge proti fiat měnám - decentralizované aktivum mimo tradiční finance');
+    suitable.push('Tech-savvy early adopters - blockchain jako revoluci');
+  } else if (isGold) {
+    suitable.push('Safe haven v krizích - zlato jako pojistka proti kolapsu trhů');
+    suitable.push('Ochranu proti inflaci a oslabení USD');
+    suitable.push('Konzervativní alokaci 5-10% portfolia');
+  } else if (isCommodity) {
+    suitable.push('Hedge proti inflaci - komodity rostou s cenami');
+    suitable.push('Diverzifikaci - nízká korelace s akciemi a dluhopisy');
+  } else if (isBond) {
+    suitable.push('Konzervativní investory - dluhopisy = nižší volatilita než akcie');
+    suitable.push('Příjem z úroků - pravidelné kupónové platby');
+    suitable.push('Vyvážení portfolia - negativní korelace s akciemi v krizích');
+  } else if (isDividend) {
+    suitable.push('Pasivní příjem - vysoké dividendové výnosy (3-5% ročně)');
+    suitable.push('Kvalitní zralé firmy - dividendy = známka finanční síly');
+    suitable.push('Lower volatility - dividendové akcie stabilnější než růstové');
+  } else if (isESG) {
+    suitable.push('Etické investory - vyloučení fosilních paliv, zbraní, tabáku');
+    suitable.push('Long-term udržitelnost - firmy s nižšími ESG riziky');
+  } else if (isCleanEnergy) {
+    suitable.push('Tematický bet na zelenou energii - solár, vítr, vodík');
+    suitable.push('Satelitní pozici - high-growth sektor s vysokou volatilitou');
+  } else if (isAI) {
+    suitable.push('Expozici k AI revoluci - firmy vyvíjející nebo využívající AI');
+    suitable.push('High-growth tematický bet - AI jako megatrend');
+  } else if (isLeveraged) {
+    suitable.push('Day tradery a spekulanty - leveraged = intraday trading nástroj');
+    suitable.push('Short-term pozice - držení přes noc způsobuje eroze hodnoty');
+  }
+
+  // === 2. GEOGRAFICKÉ STRATEGIE ===
+  if (isChina) {
+    suitable.push('Bet na čínskou ekonomiku - nejrychleji rostoucí velká ekonomika');
+    suitable.push('Satelitní pozici - Čína = high-risk high-reward');
+  } else if (isIndia) {
+    suitable.push('Demografický růst - Indie = nejlidnatější země s mladou populací');
+    suitable.push('Alternativu k Číně - diversifikace emerging markets');
+  } else if (isJapan) {
+    suitable.push('Value bet - japonské akcie historicky podhodnocené');
+    suitable.push('Kvalitní firmy - Toyota, Sony, Nintendo');
+  }
+
+  // === 3. AKCIOVÉ INDEXY - CORE vs SATELLITE ===
+  if (isSP500) {
+    suitable.push('Core portfolio - S&P 500 jako osvědčený základ (70% světové kapitalizace z USA)');
+  } else if (isAllWorld || isMSCIWorld) {
+    suitable.push('One-fund portfolio - jediné ETF pokrývající celý svět (3000+ společností)');
+  } else if (isEmerging) {
+    suitable.push('Satelitní přístup - doplnění portfolia o rychle rostoucí trhy');
+  } else if (isEurope) {
+    suitable.push('Domácí bias - evropské firmy jako doplněk ke globálnímu portfoliu');
+  } else if (isSmallCap) {
+    suitable.push('Growth tilt - expozice k menším firmám s vyšším růstovým potenciálem');
+  }
+
+  // === 2. SPECIFICKÉ USE CASE PODLE GEOGRAFIE ===
+  if (isUSOnly) {
+    suitable.push('Věřící v americkou ekonomiku a dominanci USD (100% USA expozice)');
+  } else if (isGlobal) {
+    suitable.push('Maximální globální diverzifikaci (50+ zemí, žádná závislost na jedné ekonomice)');
+  } else if (isUSHeavy) {
+    const usWeight = topCountries[0]?.weight || 0;
+    suitable.push(`Mix USA a světa (${Math.round(usWeight)}% USA + ${Math.round(100-usWeight)}% ostatní)`);
+  }
+
+  // === 3. SEKTOROVÁ SPECIFIKA ===
+  if (topSectors[0]?.name === 'Technology' && topSectors[0]?.weight > 30) {
+    suitable.push('Tech-savvy investory - vysoká expozice k technologiím a inovacím');
+  } else if (topSectors[0]?.name === 'Financials' && topSectors[0]?.weight > 25) {
+    suitable.push('Value investory - finanční sektor často znamená stabilní dividendy');
+  }
+
+  // === 4. DAŇOVÁ OPTIMALIZACE ===
+  if (etf.distribution_policy === 'Accumulating' && etf.ter_numeric < 0.20) {
+    suitable.push('České daňové rezidenty - akumuluje + nízké TER = compound effect');
+  }
+
+  // === 5. VELIKOST A LIKVIDITA ===
+  if (etf.fund_size_numeric > 10000) {
+    suitable.push('Institucionální investory - likvidita pro velké objemy (spread ~0.01%)');
+  } else if (etf.fund_size_numeric < 100) {
+    suitable.push('Early adoptery - malý fond může nabídnout zajímavou příležitost');
+  }
+
+  // Default pokud nemáme nic specifického
+  if (suitable.length === 0) {
+    if (etf.category === 'Akcie') {
+      suitable.push('Dlouhodobé investory s horizontem 10+ let');
+    } else {
+      suitable.push('Diverzifikované pasivní portfolio');
+    }
+  }
+
+  return suitable.slice(0, 3);
+}
+
+function generateNotSuitableFor(etf: any, topCountries: any[], topSectors: any[]): string[] {
+  const notSuitable = [];
+  const indexName = etf.index_name?.toLowerCase() || '';
+  const etfNameLower = etf.name?.toLowerCase() || '';
+
+  // === DETEKCE TYPU AKTIVA ===
+  const isRealEstate = indexName.includes('reit') || indexName.includes('real estate') || indexName.includes('property') ||
+                       etfNameLower.includes('reit') || etfNameLower.includes('property') || etfNameLower.includes('real estate') ||
+                       etf.category?.toLowerCase().includes('real estate') || etf.category?.toLowerCase().includes('property');
+  const isCrypto = indexName.includes('bitcoin') || indexName.includes('crypto') || etfNameLower.includes('bitcoin') || etfNameLower.includes('crypto');
+  const isGold = indexName.includes('gold') || etfNameLower.includes('gold');
+  const isCommodity = indexName.includes('commodity') || etfNameLower.includes('commodity');
+  const isBond = etf.category?.includes('Bond') || indexName.includes('bond');
+  const isDividend = indexName.includes('dividend') || etfNameLower.includes('dividend');
+  const isLeveraged = indexName.includes('2x') || indexName.includes('3x') || etfNameLower.includes('leveraged');
+  const isCleanEnergy = indexName.includes('clean energy') || indexName.includes('renewable');
+  const isChina = indexName.includes('china') || etfNameLower.includes('china');
+
+  // === ANALÝZA TYPU ETF ===
+  const isUSOnly = topCountries[0]?.name === 'United States' && topCountries[0]?.weight > 95;
+  const isEmerging = indexName.includes('emerging') || etf.category?.includes('Emerging');
+  const isSmallCap = indexName.includes('small cap');
+  const isSingleCountry = topCountries[0]?.weight > 90;
+
+  // === 0. SPECIFICKÁ RIZIKA PODLE TŘÍDY AKTIVA ===
+  if (isCrypto) {
+    notSuitable.push('Risk-averse investory - Bitcoin má 70%+ drawdowny a extrémní volatilitu');
+    notSuitable.push('Core portfolio - krypto = maximálně 5% satelitní pozice');
+    notSuitable.push('Lidi hledající fundamenty - Bitcoin nemá P/E, cash flow, dividendy');
+  } else if (isRealEstate) {
+    notSuitable.push('Ochranu v recesi - nemovitosti korelují s ekonomickým cyklem');
+    notSuitable.push('Likviditu - REITy mohou mít vyšší spread než akciové ETF');
+  } else if (isGold) {
+    notSuitable.push('Generování výnosů - zlato nevyprodukuje cash flow ani dividendy');
+    notSuitable.push('Core portfolio - zlato je hedge, ne hlavní investice');
+  } else if (isCommodity) {
+    notSuitable.push('Dlouhodobý růst - komodity pouze kopírují inflaci, nerostou reálně');
+    notSuitable.push('Buy-and-hold - commodity ETF trpí contango efektem');
+  } else if (isBond) {
+    notSuitable.push('Vysoké výnosy - dluhopisy = stabilita, ne růst (3-5% ročně)');
+    notSuitable.push('Inflační prostředí - rostoucí sazby = klesající ceny dluhopisů');
+  } else if (isDividend) {
+    notSuitable.push('Growth investory - dividendové firmy rostou pomaleji než tech');
+    notSuitable.push('České daňové rezidenty - distribuční dividendy = každoroční daně');
+  } else if (isLeveraged) {
+    notSuitable.push('Buy-and-hold - leveraged ETF = pouze intraday, držení eroduje hodnotu');
+    notSuitable.push('Začátečníky - leveraged = složitý nástroj, lze ztratit vše');
+    notSuitable.push('Long-term investory - denní rebalancování způsobuje volatility decay');
+  } else if (isCleanEnergy) {
+    notSuitable.push('Konzervativní investory - tematická ETF mají 3x vyšší volatilitu');
+    notSuitable.push('Core portfolio - clean energy = satelitní bet, ne základ');
+  } else if (isChina) {
+    notSuitable.push('Politické riziko - čínský stát může zasahovat do firem');
+    notSuitable.push('Risk-averse investory - Čína = regulatory crackdowny, delisting riziko');
+  }
+
+  // === 1. GEOGRAFICKÁ KONCENTRACE ===
+  if (isUSOnly) {
+    notSuitable.push('Investory hledající ochranu před pádem USD nebo americké ekonomiky');
+  } else if (isSingleCountry) {
+    const country = topCountries[0]?.name || 'jedna země';
+    notSuitable.push(`Diversifikaci - 90%+ koncentrace na ${country} = vysoké riziko`);
+  }
+
+  // === 2. VOLATILITA A RIZIKO ===
+  if (isEmerging) {
+    notSuitable.push('Konzervativní investory - emerging markets = 2-3x vyšší volatilita než USA');
+  } else if (isSmallCap) {
+    notSuitable.push('Nízkou toleranci rizika - malé firmy jsou volatilnější než large cap');
+  }
+
+  // === 3. SEKTOROVÁ KONCENTRACE ===
+  if (topSectors[0]?.weight !== null && topSectors[0]?.weight !== undefined && topSectors[0].weight > 40) {
+    const sector = topSectors[0]?.name || 'jeden sektor';
+    notSuitable.push(`Diverzifikaci - ${Math.round(topSectors[0].weight)}% v ${sector} znamená závislost na odvětví`);
+  }
+
+  // === 4. NÁKLADY ===
+  if (etf.ter_numeric !== null && etf.ter_numeric !== undefined && etf.ter_numeric > 0.40) {
+    notSuitable.push(`Dlouhodobé buy-and-hold - TER ${etf.ter_numeric.toFixed(2)}% sežere významnou část výnosů`);
+  } else if (etf.ter_numeric !== null && etf.ter_numeric !== undefined && etf.fund_size_numeric !== null && etf.fund_size_numeric !== undefined && etf.ter_numeric > 0.25 && etf.fund_size_numeric < 500) {
+    notSuitable.push('Cost-conscious investory - kombinace vysokého TER a malé likvidity');
+  }
+
+  // === 5. DISTRIBUCE PRO ČECHY ===
+  if (etf.distribution_policy === 'Distributing') {
+    notSuitable.push('České investory s malými částkami - daňové přiznání každý rok zdržuje a stojí');
+  }
+
+  // === 6. VELIKOST FONDU ===
+  if (etf.fund_size_numeric < 50) {
+    notSuitable.push('Risk-averse investory - fond pod 50M EUR má vysoké riziko uzavření');
+  }
+
+  // === 7. TIMING MARKET ===
+  if (etf.category === 'Akcie') {
+    notSuitable.push('Market timery - ETF vyžaduje long-term přístup (10+ let)');
+  }
+
+  // Default
+  if (notSuitable.length === 0) {
+    notSuitable.push('Day tradery a spekulanty - ETF jsou určeny pro pasivní investování');
+  }
+
+  return notSuitable.slice(0, 3);
+}
+
+function generatePersonalOpinion(etf: any, topCountries: any[], topSectors: any[]): string {
+  const parts: string[] = [];
+
+  // 1. HODNOCENÍ NÁKLADŮ (TER)
+  if (etf.ter_numeric !== null && etf.ter_numeric !== undefined) {
+    if (etf.ter_numeric < 0.10) {
+      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je vynikající - patří mezi nejlevnější ETF na trhu`);
+    } else if (etf.ter_numeric < 0.20) {
+      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je velmi dobrý - rozumná cena za kvalitní správu`);
+    } else if (etf.ter_numeric < 0.50) {
+      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je průměrný - existují levnější alternativy`);
+    } else {
+      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je vysoký - doporučuji zvážit levnější alternativy`);
+    }
+  }
+
+  // 2. VELIKOST FONDU (likvidita)
+  if (etf.fund_size_numeric !== null && etf.fund_size_numeric !== undefined) {
+    if (etf.fund_size_numeric > 5000) {
+      parts.push(`obrovská velikost ${Math.round(etf.fund_size_numeric)} mil. EUR zajišťuje excelentní likviditu`);
+    } else if (etf.fund_size_numeric > 1000) {
+      parts.push(`velikost ${Math.round(etf.fund_size_numeric)} mil. EUR poskytuje dobrou likviditu`);
+    } else if (etf.fund_size_numeric > 100) {
+      parts.push(`velikost ${Math.round(etf.fund_size_numeric)} mil. EUR je přijatelná`);
+    } else {
+      parts.push(`malá velikost ${Math.round(etf.fund_size_numeric)} mil. EUR může být riziko`);
+    }
+  }
+
+  // 3. DIVERZIFIKACE (geografická)
+  const isDiversified = topCountries.length >= 3 && topCountries[0]?.weight < 70;
+  const isConcentrated = topCountries.length > 0 && topCountries[0]?.weight > 70;
+
+  if (isDiversified && topCountries[0]?.weight !== null && topCountries[0]?.weight !== undefined) {
+    const topMarket = topCountries[0]?.name || 'hlavní trhy';
+    parts.push(`dobře diverzifikováno napříč regiony (${topMarket} ${topCountries[0].weight.toFixed(0)}%)`);
+  } else if (isConcentrated && topCountries[0]?.weight !== null && topCountries[0]?.weight !== undefined) {
+    const topMarket = topCountries[0]?.name || 'jeden trh';
+    parts.push(`koncentrováno na ${topMarket} (${topCountries[0].weight.toFixed(0)}%) - vyšší riziko`);
+  }
+
+  // 4. DAŇOVÁ OPTIMALIZACE
+  if (etf.distribution_policy === 'Accumulating') {
+    parts.push(`akumulační struktura ideální pro české daně`);
+  } else if (etf.distribution_policy === 'Distributing') {
+    parts.push(`distribuční politika znamená každoroční daňovou administrativu`);
+  }
+
+  // 5. VÝKONNOST (pokud je k dispozici)
+  if (etf.return_1y !== null && etf.return_1y !== undefined) {
+    if (etf.return_1y > 15) {
+      parts.push(`výborná 1-roční výkonnost ${etf.return_1y.toFixed(1)}%`);
+    } else if (etf.return_1y < 0) {
+      parts.push(`negativní 1-roční výkonnost ${etf.return_1y.toFixed(1)}%`);
+    }
+  }
+
+  // Sestavit finální text
+  return `${etf.name}: ${parts.slice(0, 4).join(', ')}.`;
+}
+
+// Calculate overall rating for Czech investors
+const hasRating = etf.rating !== null && etf.rating !== undefined;
+const overallRating = hasRating ? etf.rating : null;
+
+// Diagnostika proč nemá rating
+const whyNoRating = !hasRating ? (() => {
+  const age = etf.inception_date ? (new Date().getTime() - new Date(etf.inception_date).getTime()) / (1000 * 60 * 60 * 24 * 365) : 999;
+  if (age < 1) return 'Nové ETF - méně než 1 rok na trhu';
+  if (age < 3) return 'Krátká historie - méně než 3 roky dat';
+  if (etf.fund_size_numeric < 50) return 'Malý fond - nedostatečná likvidita pro objektivní hodnocení';
+  if (!etf.return_1y) return 'Chybějící výkonnostní data';
+  return 'Nedostatečná data pro komplexní hodnocení';
+})() : null;
+
+// Generate components data
+const suitableFor = generateSuitableFor(etf, topCountries, topSectors);
+const notSuitableFor = generateNotSuitableFor(etf, topCountries, topSectors);
+const personalOpinion = generatePersonalOpinion(etf, topCountries, topSectors);
+
+// Prepare alternatives for comparison
+const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
+  isin: alt.isin,
+  name: alt.name,
+  ticker: alt.primary_ticker || alt.isin.substring(0, 6),
+  ter: alt.ter_numeric,
+  fundSize: alt.fund_size_numeric,
+  return1y: alt.return_1y,
+  rating: alt.rating,
+  whyBetter: alt.ter_numeric !== null && etf.ter_numeric !== null && alt.ter_numeric < etf.ter_numeric
+    ? `Nižší TER (${alt.ter_numeric.toFixed(2)}% vs ${etf.ter_numeric.toFixed(2)}%)`
+    : alt.fund_size_numeric !== null && etf.fund_size_numeric !== null && alt.fund_size_numeric > etf.fund_size_numeric
+    ? 'Větší fond = vyšší likvidita'
+    : 'Podobné parametry, jiný poskytovatel'
+})) || [];
 ---
 
 <Layout
@@ -234,6 +591,17 @@ function getCountryFlag(countryName: string): string {
     </div>
   </section>
 
+  <!-- 🇨🇿 STRUČNÉ EXPERTNÍ HODNOCENÍ - Quick verdict above the fold -->
+  <ExpertVerdictSummary
+    etfName={etf.name}
+    rating={overallRating}
+    suitableFor={suitableFor}
+    notSuitableFor={notSuitableFor}
+    personalOpinion={personalOpinion}
+    whyNoRating={whyNoRating}
+  />
+
+  <!-- PŘEHLED VÝKONNOSTI - Performance overview -->
   <section class="py-12 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Výkonnost</h2>
@@ -396,7 +764,7 @@ function getCountryFlag(countryName: string): string {
                       data-czk={etf.return_1m_czk ?? ''}
                       data-usd={etf.return_1m_usd ?? ''}>
                     <span class:list={[etf.return_1m_czk && etf.return_1m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_1m_czk ? etf.return_1m_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_1m_czk !== null && etf.return_1m_czk !== undefined ? etf.return_1m_czk.toFixed(2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -408,7 +776,7 @@ function getCountryFlag(countryName: string): string {
                       data-czk={etf.return_3m_czk ?? ''}
                       data-usd={etf.return_3m_usd ?? ''}>
                     <span class:list={[etf.return_3m_czk && etf.return_3m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_3m_czk ? etf.return_3m_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_3m_czk !== null && etf.return_3m_czk !== undefined ? etf.return_3m_czk.toFixed(2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -420,7 +788,7 @@ function getCountryFlag(countryName: string): string {
                       data-czk={etf.return_6m_czk ?? ''}
                       data-usd={etf.return_6m_usd ?? ''}>
                     <span class:list={[etf.return_6m_czk && etf.return_6m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_6m_czk ? etf.return_6m_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_6m_czk !== null && etf.return_6m_czk !== undefined ? etf.return_6m_czk.toFixed(2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -432,7 +800,7 @@ function getCountryFlag(countryName: string): string {
                       data-czk={etf.return_ytd_czk ?? ''}
                       data-usd={etf.return_ytd_usd ?? ''}>
                     <span class:list={[etf.return_ytd_czk && etf.return_ytd_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_ytd_czk ? etf.return_ytd_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_ytd_czk !== null && etf.return_ytd_czk !== undefined ? etf.return_ytd_czk.toFixed(2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -444,11 +812,11 @@ function getCountryFlag(countryName: string): string {
                       data-czk={etf.return_1y_czk ?? ''}
                       data-usd={etf.return_1y_usd ?? ''}>
                     <span class:list={[etf.return_1y_czk && etf.return_1y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_1y_czk ? etf.return_1y_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_1y_czk !== null && etf.return_1y_czk !== undefined ? etf.return_1y_czk.toFixed(2) + '%' : '-'}
                     </span>
                   </td>
                   <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_1y && etf.return_per_risk_1y > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                    {etf.return_per_risk_1y ? etf.return_per_risk_1y.toFixed(2) : '-'}
+                    {etf.return_per_risk_1y !== null && etf.return_per_risk_1y !== undefined ? etf.return_per_risk_1y.toFixed(2) : '-'}
                   </td>
                 </tr>
                 <tr class="border-b border-gray-100">
@@ -458,11 +826,11 @@ function getCountryFlag(countryName: string): string {
                       data-czk={etf.return_3y_czk ?? ''}
                       data-usd={etf.return_3y_usd ?? ''}>
                     <span class:list={[etf.return_3y_czk && etf.return_3y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_3y_czk ? etf.return_3y_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_3y_czk !== null && etf.return_3y_czk !== undefined ? etf.return_3y_czk.toFixed(2) + '%' : '-'}
                     </span>
                   </td>
                   <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_3y && etf.return_per_risk_3y > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                    {etf.return_per_risk_3y ? etf.return_per_risk_3y.toFixed(2) : '-'}
+                    {etf.return_per_risk_3y !== null && etf.return_per_risk_3y !== undefined ? etf.return_per_risk_3y.toFixed(2) : '-'}
                   </td>
                 </tr>
                 <tr class="border-b border-gray-100">
@@ -472,11 +840,11 @@ function getCountryFlag(countryName: string): string {
                       data-czk={etf.return_5y_czk ?? ''}
                       data-usd={etf.return_5y_usd ?? ''}>
                     <span class:list={[etf.return_5y_czk && etf.return_5y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_5y_czk ? etf.return_5y_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_5y_czk !== null && etf.return_5y_czk !== undefined ? etf.return_5y_czk.toFixed(2) + '%' : '-'}
                     </span>
                   </td>
                   <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_5y && etf.return_per_risk_5y > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                    {etf.return_per_risk_5y ? etf.return_per_risk_5y.toFixed(2) : '-'}
+                    {etf.return_per_risk_5y !== null && etf.return_per_risk_5y !== undefined ? etf.return_per_risk_5y.toFixed(2) : '-'}
                   </td>
                 </tr>
               </tbody>
@@ -495,7 +863,7 @@ function getCountryFlag(countryName: string): string {
                    data-czk={etf.return_2021_czk ?? ''}
                    data-usd={etf.return_2021_usd ?? ''}>
                 <span class:list={[etf.return_2021_czk && etf.return_2021_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2021_czk ? etf.return_2021_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2021_czk !== null && etf.return_2021_czk !== undefined ? etf.return_2021_czk.toFixed(2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -506,7 +874,7 @@ function getCountryFlag(countryName: string): string {
                    data-czk={etf.return_2022_czk ?? ''}
                    data-usd={etf.return_2022_usd ?? ''}>
                 <span class:list={[etf.return_2022_czk && etf.return_2022_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2022_czk ? etf.return_2022_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2022_czk !== null && etf.return_2022_czk !== undefined ? etf.return_2022_czk.toFixed(2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -517,7 +885,7 @@ function getCountryFlag(countryName: string): string {
                    data-czk={etf.return_2023_czk ?? ''}
                    data-usd={etf.return_2023_usd ?? ''}>
                 <span class:list={[etf.return_2023_czk && etf.return_2023_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2023_czk ? etf.return_2023_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2023_czk !== null && etf.return_2023_czk !== undefined ? etf.return_2023_czk.toFixed(2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -528,7 +896,7 @@ function getCountryFlag(countryName: string): string {
                    data-czk={etf.return_2024_czk ?? ''}
                    data-usd={etf.return_2024_usd ?? ''}>
                 <span class:list={[etf.return_2024_czk && etf.return_2024_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2024_czk ? etf.return_2024_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2024_czk !== null && etf.return_2024_czk !== undefined ? etf.return_2024_czk.toFixed(2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -621,12 +989,12 @@ function getCountryFlag(countryName: string): string {
                 <div class="flex-1">
                   <div class="flex justify-between items-center mb-1">
                     <span class="font-medium text-gray-900">{holding.name}</span>
-                    <span class="font-bold text-gray-900">{holding.weight.toFixed(2)}%</span>
+                    <span class="font-bold text-gray-900">{holding.weight !== null && holding.weight !== undefined ? holding.weight.toFixed(2) + '%' : '-'}</span>
                   </div>
                   <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
-                      style={`width: ${Math.min(holding.weight * 2, 100)}%`}
+                      style={`width: ${holding.weight !== null && holding.weight !== undefined ? Math.min(holding.weight * 2, 100) : 0}%`}
                     ></div>
                   </div>
                 </div>
@@ -659,12 +1027,12 @@ function getCountryFlag(countryName: string): string {
                   <div class="flex-1">
                     <div class="flex justify-between items-center mb-1">
                       <span class="font-medium text-gray-900">{country.name}</span>
-                      <span class="font-bold text-gray-900">{country.weight.toFixed(2)}%</span>
+                      <span class="font-bold text-gray-900">{country.weight !== null && country.weight !== undefined ? country.weight.toFixed(2) + '%' : '-'}</span>
                     </div>
                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         class={`h-full bg-gradient-to-r ${colors[index % colors.length]} rounded-full`}
-                        style={`width: ${Math.min(country.weight, 100)}%`}
+                        style={`width: ${country.weight !== null && country.weight !== undefined ? Math.min(country.weight, 100) : 0}%`}
                       ></div>
                     </div>
                   </div>
@@ -699,12 +1067,12 @@ function getCountryFlag(countryName: string): string {
                   <div class="flex-1">
                     <div class="flex justify-between items-center mb-1">
                       <span class="font-medium text-gray-900">{sector.name}</span>
-                      <span class="font-bold text-gray-900">{sector.weight.toFixed(2)}%</span>
+                      <span class="font-bold text-gray-900">{sector.weight !== null && sector.weight !== undefined ? sector.weight.toFixed(2) + '%' : '-'}</span>
                     </div>
                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
                         class={`h-full bg-gradient-to-r ${colors[index % colors.length]} rounded-full`}
-                        style={`width: ${Math.min(sector.weight, 100)}%`}
+                        style={`width: ${sector.weight !== null && sector.weight !== undefined ? Math.min(sector.weight, 100) : 0}%`}
                       ></div>
                     </div>
                   </div>
@@ -727,13 +1095,13 @@ function getCountryFlag(countryName: string): string {
             <div>
               <dt class="text-sm text-gray-500 mb-1">Dividendový výnos</dt>
               <dd class="text-xl font-bold text-emerald-600">
-                {etf.current_dividend_yield_numeric ? etf.current_dividend_yield_numeric.toFixed(2) + '%' : '-'}
+                {etf.current_dividend_yield_numeric !== null && etf.current_dividend_yield_numeric !== undefined ? etf.current_dividend_yield_numeric.toFixed(2) + '%' : '-'}
               </dd>
             </div>
             <div>
               <dt class="text-sm text-gray-500 mb-1">Dividendy za 12m</dt>
               <dd class="text-xl font-bold text-gray-900">
-                {etf.dividends_12m_numeric ? etf.dividends_12m_numeric.toFixed(2) + ' ' + (etf.dividends_12m_currency || 'EUR') : '-'}
+                {etf.dividends_12m_numeric !== null && etf.dividends_12m_numeric !== undefined ? etf.dividends_12m_numeric.toFixed(2) + ' ' + (etf.dividends_12m_currency || 'EUR') : '-'}
               </dd>
             </div>
             <div>
@@ -769,13 +1137,13 @@ function getCountryFlag(countryName: string): string {
                 </tr>
               </thead>
               <tbody>
-                {etf.beta && (
+                {(etf.beta !== null && etf.beta !== undefined) && (
                   <tr class="border-b border-gray-100">
                     <td class="py-3 px-4 text-gray-700">Beta</td>
                     <td class="py-3 px-4 text-right font-medium text-gray-900">{etf.beta.toFixed(2)}</td>
                   </tr>
                 )}
-                {etf.correlation && (
+                {(etf.correlation !== null && etf.correlation !== undefined) && (
                   <tr class="border-b border-gray-100">
                     <td class="py-3 px-4 text-gray-700">Korelace</td>
                     <td class="py-3 px-4 text-right font-medium text-gray-900">{etf.correlation.toFixed(2)}</td>
@@ -812,6 +1180,27 @@ function getCountryFlag(countryName: string): string {
       </div>
     </section>
   )}
+
+  <!-- 🇨🇿 DETAILNÍ HODNOCENÍ - Pro zvídavé investory -->
+  <section class="py-12 bg-gradient-to-br from-violet-50 to-blue-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Detailní hodnocení ETF</h2>
+        <p class="text-gray-600">Naše expertní analýza ve 5 kategoriích</p>
+      </div>
+      <ETFRatingDetailed
+        ter={etf.ter_numeric}
+        fundSize={etf.fund_size_numeric}
+        return1y={etf.return_1y}
+        return3y={etf.return_3y}
+        return5y={etf.return_5y}
+        trackingError={etf.tracking_error}
+        category={etf.category}
+        distributionPolicy={etf.distribution_policy}
+        replication={etf.replication}
+      />
+    </div>
+  </section>
 
   <!-- Obchodní informace (Exchanges) -->
   {exchanges.length > 0 && (
@@ -875,6 +1264,22 @@ function getCountryFlag(countryName: string): string {
     </section>
   )}
 
+  <!-- 🇨🇿 KDE KOUPIT V ČR - Praktické info pro české investory -->
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Kde koupit v České republice</h2>
+        <p class="text-gray-600">Porovnání českých brokerů a reálných nákladů</p>
+      </div>
+      <CzechBrokerAvailability
+        etfName={etf.name}
+        isin={etf.isin}
+        ter={etf.ter_numeric}
+        isPopular={etf.fund_size_numeric > 1000}
+      />
+    </div>
+  </section>
+
   <section class="py-12 bg-gradient-to-r from-blue-600 to-indigo-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="text-2xl font-bold text-white mb-4">Chcete koupit {ticker}?</h2>
@@ -882,6 +1287,36 @@ function getCountryFlag(countryName: string): string {
       <a href="/kde-koupit-etf" class="inline-block bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
         Kde koupit ETF →
       </a>
+    </div>
+  </section>
+
+  <!-- ALTERNATIVY - Help users find better options -->
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <AlternativesComparison
+        currentETF={{
+          isin: etf.isin,
+          name: etf.name,
+          ticker: ticker
+        }}
+        alternatives={alternatives}
+        reason="Pokud vás zajímají podobná ETF ve stejné kategorii, porovnali jsme pro vás 3 nejpopulárnější alternativy."
+      />
+    </div>
+  </section>
+
+  <!-- 🇨🇿 DAŇOVÝ KONTEXT PRO ČR - Kritické info pro české investory -->
+  <section class="py-12 bg-gradient-to-br from-green-50 to-emerald-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Daňové hledisko pro české investory</h2>
+        <p class="text-gray-600">Co potřebujete vědět o zdanění tohoto ETF v ČR</p>
+      </div>
+      <CzechTaxContext
+        isAccumulating={etf.distribution_policy === 'Accumulating'}
+        currency={etf.fund_currency}
+        fundName={etf.name}
+      />
     </div>
   </section>
 

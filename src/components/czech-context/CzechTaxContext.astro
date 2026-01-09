@@ -1,0 +1,141 @@
+---
+interface Props {
+  isAccumulating: boolean;
+  currency: string;
+  fundName?: string;
+}
+
+const { isAccumulating, currency, fundName } = Astro.props;
+---
+
+<section class="bg-gradient-to-r from-blue-50 to-violet-50 rounded-xl p-6 my-8 border-2 border-blue-200">
+  <div class="flex items-start gap-3 mb-4">
+    <span class="text-3xl">🇨🇿</span>
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">
+        Jak danit toto ETF v České republice
+      </h2>
+      <p class="text-sm text-gray-600 mt-1">
+        Hodnocení z pohledu českého investora
+      </p>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    <!-- Akumulační vs Distribuční -->
+    <div class="bg-white rounded-lg p-5 border-l-4 {isAccumulating ? 'border-green-500' : 'border-orange-500'}">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">{isAccumulating ? '✅' : '⚠️'}</span>
+        <h3 class="font-bold text-lg {isAccumulating ? 'text-green-900' : 'text-orange-900'}">
+          {isAccumulating ? 'Akumulační ETF - daňově výhodné' : 'Distribuční ETF - dividendy se zdaňují'}
+        </h3>
+      </div>
+      <p class="text-gray-700 leading-relaxed">
+        {isAccumulating
+          ? `Toto ETF automaticky reinvestuje všechny zisky zpět do fondu. Pro českého investora je to ideální - během držení neplatíte žádnou daň z dividend. Daň zaplatíte pouze při prodeji, a to jen z realizovaného zisku.`
+          : `Dividendy podléhají 15% srážkové dani a musíte je každoročně uvést v daňovém přiznání. Pro české investory je výhodnější akumulační verze stejného ETF, pokud existuje. Distribuční ETF má smysl pouze pokud chcete pravidelný pasivní příjem.`}
+      </p>
+
+      {!isAccumulating && (
+        <div class="mt-3 p-3 bg-orange-50 rounded border border-orange-200">
+          <p class="text-sm text-orange-900 font-medium">
+            💡 <strong>Tip od editora:</strong> Pokud hledáte dlouhodobou investici, zvažte akumulační verzi tohoto ETF.
+            Ušetříte čas s daňovým přiznáním a kompoundování výnosů bude efektivnější.
+          </p>
+        </div>
+      )}
+    </div>
+
+    <!-- 3letý časový test -->
+    <div class="bg-white rounded-lg p-5 border-l-4 border-green-500">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">🎯</span>
+        <h3 class="font-bold text-lg text-green-900">
+          3letý časový test - osvobození od daně
+        </h3>
+      </div>
+      <p class="text-gray-700 leading-relaxed mb-3">
+        Při držení <strong>3 roky a více</strong> je zisk z prodeje <strong class="text-green-700">zcela osvobozen od daně z příjmu</strong>.
+        Toto je klíčová výhoda dlouhodobého investování v České republice.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-3">
+        <div class="bg-green-50 rounded p-3 border border-green-200">
+          <div class="font-semibold text-green-900 mb-1">✅ Držení 3+ roky</div>
+          <div class="text-sm text-gray-700">0 % daň z příjmu</div>
+          <div class="text-xs text-green-700 mt-1">Zisk není třeba uvádět v daňovém přiznání</div>
+        </div>
+
+        <div class="bg-red-50 rounded p-3 border border-red-200">
+          <div class="font-semibold text-red-900 mb-1">❌ Držení méně než 3 roky</div>
+          <div class="text-sm text-gray-700">15 % daň z příjmu</div>
+          <div class="text-xs text-red-700 mt-1">Zisk musí být uveden v daňovém přiznání</div>
+        </div>
+      </div>
+
+      <div class="mt-3 p-3 bg-blue-50 rounded border border-blue-200">
+        <p class="text-sm text-blue-900">
+          <strong>Příklad:</strong> Zisk 100 000 Kč po 2 letech = daň 15 000 Kč.
+          Stejný zisk po 3 letech = <strong>daň 0 Kč</strong>. Proto doporučujeme investiční horizont minimálně 5 let.
+        </p>
+      </div>
+    </div>
+
+    <!-- Měnové riziko -->
+    <div class="bg-white rounded-lg p-5 border-l-4 border-blue-500">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">💱</span>
+        <h3 class="font-bold text-lg text-blue-900">
+          Měnové riziko ({currency})
+        </h3>
+      </div>
+      <p class="text-gray-700 leading-relaxed mb-3">
+        {currency === 'EUR'
+          ? `Toto ETF je denominováno v EUR. Pokud koruna vůči euru posiluje, část vašeho výnosu "sežere" měnový kurz. Naopak při oslabování koruny získáte navíc.`
+          : currency === 'USD'
+          ? `Toto ETF je denominováno v USD. Americký dolar historicky posiloval vůči koruně, což pro české investory znamenalo dodatečný výnos. Není to ale zaručeno do budoucna.`
+          : `Toto ETF je denominováno v ${currency}. Sledujte vývoj kurzu vůči koruně - může významně ovlivnit váš celkový výnos.`}
+      </p>
+
+      <div class="bg-blue-50 rounded p-3 border border-blue-200">
+        <p class="text-sm text-blue-900">
+          <strong>Náš názor:</strong> Pro investiční horizont 10+ let je měnové riziko zanedbatelné.
+          Kurzy se v dlouhodobém horizontu vyrovnávají a diverzifikace do zahraničních měn je zdravá.
+          {currency === 'EUR' && ' Navíc EUR je pro Čechy relativně stabilní měna.'}
+        </p>
+      </div>
+    </div>
+
+    <!-- Praktické tipy -->
+    <div class="bg-gradient-to-r from-violet-50 to-blue-50 rounded-lg p-5 border border-violet-200">
+      <h3 class="font-bold text-violet-900 mb-3 flex items-center gap-2">
+        <span>💼</span>
+        Praktické rady pro české investory
+      </h3>
+      <ul class="space-y-2 text-gray-700">
+        <li class="flex gap-2">
+          <span class="text-green-600 font-bold">•</span>
+          <span><strong>Automatizujte investice:</strong> Nastavte si pravidelný měsíční nákup (DCA strategie) - snížíte riziko špatného načasování</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="text-green-600 font-bold">•</span>
+          <span><strong>Evidujte nákupy:</strong> Excel se vstupními cenami vám usnadní výpočet daně při prodeji</span>
+        </li>
+        <li class="flex gap-2">
+          <span class="text-green-600 font-bold">•</span>
+          <span><strong>Dlouhodobý horizont:</strong> Minimálně 5 let, ideálně 10-20 let pro maximální efekt compoundingu</span>
+        </li>
+        {isAccumulating && (
+          <li class="flex gap-2">
+            <span class="text-green-600 font-bold">•</span>
+            <span><strong>Akumulační výhoda:</strong> Žádná administrativa s dividendami = více času, méně starostí</span>
+          </li>
+        )}
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-4 text-xs text-gray-500 italic">
+    ⚠️ Tento obsah není daňové poradenství. Pro konkrétní daňovou situaci konzultujte s daňovým poradcem.
+  </div>
+</section>

@@ -1,0 +1,214 @@
+---
+interface Props {
+  etfName: string;
+  category: string;
+  rating: number; // 1-5
+  suitableFor: string[];
+  notSuitableFor: string[];
+  personalOpinion: string;
+  author?: string;
+  lastUpdated?: string;
+}
+
+const {
+  etfName,
+  category,
+  rating,
+  suitableFor,
+  notSuitableFor,
+  personalOpinion,
+  author = 'Tomáš Kostrhoun',
+  lastUpdated = new Date().toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' })
+} = Astro.props;
+
+// Generuj hvězdičky
+const stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
+
+// Rating text
+const getRatingText = (rating: number) => {
+  if (rating >= 4.5) return 'Výborná volba';
+  if (rating >= 4.0) return 'Dobrá volba';
+  if (rating >= 3.5) return 'Průměrná volba';
+  if (rating >= 3.0) return 'Podmíněně vhodné';
+  return 'Nedoporučujeme';
+};
+
+const getRatingColor = (rating: number) => {
+  if (rating >= 4.5) return 'from-green-600 to-emerald-600';
+  if (rating >= 4.0) return 'from-blue-600 to-violet-600';
+  if (rating >= 3.5) return 'from-violet-600 to-purple-600';
+  if (rating >= 3.0) return 'from-orange-600 to-red-600';
+  return 'from-red-600 to-red-700';
+};
+---
+
+<section class="bg-gradient-to-br {getRatingColor(rating)} rounded-2xl p-8 my-8 text-white shadow-xl">
+  <!-- Hlavička -->
+  <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
+    <div>
+      <div class="inline-flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-3">
+        <span class="text-sm font-medium">🇨🇿 Hodnocení z pohledu českého investora</span>
+      </div>
+      <h2 class="text-3xl md:text-4xl font-bold mb-2">
+        Náš verdikt: {etfName}
+      </h2>
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="text-3xl text-yellow-300">
+          {stars}
+        </div>
+        <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+          <span class="font-bold text-lg">{rating.toFixed(1)}/5.0</span>
+          <span class="text-sm ml-2 opacity-90">{getRatingText(rating)}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-sm">
+      <div class="opacity-75 mb-1">Poslední aktualizace</div>
+      <div class="font-semibold">{lastUpdated}</div>
+    </div>
+  </div>
+
+  <!-- Grid: Pro koho je / Pro koho není -->
+  <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <!-- Pro koho je vhodné -->
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-3xl">✅</span>
+        <h3 class="text-xl font-bold">Pro koho je vhodné</h3>
+      </div>
+      <ul class="space-y-3">
+        {suitableFor.map((item) => (
+          <li class="flex items-start gap-3">
+            <span class="text-green-300 text-xl mt-1 flex-shrink-0">•</span>
+            <span class="text-white/95 leading-relaxed">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- Pro koho to není -->
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-3xl">❌</span>
+        <h3 class="text-xl font-bold">Pro koho to není</h3>
+      </div>
+      <ul class="space-y-3">
+        {notSuitableFor.map((item) => (
+          <li class="flex items-start gap-3">
+            <span class="text-red-300 text-xl mt-1 flex-shrink-0">•</span>
+            <span class="text-white/95 leading-relaxed">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Osobní názor autora -->
+  <div class="bg-white/15 backdrop-blur-lg rounded-xl p-6 border-2 border-white/30 mb-6">
+    <div class="flex items-start gap-4 mb-4">
+      <div class="bg-white/20 rounded-full p-3 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold mb-1">Osobní názor editora</h3>
+        <p class="text-white/80 text-sm">{author} · Zakladatel ETF průvodce.cz · Investor od 2015</p>
+      </div>
+    </div>
+
+    <div class="bg-white/10 rounded-lg p-5 border-l-4 border-white/50">
+      <p class="text-lg leading-relaxed text-white/95 italic">
+        "{personalOpinion}"
+      </p>
+    </div>
+
+    <div class="mt-4 flex items-center gap-2 text-sm text-white/70">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 6v6l4 2"></path>
+      </svg>
+      <span>Tento názor vychází z osobní zkušenosti a analýzy dostupných dat k datu {lastUpdated}</span>
+    </div>
+  </div>
+
+  <!-- Shrnutí - Key takeaways -->
+  <div class="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-md rounded-xl p-6 border border-white/20">
+    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+      <span>🎯</span>
+      Klíčové body k zapamatování
+    </h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">📊</span>
+        <div>
+          <div class="font-semibold mb-1">Kategorie</div>
+          <div class="text-white/80 text-sm">{category}</div>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">⭐</span>
+        <div>
+          <div class="font-semibold mb-1">Naše hodnocení</div>
+          <div class="text-white/80 text-sm">{rating.toFixed(1)}/5.0 - {getRatingText(rating)}</div>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">👥</span>
+        <div>
+          <div class="font-semibold mb-1">Ideální pro</div>
+          <div class="text-white/80 text-sm">{suitableFor[0]}</div>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">🏦</span>
+        <div>
+          <div class="font-semibold mb-1">Doporučený broker</div>
+          <div class="text-white/80 text-sm">
+            <a href="/xtb-recenze" class="hover:underline">XTB (0% poplatky)</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Autor credentials -->
+  <div class="mt-6 pt-6 border-t border-white/20">
+    <div class="flex items-center gap-4 flex-wrap">
+      <div class="text-sm text-white/70">
+        <strong class="text-white">Autor recenze:</strong> {author}
+      </div>
+      <span class="text-white/30">•</span>
+      <a
+        href="https://www.linkedin.com/in/tomas-kostrhoun-b34a6831"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-sm text-white/80 hover:text-white hover:underline flex items-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+        </svg>
+        LinkedIn profil
+      </a>
+      <span class="text-white/30">•</span>
+      <a
+        href="/o-nas"
+        class="text-sm text-white/80 hover:text-white hover:underline"
+      >
+        O nás
+      </a>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
+    <p class="text-xs text-white/60 leading-relaxed">
+      ⚠️ <strong>Disclaimer:</strong> Tento obsah není investiční poradenství. Jedná se o osobní názor autora
+      založený na analýze dostupných dat. Investování do ETF s sebou nese riziko ztráty investované částky.
+      Minulá výkonnost není zárukou budoucích výnosů. Před investováním si prověřte vlastní investiční cíle,
+      rizikový profil a případně konzultujte s finančním poradcem.
+    </p>
+  </div>
+</section>

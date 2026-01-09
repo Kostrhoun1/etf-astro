@@ -1,0 +1,386 @@
+---
+interface Props {
+  etfName: string;
+  isin: string;
+  ter: number;
+  isPopular?: boolean;
+}
+
+const { etfName, isin, ter, isPopular = false } = Astro.props;
+
+// Poplatky brokerů (aktuální k 2026)
+const brokers = [
+  {
+    name: 'XTB',
+    logo: '🟢',
+    fee: 0,
+    feeText: '0 % poplatky',
+    pros: ['0 % poplatky do 100 000 EUR/měsíc', 'Česká zákaznická podpora', 'Frakční podíly'],
+    cons: ['Nad 100k EUR/měsíc poplatky 0.2%'],
+    minInvestment: 'Od 1 EUR',
+    automation: 'Automatické investování',
+    rating: 4.8,
+    recommended: true,
+    link: '/xtb-recenze'
+  },
+  {
+    name: 'Portu',
+    logo: '🟣',
+    fee: 0.24,
+    feeText: '0.24-1 % ročně',
+    pros: ['Automatické investování', 'Rebalancování portfolia', 'Česká společnost'],
+    cons: ['Vyšší poplatky než u XTB', 'Méně ETF na výběr'],
+    minInvestment: 'Od 500 Kč',
+    automation: 'Plně automatické',
+    rating: 4.9,
+    recommended: false,
+    link: '/portu-recenze'
+  },
+  {
+    name: 'Trading212',
+    logo: '🔵',
+    fee: 0,
+    feeText: '0 % poplatky',
+    pros: ['0 % poplatky bez limitu', 'Frakční podíly', 'Auto-invest zdarma'],
+    cons: ['Bez české podpory', 'Občas fronta na registraci'],
+    minInvestment: 'Od 1 EUR',
+    automation: 'Pie portfolia',
+    rating: 4.5,
+    recommended: true,
+    link: '/trading212-recenze'
+  },
+  {
+    name: 'DEGIRO',
+    logo: '🟠',
+    fee: 1,
+    feeText: '1 EUR + 0.02% spread',
+    pros: ['Nízké poplatky', 'Velký výběr ETF', 'Některá ETF zdarma'],
+    cons: ['Roční poplatek za konektivitu (2.50 EUR)', 'Poplatky za inaktivitu'],
+    minInvestment: '1 EUR + poplatek',
+    automation: 'Ne',
+    rating: 4.2,
+    recommended: false,
+    link: '/degiro-recenze'
+  },
+  {
+    name: 'Interactive Brokers',
+    logo: '⚪',
+    fee: 1.25,
+    feeText: '0.05% (min 1.25 EUR)',
+    pros: ['Profesionální platforma', 'Nejnižší poplatky pro velké objemy', 'Globální přístup'],
+    cons: ['Složitější pro začátečníky', 'Minimum 10 USD/měsíc aktivita'],
+    minInvestment: 'Bez minima',
+    automation: 'Částečně',
+    rating: 4.7,
+    recommended: false,
+    link: '/interactive-brokers-recenze'
+  },
+  {
+    name: 'Fio eBroker',
+    logo: '🔴',
+    fee: 15,
+    feeText: '0.25% (min 15 Kč)',
+    pros: ['Česká banka', 'Snadné propojení s účtem', 'Dobrá pro začátečníky'],
+    cons: ['Vysoké poplatky', 'Omezený výběr ETF', 'Žádné frakční podíly'],
+    minInvestment: 'Cena 1 podílu',
+    automation: 'Ne',
+    rating: 3.5,
+    recommended: false,
+    link: '/fio-ebroker-recenze'
+  }
+];
+
+// Simulace celkových nákladů za 10 let pravidelného investování
+function calculateTotalCost10Years(monthlyAmount: number, broker: typeof brokers[0], ter: number) {
+  const years = 10;
+  const annualReturn = 0.07; // předpokládaný 7% roční výnos
+  let portfolioValue = 0;
+  let totalBrokerFees = 0;
+  let totalTERFees = 0;
+
+  for (let year = 1; year <= years; year++) {
+    // Investování každý měsíc
+    for (let month = 1; month <= 12; month++) {
+      // Broker poplatek za transakci
+      let transactionFee = 0;
+      if (broker.name === 'Portu') {
+        // Portu nemá transakční poplatky, jen roční z portfolia
+        transactionFee = 0;
+      } else if (broker.name === 'DEGIRO') {
+        transactionFee = broker.fee * 25; // 1 EUR = ~25 Kč
+      } else if (broker.name === 'Fio eBroker') {
+        transactionFee = Math.max((monthlyAmount * broker.fee) / 100, 15);
+      } else if (broker.name === 'Interactive Brokers') {
+        transactionFee = Math.max((monthlyAmount * 0.05) / 100, 1.25) * 25; // EUR to CZK
+      }
+      // XTB a Trading212 mají 0
+
+      totalBrokerFees += transactionFee;
+      portfolioValue += monthlyAmount;
+    }
+
+    // Roční růst portfolia (po investicích)
+    portfolioValue *= (1 + annualReturn);
+
+    // Roční poplatky (TER + Portu) z hodnoty portfolia
+    const annualTER = portfolioValue * (ter / 100);
+    totalTERFees += annualTER;
+
+    if (broker.name === 'Portu') {
+      // Portu účtuje 0.6% ročně z portfolia (realistická sazba)
+      totalBrokerFees += portfolioValue * 0.006;
+    }
+
+    // Odečteme TER z portfolia (je to skrytý náklad)
+    portfolioValue -= annualTER;
+  }
+
+  return {
+    totalBrokerFees: Math.round(totalBrokerFees),
+    totalTERFees: Math.round(totalTERFees),
+    totalCost: Math.round(totalBrokerFees + totalTERFees),
+    portfolioValue: Math.round(portfolioValue)
+  };
+}
+
+const monthlyInvestments = [10000, 20000, 30000];
+---
+
+<section class="bg-white rounded-xl p-6 md:p-8 my-8 border-2 border-gray-200 shadow-lg">
+  <div class="flex items-start gap-3 mb-6">
+    <span class="text-3xl">🏦</span>
+    <div>
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
+        Kde koupit {etfName} v České republice
+      </h2>
+      <p class="text-sm text-gray-600 mt-1">
+        Srovnání poplatků a dostupnosti u českých brokerů
+      </p>
+    </div>
+  </div>
+
+  <!-- Doporučený broker - Highlight -->
+  <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-8 border-2 border-green-300">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-4xl">✅</span>
+      <div>
+        <div class="text-sm font-semibold text-green-700 uppercase tracking-wide">Naše doporučení pro české investory</div>
+        <h3 class="text-2xl font-bold text-green-900">XTB - Nejlepší pro pravidelné investování</h3>
+      </div>
+    </div>
+    <p class="text-gray-700 leading-relaxed mb-4">
+      Pro investování do <strong>{etfName}</strong> doporučujeme brokera <strong>XTB</strong>.
+      Nabízí 0 % poplatky do objemu 100 000 EUR měsíčně, českou zákaznickou podporu
+      a možnost nákupu frakčních podílů. Ideální pro začátečníky i pokročilé investory.
+    </p>
+    <div class="flex flex-wrap gap-3">
+      <a
+        href="/xtb-recenze"
+        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
+      >
+        📊 Detailní recenze XTB
+      </a>
+      <a
+        href="https://www.xtb.com/cz"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="bg-white hover:bg-gray-50 text-green-700 border-2 border-green-300 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
+      >
+        🔗 Otevřít účet na XTB
+      </a>
+    </div>
+  </div>
+
+  <!-- Srovnávací tabulka -->
+  <div class="mb-8">
+    <h3 class="text-xl font-bold text-gray-900 mb-4">Porovnání poplatků u všech brokerů</h3>
+
+    <!-- Desktop tabulka -->
+    <div class="hidden md:block overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="text-left p-3 font-semibold text-gray-700">Broker</th>
+            <th class="text-left p-3 font-semibold text-gray-700">Poplatek</th>
+            <th class="text-left p-3 font-semibold text-gray-700">Min. investice</th>
+            <th class="text-left p-3 font-semibold text-gray-700">Automatizace</th>
+            <th class="text-left p-3 font-semibold text-gray-700">Hodnocení</th>
+            <th class="text-left p-3 font-semibold text-gray-700"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {brokers.map((broker) => (
+            <tr class="border-t border-gray-200 hover:bg-gray-50">
+              <td class="p-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">{broker.logo}</span>
+                  <strong class="text-gray-900">{broker.name}</strong>
+                  {broker.recommended && (
+                    <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">
+                      Doporučeno
+                    </span>
+                  )}
+                </div>
+              </td>
+              <td class="p-3">
+                <div class="font-semibold text-gray-900">{broker.feeText}</div>
+              </td>
+              <td class="p-3 text-gray-600">{broker.minInvestment}</td>
+              <td class="p-3 text-gray-600">{broker.automation}</td>
+              <td class="p-3">
+                <div class="flex items-center gap-1">
+                  <span class="text-yellow-500">★</span>
+                  <span class="font-semibold text-gray-900">{broker.rating}</span>
+                  <span class="text-gray-500 text-xs">/5</span>
+                </div>
+              </td>
+              <td class="p-3">
+                <a
+                  href={broker.link}
+                  class="text-violet-600 hover:text-violet-700 font-medium text-sm hover:underline"
+                >
+                  Recenze →
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile cards -->
+    <div class="md:hidden space-y-4">
+      {brokers.map((broker) => (
+        <div class="border border-gray-200 rounded-lg p-4 {broker.recommended ? 'border-green-300 bg-green-50' : 'bg-white'}">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">{broker.logo}</span>
+              <strong class="text-gray-900">{broker.name}</strong>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-yellow-500 text-sm">★</span>
+              <span class="font-semibold text-sm text-gray-900">{broker.rating}</span>
+            </div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div><span class="text-gray-600">Poplatek:</span> <strong>{broker.feeText}</strong></div>
+            <div><span class="text-gray-600">Min. investice:</span> {broker.minInvestment}</div>
+            <div><span class="text-gray-600">Automatizace:</span> {broker.automation}</div>
+          </div>
+          <a
+            href={broker.link}
+            class="mt-3 block text-center bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded font-medium text-sm"
+          >
+            Zobrazit recenzi
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Kalkulace reálných nákladů -->
+  <div class="mb-8">
+    <h3 class="text-xl font-bold text-gray-900 mb-4">
+      💰 Celkové náklady za 10 let investování
+    </h3>
+    <p class="text-gray-600 mb-4">
+      Kolik <strong>celkem zaplatíte na poplatcích</strong> za 10 let pravidelného investování do tohoto ETF?
+    </p>
+    <p class="text-sm text-gray-500 mb-4">
+      ℹ️ Simulace zahrnuje: poplatky brokera + TER fondu ({ter.toFixed(2)}%) + předpokládaný růst 7% ročně
+    </p>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-violet-50">
+          <tr>
+            <th class="text-left p-3 font-semibold text-gray-700">Měsíční investice</th>
+            {brokers.slice(0, 4).map((broker) => (
+              <th class="text-right p-3 font-semibold text-gray-700">{broker.name}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {monthlyInvestments.map((amount) => (
+            <tr class="border-t border-gray-200">
+              <td class="p-3">
+                <div class="font-medium text-gray-900">{amount.toLocaleString('cs-CZ')} Kč/měsíc</div>
+                <div class="text-xs text-gray-500">Za 10 let: {(amount * 12 * 10).toLocaleString('cs-CZ')} Kč investováno</div>
+              </td>
+              {brokers.slice(0, 4).map((broker) => {
+                const result = calculateTotalCost10Years(amount, broker, ter);
+                const allResults = brokers.slice(0, 4).map(b => calculateTotalCost10Years(amount, b, ter));
+                const lowestCost = Math.min(...allResults.map(r => r.totalCost));
+                const isLowest = result.totalCost === lowestCost;
+                return (
+                  <td class="p-3 text-right {isLowest ? 'bg-green-50' : ''}">
+                    <div class={isLowest ? 'font-bold text-green-700 text-base' : 'font-semibold text-gray-900 text-base'}>
+                      {result.totalCost.toLocaleString('cs-CZ')} Kč
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">
+                      {result.totalBrokerFees.toLocaleString('cs-CZ')} broker
+                      <br/>+ {result.totalTERFees.toLocaleString('cs-CZ')} TER
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+      <p class="text-sm text-blue-900">
+        <strong>💡 Příklad:</strong> Při investování <strong>20 000 Kč měsíčně</strong> po dobu <strong>10 let</strong>:
+        <br/>• Investujete celkem: <strong>2 400 000 Kč</strong>
+        <br/>• S XTB zaplatíte: <strong>{calculateTotalCost10Years(20000, brokers[0], ter).totalCost.toLocaleString('cs-CZ')} Kč</strong> na poplatcích
+        <br/>• S Fio eBroker: <strong>{calculateTotalCost10Years(20000, brokers[5], ter).totalCost.toLocaleString('cs-CZ')} Kč</strong> na poplatcích
+        <br/>• Rozdíl: <strong>{(calculateTotalCost10Years(20000, brokers[5], ter).totalCost - calculateTotalCost10Years(20000, brokers[0], ter).totalCost).toLocaleString('cs-CZ')} Kč</strong> ušetříte!
+      </p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="mt-8 pt-8 border-t border-gray-200">
+    <h3 class="text-lg font-bold text-gray-900 mb-4">Časté otázky</h3>
+    <div class="space-y-4">
+      <details class="group">
+        <summary class="cursor-pointer font-semibold text-gray-900 hover:text-violet-600 list-none flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <span>Mohu koupit frakční podíl tohoto ETF?</span>
+          <span class="group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div class="p-4 text-gray-700 text-sm leading-relaxed">
+          Ano, u brokerů <strong>XTB</strong> a <strong>Trading212</strong> můžete koupit i zlomky podílů.
+          To znamená, že můžete investovat přesně částku, kterou chcete (např. 5 000 Kč), bez ohledu na cenu jednoho podílu ETF.
+          U ostatních brokerů musíte kupovat celé podíly.
+        </div>
+      </details>
+
+      <details class="group">
+        <summary class="cursor-pointer font-semibold text-gray-900 hover:text-violet-600 list-none flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <span>Je toto ETF dostupné na všech českých brokerech?</span>
+          <span class="group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div class="p-4 text-gray-700 text-sm leading-relaxed">
+          {isPopular
+            ? `Ano, ${etfName} je velmi populární ETF, takže je dostupné u všech hlavních českých brokerů včetně XTB, Trading212, DEGIRO, Interactive Brokers i Fio eBroker.`
+            : `U populárních brokerů (XTB, Trading212, DEGIRO) by toto ETF mělo být dostupné. U menších brokerů jako Fio eBroker doporučuji nejprve ověřit dostupnost před otevřením účtu.`}
+        </div>
+      </details>
+
+      <details class="group">
+        <summary class="cursor-pointer font-semibold text-gray-900 hover:text-violet-600 list-none flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <span>Proč ne Fio eBroker, když je to česká banka?</span>
+          <span class="group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <div class="p-4 text-gray-700 text-sm leading-relaxed">
+          Fio eBroker je skvělý pro začátečníky kvůli jednoduchosti a propojení s bankovním účtem.
+          <strong>Ale poplatky 0.25% (min. 15 Kč) za každý nákup</strong> jsou v dnešní době nekonkurenceschopné.
+          Za 10 let investování 10 000 Kč měsíčně zaplatíte u Fio <strong>{calculateTotalCost10Years(10000, brokers[5], ter).totalBrokerFees.toLocaleString('cs-CZ')} Kč</strong> jen na poplatcích brokera,
+          zatímco u XTB <strong>0 Kč</strong>. XTB má navíc českou podporu, takže komfort je podobný.
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
