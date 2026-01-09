@@ -812,11 +812,11 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                       data-czk={etf.return_1y_czk ?? ''}
                       data-usd={etf.return_1y_usd ?? ''}>
                     <span class:list={[etf.return_1y_czk && etf.return_1y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_1y_czk !== null && etf.return_1y_czk !== undefined ? etf.return_1y_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_1y_czk !== null && etf.return_1y_czk !== undefined ? safeToFixed(etf.return_1y_czk, 2) + '%' : '-'}
                     </span>
                   </td>
                   <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_1y && etf.return_per_risk_1y > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                    {etf.return_per_risk_1y !== null && etf.return_per_risk_1y !== undefined ? etf.return_per_risk_1y.toFixed(2) : '-'}
+                    {etf.return_per_risk_1y !== null && etf.return_per_risk_1y !== undefined ? safeToFixed(etf.return_per_risk_1y, 2) : '-'}
                   </td>
                 </tr>
                 <tr class="border-b border-gray-100">
@@ -826,11 +826,11 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                       data-czk={etf.return_3y_czk ?? ''}
                       data-usd={etf.return_3y_usd ?? ''}>
                     <span class:list={[etf.return_3y_czk && etf.return_3y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_3y_czk !== null && etf.return_3y_czk !== undefined ? etf.return_3y_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_3y_czk !== null && etf.return_3y_czk !== undefined ? safeToFixed(etf.return_3y_czk, 2) + '%' : '-'}
                     </span>
                   </td>
                   <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_3y && etf.return_per_risk_3y > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                    {etf.return_per_risk_3y !== null && etf.return_per_risk_3y !== undefined ? etf.return_per_risk_3y.toFixed(2) : '-'}
+                    {etf.return_per_risk_3y !== null && etf.return_per_risk_3y !== undefined ? safeToFixed(etf.return_per_risk_3y, 2) : '-'}
                   </td>
                 </tr>
                 <tr class="border-b border-gray-100">
@@ -840,11 +840,11 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                       data-czk={etf.return_5y_czk ?? ''}
                       data-usd={etf.return_5y_usd ?? ''}>
                     <span class:list={[etf.return_5y_czk && etf.return_5y_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_5y_czk !== null && etf.return_5y_czk !== undefined ? etf.return_5y_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_5y_czk !== null && etf.return_5y_czk !== undefined ? safeToFixed(etf.return_5y_czk, 2) + '%' : '-'}
                     </span>
                   </td>
                   <td class:list={['py-3 px-2 text-right font-medium', etf.return_per_risk_5y && etf.return_per_risk_5y > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                    {etf.return_per_risk_5y !== null && etf.return_per_risk_5y !== undefined ? etf.return_per_risk_5y.toFixed(2) : '-'}
+                    {etf.return_per_risk_5y !== null && etf.return_per_risk_5y !== undefined ? safeToFixed(etf.return_per_risk_5y, 2) : '-'}
                   </td>
                 </tr>
               </tbody>
@@ -1095,13 +1095,13 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
             <div>
               <dt class="text-sm text-gray-500 mb-1">Dividendový výnos</dt>
               <dd class="text-xl font-bold text-emerald-600">
-                {etf.current_dividend_yield_numeric !== null && etf.current_dividend_yield_numeric !== undefined ? etf.current_dividend_yield_numeric.toFixed(2) + '%' : '-'}
+                {etf.current_dividend_yield_numeric !== null && etf.current_dividend_yield_numeric !== undefined ? safeToFixed(etf.current_dividend_yield_numeric, 2) + '%' : '-'}
               </dd>
             </div>
             <div>
               <dt class="text-sm text-gray-500 mb-1">Dividendy za 12m</dt>
               <dd class="text-xl font-bold text-gray-900">
-                {etf.dividends_12m_numeric !== null && etf.dividends_12m_numeric !== undefined ? etf.dividends_12m_numeric.toFixed(2) + ' ' + (etf.dividends_12m_currency || 'EUR') : '-'}
+                {etf.dividends_12m_numeric !== null && etf.dividends_12m_numeric !== undefined ? safeToFixed(etf.dividends_12m_numeric, 2) + ' ' + (etf.dividends_12m_currency || 'EUR') : '-'}
               </dd>
             </div>
             <div>

@@ -5,6 +5,11 @@ import Top3ETF from '../../components/etf/Top3ETF.astro';
 import Top10Sections from '../../components/etf/Top10Sections.astro';
 import { getTopETFsForCategory, categoryConfigs } from '../../lib/etf-data';
 
+// 🇨🇿 Czech-context components for Gemini Strategy
+import CategorySpecificInsights from '../../components/czech-context/CategorySpecificInsights.astro';
+import CategoryBrokerComparison from '../../components/czech-context/CategoryBrokerComparison.astro';
+import CategoryTaxImpact from '../../components/czech-context/CategoryTaxImpact.astro';
+
 const config = categoryConfigs['nejlepsi-emerging-markets-etf'];
 const etfs = await getTopETFsForCategory(config);
 const currentYear = new Date().getFullYear();
@@ -467,6 +472,11 @@ const introFeatures = [
       <Top10Sections etfs={etfs} currency="EUR" categoryName="Emerging Markets" />
     </div>
   </section>
+
+  <!-- 🇨🇿 Czech Context Components -->
+  <CategorySpecificInsights categoryKey="emerging-markets" categoryName="Emerging Markets" />
+  <CategoryBrokerComparison categoryKey="emerging-markets" categoryName="Emerging Markets" topETFs={etfs.slice(0, 3)} />
+  <CategoryTaxImpact categoryKey="emerging-markets" categoryName="Emerging Markets" />
 
   <!-- Selection Guide -->
   <section id="pruvodce" class="py-20 bg-gradient-to-br from-emerald-50 to-violet-50">
