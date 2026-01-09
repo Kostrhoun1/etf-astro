@@ -382,7 +382,7 @@ function generateNotSuitableFor(etf: any, topCountries: any[], topSectors: any[]
 
   // === 4. NÁKLADY ===
   if (etf.ter_numeric !== null && etf.ter_numeric !== undefined && etf.ter_numeric > 0.40) {
-    notSuitable.push(`Dlouhodobé buy-and-hold - TER ${etf.ter_numeric.toFixed(2)}% sežere významnou část výnosů`);
+    notSuitable.push(`Dlouhodobé buy-and-hold - TER ${safeToFixed(etf.ter_numeric, 2)}% sežere významnou část výnosů`);
   } else if (etf.ter_numeric !== null && etf.ter_numeric !== undefined && etf.fund_size_numeric !== null && etf.fund_size_numeric !== undefined && etf.ter_numeric > 0.25 && etf.fund_size_numeric < 500) {
     notSuitable.push('Cost-conscious investory - kombinace vysokého TER a malé likvidity');
   }
@@ -416,13 +416,13 @@ function generatePersonalOpinion(etf: any, topCountries: any[], topSectors: any[
   // 1. HODNOCENÍ NÁKLADŮ (TER)
   if (etf.ter_numeric !== null && etf.ter_numeric !== undefined) {
     if (etf.ter_numeric < 0.10) {
-      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je vynikající - patří mezi nejlevnější ETF na trhu`);
+      parts.push(`TER ${safeToFixed(etf.ter_numeric, 2)}% je vynikající - patří mezi nejlevnější ETF na trhu`);
     } else if (etf.ter_numeric < 0.20) {
-      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je velmi dobrý - rozumná cena za kvalitní správu`);
+      parts.push(`TER ${safeToFixed(etf.ter_numeric, 2)}% je velmi dobrý - rozumná cena za kvalitní správu`);
     } else if (etf.ter_numeric < 0.50) {
-      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je průměrný - existují levnější alternativy`);
+      parts.push(`TER ${safeToFixed(etf.ter_numeric, 2)}% je průměrný - existují levnější alternativy`);
     } else {
-      parts.push(`TER ${etf.ter_numeric.toFixed(2)}% je vysoký - doporučuji zvážit levnější alternativy`);
+      parts.push(`TER ${safeToFixed(etf.ter_numeric, 2)}% je vysoký - doporučuji zvážit levnější alternativy`);
     }
   }
 
@@ -445,10 +445,10 @@ function generatePersonalOpinion(etf: any, topCountries: any[], topSectors: any[
 
   if (isDiversified && topCountries[0]?.weight !== null && topCountries[0]?.weight !== undefined) {
     const topMarket = topCountries[0]?.name || 'hlavní trhy';
-    parts.push(`dobře diverzifikováno napříč regiony (${topMarket} ${topCountries[0].weight.toFixed(0)}%)`);
+    parts.push(`dobře diverzifikováno napříč regiony (${topMarket} ${safeToFixed(topCountries[0].weight, 0)}%)`);
   } else if (isConcentrated && topCountries[0]?.weight !== null && topCountries[0]?.weight !== undefined) {
     const topMarket = topCountries[0]?.name || 'jeden trh';
-    parts.push(`koncentrováno na ${topMarket} (${topCountries[0].weight.toFixed(0)}%) - vyšší riziko`);
+    parts.push(`koncentrováno na ${topMarket} (${safeToFixed(topCountries[0].weight, 0)}%) - vyšší riziko`);
   }
 
   // 4. DAŇOVÁ OPTIMALIZACE
@@ -461,9 +461,9 @@ function generatePersonalOpinion(etf: any, topCountries: any[], topSectors: any[
   // 5. VÝKONNOST (pokud je k dispozici)
   if (etf.return_1y !== null && etf.return_1y !== undefined) {
     if (etf.return_1y > 15) {
-      parts.push(`výborná 1-roční výkonnost ${etf.return_1y.toFixed(1)}%`);
+      parts.push(`výborná 1-roční výkonnost ${safeToFixed(etf.return_1y, 1)}%`);
     } else if (etf.return_1y < 0) {
-      parts.push(`negativní 1-roční výkonnost ${etf.return_1y.toFixed(1)}%`);
+      parts.push(`negativní 1-roční výkonnost ${safeToFixed(etf.return_1y, 1)}%`);
     }
   }
 
@@ -500,7 +500,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
   return1y: alt.return_1y,
   rating: alt.rating,
   whyBetter: alt.ter_numeric !== null && etf.ter_numeric !== null && alt.ter_numeric < etf.ter_numeric
-    ? `Nižší TER (${alt.ter_numeric.toFixed(2)}% vs ${etf.ter_numeric.toFixed(2)}%)`
+    ? `Nižší TER (${safeToFixed(alt.ter_numeric, 2)}% vs ${safeToFixed(etf.ter_numeric, 2)}%)`
     : alt.fund_size_numeric !== null && etf.fund_size_numeric !== null && alt.fund_size_numeric > etf.fund_size_numeric
     ? 'Větší fond = vyšší likvidita'
     : 'Podobné parametry, jiný poskytovatel'
@@ -949,7 +949,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
           const span = el.querySelector('span') || el;
 
           if (val && !isNaN(num)) {
-            span.textContent = num.toFixed(2) + '%';
+            span.textContent = safeToFixed(num, 2) + '%';
             span.className = num > 0 ? 'text-emerald-600' : 'text-red-600';
           } else {
             span.textContent = '-';
@@ -1140,13 +1140,13 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                 {(etf.beta !== null && etf.beta !== undefined) && (
                   <tr class="border-b border-gray-100">
                     <td class="py-3 px-4 text-gray-700">Beta</td>
-                    <td class="py-3 px-4 text-right font-medium text-gray-900">{etf.beta.toFixed(2)}</td>
+                    <td class="py-3 px-4 text-right font-medium text-gray-900">{safeToFixed(etf.beta, 2)}</td>
                   </tr>
                 )}
                 {(etf.correlation !== null && etf.correlation !== undefined) && (
                   <tr class="border-b border-gray-100">
                     <td class="py-3 px-4 text-gray-700">Korelace</td>
-                    <td class="py-3 px-4 text-right font-medium text-gray-900">{etf.correlation.toFixed(2)}</td>
+                    <td class="py-3 px-4 text-right font-medium text-gray-900">{safeToFixed(etf.correlation, 2)}</td>
                   </tr>
                 )}
                 {etf.tracking_error && (
