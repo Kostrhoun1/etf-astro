@@ -2,7 +2,7 @@
 interface Props {
   etfName: string;
   category: string;
-  rating: number; // 1-5
+  rating: number | null; // 1-5
   suitableFor: string[];
   notSuitableFor: string[];
   personalOpinion: string;
@@ -21,23 +21,32 @@ const {
   lastUpdated = new Date().toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' })
 } = Astro.props;
 
+// Safe number formatting helper
+function safeToFixed(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined || isNaN(value)) return '0';
+  return value.toFixed(decimals);
+}
+
 // Generuj hvězdičky
-const stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
+const ratingValue = rating || 0;
+const stars = '★'.repeat(Math.round(ratingValue)) + '☆'.repeat(5 - Math.round(ratingValue));
 
 // Rating text
-const getRatingText = (rating: number) => {
-  if (rating >= 4.5) return 'Výborná volba';
-  if (rating >= 4.0) return 'Dobrá volba';
-  if (rating >= 3.5) return 'Průměrná volba';
-  if (rating >= 3.0) return 'Podmíněně vhodné';
+const getRatingText = (rating: number | null) => {
+  const r = rating || 0;
+  if (r >= 4.5) return 'Výborná volba';
+  if (r >= 4.0) return 'Dobrá volba';
+  if (r >= 3.5) return 'Průměrná volba';
+  if (r >= 3.0) return 'Podmíněně vhodné';
   return 'Nedoporučujeme';
 };
 
-const getRatingColor = (rating: number) => {
-  if (rating >= 4.5) return 'from-green-600 to-emerald-600';
-  if (rating >= 4.0) return 'from-blue-600 to-violet-600';
-  if (rating >= 3.5) return 'from-violet-600 to-purple-600';
-  if (rating >= 3.0) return 'from-orange-600 to-red-600';
+const getRatingColor = (rating: number | null) => {
+  const r = rating || 0;
+  if (r >= 4.5) return 'from-green-600 to-emerald-600';
+  if (r >= 4.0) return 'from-blue-600 to-violet-600';
+  if (r >= 3.5) return 'from-violet-600 to-purple-600';
+  if (r >= 3.0) return 'from-orange-600 to-red-600';
   return 'from-red-600 to-red-700';
 };
 ---
@@ -57,7 +66,7 @@ const getRatingColor = (rating: number) => {
           {stars}
         </div>
         <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-          <span class="font-bold text-lg">{rating.toFixed(1)}/5.0</span>
+          <span class="font-bold text-lg">{safeToFixed(rating, 1)}/5.0</span>
           <span class="text-sm ml-2 opacity-90">{getRatingText(rating)}</span>
         </div>
       </div>
@@ -152,7 +161,7 @@ const getRatingColor = (rating: number) => {
         <span class="text-2xl">⭐</span>
         <div>
           <div class="font-semibold mb-1">Naše hodnocení</div>
-          <div class="text-white/80 text-sm">{rating.toFixed(1)}/5.0 - {getRatingText(rating)}</div>
+          <div class="text-white/80 text-sm">{safeToFixed(rating, 1)}/5.0 - {getRatingText(rating)}</div>
         </div>
       </div>
       <div class="flex items-start gap-3">

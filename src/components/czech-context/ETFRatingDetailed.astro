@@ -1,8 +1,8 @@
 ---
 interface Props {
   // Základní metriky
-  ter: number;
-  fundSize: number; // v mil EUR
+  ter: number | null;
+  fundSize: number | null; // v mil EUR
   return1y?: number | null;
   return3y?: number | null;
   return5y?: number | null;
@@ -12,8 +12,8 @@ interface Props {
   replication: string;
 
   // Context pro srovnání
-  avgTerInCategory?: number;
-  avgFundSizeInCategory?: number;
+  avgTerInCategory?: number | null;
+  avgFundSizeInCategory?: number | null;
 }
 
 const {
@@ -30,21 +30,30 @@ const {
   avgFundSizeInCategory = 500
 } = Astro.props;
 
+// Safe number formatting helper
+function safeToFixed(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined || isNaN(value)) return '0';
+  return value.toFixed(decimals);
+}
+
 // === HODNOCENÍ NÁKLADOVOSTI (TER) ===
-function rateCost(ter: number, avgTer: number) {
-  if (ter < 0.10) return { rating: 5, text: 'Extrémně nízké poplatky', color: 'green', emoji: '🟢' };
-  if (ter < 0.20) return { rating: 4, text: 'Velmi nízké poplatky', color: 'emerald', emoji: '🟢' };
-  if (ter < avgTer) return { rating: 3, text: 'Průměrné poplatky', color: 'blue', emoji: '🔵' };
-  if (ter < avgTer * 1.5) return { rating: 2, text: 'Vyšší poplatky', color: 'orange', emoji: '🟠' };
+function rateCost(ter: number | null, avgTer: number | null) {
+  const terValue = ter || 0;
+  const avgValue = avgTer || 0.25;
+  if (terValue < 0.10) return { rating: 5, text: 'Extrémně nízké poplatky', color: 'green', emoji: '🟢' };
+  if (terValue < 0.20) return { rating: 4, text: 'Velmi nízké poplatky', color: 'emerald', emoji: '🟢' };
+  if (terValue < avgValue) return { rating: 3, text: 'Průměrné poplatky', color: 'blue', emoji: '🔵' };
+  if (terValue < avgValue * 1.5) return { rating: 2, text: 'Vyšší poplatky', color: 'orange', emoji: '🟠' };
   return { rating: 1, text: 'Vysoké poplatky', color: 'red', emoji: '🔴' };
 }
 
 // === HODNOCENÍ VELIKOSTI FONDU ===
-function rateFundSize(size: number) {
-  if (size > 5000) return { rating: 5, text: 'Mega fond - extrémní likvidita', color: 'green', emoji: '🟢' };
-  if (size > 1000) return { rating: 4, text: 'Velký fond - vysoká likvidita', color: 'emerald', emoji: '🟢' };
-  if (size > 100) return { rating: 3, text: 'Střední fond - dostatečná likvidita', color: 'blue', emoji: '🔵' };
-  if (size > 50) return { rating: 2, text: 'Menší fond - nižší likvidita', color: 'orange', emoji: '🟠' };
+function rateFundSize(size: number | null) {
+  const sizeValue = size || 0;
+  if (sizeValue > 5000) return { rating: 5, text: 'Mega fond - extrémní likvidita', color: 'green', emoji: '🟢' };
+  if (sizeValue > 1000) return { rating: 4, text: 'Velký fond - vysoká likvidita', color: 'emerald', emoji: '🟢' };
+  if (sizeValue > 100) return { rating: 3, text: 'Střední fond - dostatečná likvidita', color: 'blue', emoji: '🔵' };
+  if (sizeValue > 50) return { rating: 2, text: 'Menší fond - nižší likvidita', color: 'orange', emoji: '🟠' };
   return { rating: 1, text: 'Malý fond - riziko zrušení', color: 'red', emoji: '🔴' };
 }
 
@@ -142,7 +151,7 @@ const czechAdjustedRating = Math.min(5, overallRating + czechBonusPoints.reduce(
     <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
       <!-- Číslo ratingu -->
       <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center min-w-[140px]">
-        <div class="text-6xl font-bold mb-2">{czechAdjustedRating.toFixed(1)}</div>
+        <div class="text-6xl font-bold mb-2">{safeToFixed(czechAdjustedRating, 1)}</div>
         <div class="text-2xl text-yellow-300 mb-2">
           {'★'.repeat(Math.round(czechAdjustedRating))}{'☆'.repeat(5 - Math.round(czechAdjustedRating))}
         </div>
@@ -215,19 +224,19 @@ const czechAdjustedRating = Math.min(5, overallRating + czechBonusPoints.reduce(
       <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
         <div class="font-semibold text-gray-900 mb-2">{costRating.text}</div>
         <p class="text-sm text-gray-700 leading-relaxed mb-3">
-          TER <strong>{ter.toFixed(2)}%</strong> znamená, že při investici <strong>1 000 000 Kč</strong>
-          zaplatíte ročně <strong>{(ter * 10000).toLocaleString('cs-CZ')} Kč</strong>.
+          TER <strong>{safeToFixed(ter, 2)}%</strong> znamená, že při investici <strong>1 000 000 Kč</strong>
+          zaplatíte ročně <strong>{((ter || 0) * 10000).toLocaleString('cs-CZ')} Kč</strong>.
         </p>
 
         <!-- Porovnání s průměrem -->
         <div class="grid md:grid-cols-2 gap-3 text-sm">
           <div class="bg-white rounded p-3 border border-gray-200">
             <div class="text-gray-600 mb-1">Toto ETF</div>
-            <div class="font-bold text-gray-900">{ter.toFixed(2)}% TER</div>
+            <div class="font-bold text-gray-900">{safeToFixed(ter, 2)}% TER</div>
           </div>
           <div class="bg-white rounded p-3 border border-gray-200">
             <div class="text-gray-600 mb-1">Průměr kategorie</div>
-            <div class="font-bold text-gray-900">{avgTerInCategory.toFixed(2)}% TER</div>
+            <div class="font-bold text-gray-900">{safeToFixed(avgTerInCategory, 2)}% TER</div>
           </div>
         </div>
 
@@ -270,11 +279,11 @@ const czechAdjustedRating = Math.min(5, overallRating + czechBonusPoints.reduce(
       <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
         <div class="font-semibold text-gray-900 mb-2">{sizeRating.text}</div>
         <p class="text-sm text-gray-700 leading-relaxed mb-3">
-          Fond spravuje <strong>{fundSize >= 1000 ? `${(fundSize / 1000).toFixed(1)} mld EUR` : `${fundSize} mil EUR`}</strong>.
-          {fundSize > 1000 && ' To je obrovský fond s vynikající likviditou.'}
-          {fundSize > 100 && fundSize <= 1000 && ' To je solidní velikost zajišťující dobrou likviditu.'}
-          {fundSize <= 100 && fundSize > 50 && ' Menší fond, sledujte vývoj velikosti.'}
-          {fundSize <= 50 && ' Malý fond - hrozí riziko zrušení při poklesu aktiv.'}
+          Fond spravuje <strong>{(fundSize || 0) >= 1000 ? `${safeToFixed((fundSize || 0) / 1000, 1)} mld EUR` : `${fundSize || 0} mil EUR`}</strong>.
+          {fundSize && fundSize > 1000 && ' To je obrovský fond s vynikající likviditou.'}
+          {fundSize && fundSize > 100 && fundSize <= 1000 && ' To je solidní velikost zajišťující dobrou likviditu.'}
+          {fundSize && fundSize <= 100 && fundSize > 50 && ' Menší fond, sledujte vývoj velikosti.'}
+          {fundSize && fundSize <= 50 && ' Malý fond - hrozí riziko zrušení při poklesu aktiv.'}
         </p>
 
         <div class="mt-3 p-3 bg-blue-50 rounded border border-blue-200">
@@ -320,19 +329,19 @@ const czechAdjustedRating = Math.min(5, overallRating + czechBonusPoints.reduce(
             {return1y !== null && return1y !== undefined && (
               <div class="bg-white rounded p-3 border border-gray-200">
                 <div class="text-gray-600 mb-1">1 rok</div>
-                <div class="font-bold text-gray-900">{return1y > 0 ? '+' : ''}{return1y.toFixed(2)}%</div>
+                <div class="font-bold text-gray-900">{return1y > 0 ? '+' : ''}{safeToFixed(return1y, 2)}%</div>
               </div>
             )}
             {return3y !== null && return3y !== undefined && (
               <div class="bg-white rounded p-3 border border-gray-200">
                 <div class="text-gray-600 mb-1">3 roky</div>
-                <div class="font-bold text-gray-900">{return3y > 0 ? '+' : ''}{return3y.toFixed(2)}%</div>
+                <div class="font-bold text-gray-900">{return3y > 0 ? '+' : ''}{safeToFixed(return3y, 2)}%</div>
               </div>
             )}
             {return5y !== null && return5y !== undefined && (
               <div class="bg-white rounded p-3 border border-gray-200">
                 <div class="text-gray-600 mb-1">5 let</div>
-                <div class="font-bold text-gray-900">{return5y > 0 ? '+' : ''}{return5y.toFixed(2)}%</div>
+                <div class="font-bold text-gray-900">{return5y > 0 ? '+' : ''}{safeToFixed(return5y, 2)}%</div>
               </div>
             )}
           </div>
@@ -378,7 +387,7 @@ const czechAdjustedRating = Math.min(5, overallRating + czechBonusPoints.reduce(
         <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
           <div class="font-semibold text-gray-900 mb-2">{teRating.text}</div>
           <p class="text-sm text-gray-700 leading-relaxed">
-            Tracking error <strong>{trackingError?.toFixed(2)}%</strong> znamená průměrnou odchylku od indexu.
+            Tracking error <strong>{safeToFixed(trackingError, 2)}%</strong> znamená průměrnou odchylku od indexu.
             {trackingError && trackingError < 0.25 && ' To je vynikající přesnost.'}
           </p>
         </div>
@@ -396,13 +405,13 @@ const czechAdjustedRating = Math.min(5, overallRating + czechBonusPoints.reduce(
       <div class="flex items-start gap-3">
         <span class="text-lg">{czechAdjustedRating >= 4.5 ? '✅' : czechAdjustedRating >= 3.5 ? '👍' : '⚠️'}</span>
         <p class="text-gray-700">
-          <strong>Celkové hodnocení:</strong> {czechAdjustedRating.toFixed(1)}/5.0 hvězdiček z pohledu českého investora
+          <strong>Celkové hodnocení:</strong> {safeToFixed(czechAdjustedRating, 1)}/5.0 hvězdiček z pohledu českého investora
         </p>
       </div>
       <div class="flex items-start gap-3">
         <span class="text-lg">{costRating.rating >= 4 ? '✅' : '⚠️'}</span>
         <p class="text-gray-700">
-          <strong>Náklady:</strong> {costRating.text} ({ter.toFixed(2)}% TER)
+          <strong>Náklady:</strong> {costRating.text} ({safeToFixed(ter, 2)}% TER)
         </p>
       </div>
       <div class="flex items-start gap-3">

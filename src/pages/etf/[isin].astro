@@ -764,7 +764,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                       data-czk={etf.return_1m_czk ?? ''}
                       data-usd={etf.return_1m_usd ?? ''}>
                     <span class:list={[etf.return_1m_czk && etf.return_1m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_1m_czk !== null && etf.return_1m_czk !== undefined ? etf.return_1m_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_1m_czk !== null && etf.return_1m_czk !== undefined ? safeToFixed(etf.return_1m_czk, 2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -776,7 +776,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                       data-czk={etf.return_3m_czk ?? ''}
                       data-usd={etf.return_3m_usd ?? ''}>
                     <span class:list={[etf.return_3m_czk && etf.return_3m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_3m_czk !== null && etf.return_3m_czk !== undefined ? etf.return_3m_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_3m_czk !== null && etf.return_3m_czk !== undefined ? safeToFixed(etf.return_3m_czk, 2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -788,7 +788,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                       data-czk={etf.return_6m_czk ?? ''}
                       data-usd={etf.return_6m_usd ?? ''}>
                     <span class:list={[etf.return_6m_czk && etf.return_6m_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_6m_czk !== null && etf.return_6m_czk !== undefined ? etf.return_6m_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_6m_czk !== null && etf.return_6m_czk !== undefined ? safeToFixed(etf.return_6m_czk, 2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -800,7 +800,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                       data-czk={etf.return_ytd_czk ?? ''}
                       data-usd={etf.return_ytd_usd ?? ''}>
                     <span class:list={[etf.return_ytd_czk && etf.return_ytd_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                      {etf.return_ytd_czk !== null && etf.return_ytd_czk !== undefined ? etf.return_ytd_czk.toFixed(2) + '%' : '-'}
+                      {etf.return_ytd_czk !== null && etf.return_ytd_czk !== undefined ? safeToFixed(etf.return_ytd_czk, 2) + '%' : '-'}
                     </span>
                   </td>
                   <td class="py-3 px-2 text-right text-gray-500">-</td>
@@ -863,7 +863,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                    data-czk={etf.return_2021_czk ?? ''}
                    data-usd={etf.return_2021_usd ?? ''}>
                 <span class:list={[etf.return_2021_czk && etf.return_2021_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2021_czk !== null && etf.return_2021_czk !== undefined ? etf.return_2021_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2021_czk !== null && etf.return_2021_czk !== undefined ? safeToFixed(etf.return_2021_czk, 2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -874,7 +874,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                    data-czk={etf.return_2022_czk ?? ''}
                    data-usd={etf.return_2022_usd ?? ''}>
                 <span class:list={[etf.return_2022_czk && etf.return_2022_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2022_czk !== null && etf.return_2022_czk !== undefined ? etf.return_2022_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2022_czk !== null && etf.return_2022_czk !== undefined ? safeToFixed(etf.return_2022_czk, 2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -885,7 +885,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                    data-czk={etf.return_2023_czk ?? ''}
                    data-usd={etf.return_2023_usd ?? ''}>
                 <span class:list={[etf.return_2023_czk && etf.return_2023_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2023_czk !== null && etf.return_2023_czk !== undefined ? etf.return_2023_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2023_czk !== null && etf.return_2023_czk !== undefined ? safeToFixed(etf.return_2023_czk, 2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -896,7 +896,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                    data-czk={etf.return_2024_czk ?? ''}
                    data-usd={etf.return_2024_usd ?? ''}>
                 <span class:list={[etf.return_2024_czk && etf.return_2024_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2024_czk !== null && etf.return_2024_czk !== undefined ? etf.return_2024_czk.toFixed(2) + '%' : '-'}
+                  {etf.return_2024_czk !== null && etf.return_2024_czk !== undefined ? safeToFixed(etf.return_2024_czk, 2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -989,7 +989,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                 <div class="flex-1">
                   <div class="flex justify-between items-center mb-1">
                     <span class="font-medium text-gray-900">{holding.name}</span>
-                    <span class="font-bold text-gray-900">{holding.weight !== null && holding.weight !== undefined ? holding.weight.toFixed(2) + '%' : '-'}</span>
+                    <span class="font-bold text-gray-900">{holding.weight !== null && holding.weight !== undefined ? safeToFixed(holding.weight, 2) + '%' : '-'}</span>
                   </div>
                   <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
@@ -1027,7 +1027,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                   <div class="flex-1">
                     <div class="flex justify-between items-center mb-1">
                       <span class="font-medium text-gray-900">{country.name}</span>
-                      <span class="font-bold text-gray-900">{country.weight !== null && country.weight !== undefined ? country.weight.toFixed(2) + '%' : '-'}</span>
+                      <span class="font-bold text-gray-900">{country.weight !== null && country.weight !== undefined ? safeToFixed(country.weight, 2) + '%' : '-'}</span>
                     </div>
                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
@@ -1067,7 +1067,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
                   <div class="flex-1">
                     <div class="flex justify-between items-center mb-1">
                       <span class="font-medium text-gray-900">{sector.name}</span>
-                      <span class="font-bold text-gray-900">{sector.weight !== null && sector.weight !== undefined ? sector.weight.toFixed(2) + '%' : '-'}</span>
+                      <span class="font-bold text-gray-900">{sector.weight !== null && sector.weight !== undefined ? safeToFixed(sector.weight, 2) + '%' : '-'}</span>
                     </div>
                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div

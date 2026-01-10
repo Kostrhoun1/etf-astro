@@ -3,8 +3,8 @@ interface Alternative {
   isin: string;
   name: string;
   ticker: string;
-  ter: number;
-  fundSize: number;
+  ter: number | null;
+  fundSize: number | null;
   return1y?: number | null;
   rating?: number | null;
   whyBetter?: string; // Proč je alternativa lepší
@@ -21,6 +21,12 @@ interface Props {
 }
 
 const { currentETF, alternatives, reason } = Astro.props;
+
+// Safe number formatting helper
+function safeToFixed(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined || isNaN(value)) return '0';
+  return value.toFixed(decimals);
+}
 ---
 
 {alternatives && alternatives.length > 0 && (
@@ -60,15 +66,15 @@ const { currentETF, alternatives, reason } = Astro.props;
                 </div>
               </td>
               <td class="p-3">
-                <span class="font-semibold text-gray-900">{(alt.ter * 100).toFixed(2)}%</span>
+                <span class="font-semibold text-gray-900">{safeToFixed((alt.ter || 0) * 100, 2)}%</span>
               </td>
               <td class="p-3 text-gray-600">
-                {alt.fundSize >= 1000 ? `${(alt.fundSize / 1000).toFixed(1)} mld €` : `${alt.fundSize} mil €`}
+                {(alt.fundSize || 0) >= 1000 ? `${safeToFixed((alt.fundSize || 0) / 1000, 1)} mld €` : `${alt.fundSize} mil €`}
               </td>
               <td class="p-3">
                 {alt.return1y !== null && alt.return1y !== undefined ? (
                   <span class={alt.return1y > 0 ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>
-                    {alt.return1y > 0 ? '+' : ''}{alt.return1y.toFixed(2)}%
+                    {alt.return1y > 0 ? '+' : ''}{safeToFixed(alt.return1y, 2)}%
                   </span>
                 ) : (
                   <span class="text-gray-400">-</span>
@@ -78,7 +84,7 @@ const { currentETF, alternatives, reason } = Astro.props;
                 {alt.rating ? (
                   <div class="flex items-center gap-1">
                     <span class="text-yellow-500">★</span>
-                    <span class="font-semibold">{alt.rating.toFixed(1)}</span>
+                    <span class="font-semibold">{safeToFixed(alt.rating, 1)}</span>
                   </div>
                 ) : (
                   <span class="text-gray-400">-</span>
@@ -110,7 +116,7 @@ const { currentETF, alternatives, reason } = Astro.props;
             {alt.rating && (
               <div class="flex items-center gap-1 text-sm">
                 <span class="text-yellow-500">★</span>
-                <span class="font-semibold">{alt.rating.toFixed(1)}</span>
+                <span class="font-semibold">{safeToFixed(alt.rating, 1)}</span>
               </div>
             )}
           </div>
@@ -118,12 +124,12 @@ const { currentETF, alternatives, reason } = Astro.props;
           <div class="grid grid-cols-2 gap-3 text-sm mb-3">
             <div>
               <div class="text-gray-600">TER</div>
-              <div class="font-semibold text-gray-900">{(alt.ter * 100).toFixed(2)}%</div>
+              <div class="font-semibold text-gray-900">{safeToFixed((alt.ter || 0) * 100, 2)}%</div>
             </div>
             <div>
               <div class="text-gray-600">Velikost</div>
               <div class="font-semibold text-gray-900">
-                {alt.fundSize >= 1000 ? `${(alt.fundSize / 1000).toFixed(1)} mld €` : `${alt.fundSize} mil €`}
+                {(alt.fundSize || 0) >= 1000 ? `${safeToFixed((alt.fundSize || 0) / 1000, 1)} mld €` : `${alt.fundSize} mil €`}
               </div>
             </div>
           </div>

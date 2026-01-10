@@ -2,11 +2,17 @@
 interface Props {
   etfName: string;
   isin: string;
-  ter: number;
+  ter: number | null;
   isPopular?: boolean;
 }
 
 const { etfName, isin, ter, isPopular = false } = Astro.props;
+
+// Safe number formatting helper
+function safeToFixed(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined || isNaN(value)) return '0';
+  return value.toFixed(decimals);
+}
 
 // Poplatky brokerů (aktuální k 2026)
 const brokers = [
@@ -287,7 +293,7 @@ const monthlyInvestments = [10000, 20000, 30000];
       Kolik <strong>celkem zaplatíte na poplatcích</strong> za 10 let pravidelného investování do tohoto ETF?
     </p>
     <p class="text-sm text-gray-500 mb-4">
-      ℹ️ Simulace zahrnuje: poplatky brokera + TER fondu ({ter.toFixed(2)}%) + předpokládaný růst 7% ročně
+      ℹ️ Simulace zahrnuje: poplatky brokera + TER fondu ({safeToFixed(ter, 2)}%) + předpokládaný růst 7% ročně
     </p>
 
     <div class="overflow-x-auto">
