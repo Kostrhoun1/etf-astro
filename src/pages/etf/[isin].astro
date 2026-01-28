@@ -855,26 +855,26 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
         <!-- Roční výkonnost -->
         <div class="bg-white rounded-xl p-6 shadow border border-gray-100">
           <h3 class="font-bold text-gray-900 mb-4">Roční výkonnost (<span id="currency-label-2">CZK</span>)</h3>
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="text-center p-4 border border-gray-200 rounded-lg">
-              <div class="text-sm text-gray-500 mb-1">2021</div>
+              <div class="text-sm text-gray-500 mb-1">2025</div>
               <div class="text-xl font-bold performance-value"
-                   data-eur={etf.return_2021 ?? ''}
-                   data-czk={etf.return_2021_czk ?? ''}
-                   data-usd={etf.return_2021_usd ?? ''}>
-                <span class:list={[etf.return_2021_czk && etf.return_2021_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2021_czk !== null && etf.return_2021_czk !== undefined ? safeToFixed(etf.return_2021_czk, 2) + '%' : '-'}
+                   data-eur={etf.return_2025 ?? ''}
+                   data-czk={etf.return_2025_czk ?? ''}
+                   data-usd={etf.return_2025_usd ?? ''}>
+                <span class:list={[etf.return_2025_czk && etf.return_2025_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2025_czk !== null && etf.return_2025_czk !== undefined ? safeToFixed(etf.return_2025_czk, 2) + '%' : '-'}
                 </span>
               </div>
             </div>
             <div class="text-center p-4 border border-gray-200 rounded-lg">
-              <div class="text-sm text-gray-500 mb-1">2022</div>
+              <div class="text-sm text-gray-500 mb-1">2024</div>
               <div class="text-xl font-bold performance-value"
-                   data-eur={etf.return_2022 ?? ''}
-                   data-czk={etf.return_2022_czk ?? ''}
-                   data-usd={etf.return_2022_usd ?? ''}>
-                <span class:list={[etf.return_2022_czk && etf.return_2022_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2022_czk !== null && etf.return_2022_czk !== undefined ? safeToFixed(etf.return_2022_czk, 2) + '%' : '-'}
+                   data-eur={etf.return_2024 ?? ''}
+                   data-czk={etf.return_2024_czk ?? ''}
+                   data-usd={etf.return_2024_usd ?? ''}>
+                <span class:list={[etf.return_2024_czk && etf.return_2024_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2024_czk !== null && etf.return_2024_czk !== undefined ? safeToFixed(etf.return_2024_czk, 2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -890,13 +890,24 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
               </div>
             </div>
             <div class="text-center p-4 border border-gray-200 rounded-lg">
-              <div class="text-sm text-gray-500 mb-1">2024</div>
+              <div class="text-sm text-gray-500 mb-1">2022</div>
               <div class="text-xl font-bold performance-value"
-                   data-eur={etf.return_2024 ?? ''}
-                   data-czk={etf.return_2024_czk ?? ''}
-                   data-usd={etf.return_2024_usd ?? ''}>
-                <span class:list={[etf.return_2024_czk && etf.return_2024_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
-                  {etf.return_2024_czk !== null && etf.return_2024_czk !== undefined ? safeToFixed(etf.return_2024_czk, 2) + '%' : '-'}
+                   data-eur={etf.return_2022 ?? ''}
+                   data-czk={etf.return_2022_czk ?? ''}
+                   data-usd={etf.return_2022_usd ?? ''}>
+                <span class:list={[etf.return_2022_czk && etf.return_2022_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2022_czk !== null && etf.return_2022_czk !== undefined ? safeToFixed(etf.return_2022_czk, 2) + '%' : '-'}
+                </span>
+              </div>
+            </div>
+            <div class="text-center p-4 border border-gray-200 rounded-lg">
+              <div class="text-sm text-gray-500 mb-1">2021</div>
+              <div class="text-xl font-bold performance-value"
+                   data-eur={etf.return_2021 ?? ''}
+                   data-czk={etf.return_2021_czk ?? ''}
+                   data-usd={etf.return_2021_usd ?? ''}>
+                <span class:list={[etf.return_2021_czk && etf.return_2021_czk > 0 ? 'text-emerald-600' : 'text-red-600']}>
+                  {etf.return_2021_czk !== null && etf.return_2021_czk !== undefined ? safeToFixed(etf.return_2021_czk, 2) + '%' : '-'}
                 </span>
               </div>
             </div>
@@ -913,6 +924,11 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
       const values = document.querySelectorAll('.performance-value');
       const label1 = document.getElementById('currency-label');
       const label2 = document.getElementById('currency-label-2');
+
+      function safeToFixed(value, decimals) {
+        if (value === null || value === undefined || isNaN(value)) return '0';
+        return Number(value).toFixed(decimals);
+      }
 
       // Load saved preference
       const saved = localStorage.getItem('etf-currency-preference') || 'CZK';
