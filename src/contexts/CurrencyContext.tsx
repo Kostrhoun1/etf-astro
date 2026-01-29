@@ -8,7 +8,7 @@ import type { ETF, ETFListItem } from '../types/etf';
 export type Currency = 'EUR' | 'CZK' | 'USD';
 
 // Performance period types
-export type PerformancePeriod = '1m' | '3m' | '6m' | 'ytd' | '1y' | '3y' | '5y' | '2021' | '2022' | '2023' | '2024' | 'inception';
+export type PerformancePeriod = '1m' | '3m' | '6m' | 'ytd' | '1y' | '3y' | '5y' | '2021' | '2022' | '2023' | '2024' | '2025' | 'inception';
 
 // Currency context interface
 interface CurrencyContextType {

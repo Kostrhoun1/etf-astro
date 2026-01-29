@@ -146,6 +146,7 @@ export const useETFComparison = () => {
           return_2022,
           return_2023,
           return_2024,
+          return_2025,
           return_inception,
           return_1m_czk,
           return_3m_czk,
@@ -158,6 +159,7 @@ export const useETFComparison = () => {
           return_2022_czk,
           return_2023_czk,
           return_2024_czk,
+          return_2025_czk,
           return_1m_usd,
           return_3m_usd,
           return_6m_usd,
@@ -168,7 +170,8 @@ export const useETFComparison = () => {
           return_2021_usd,
           return_2022_usd,
           return_2023_usd,
-          return_2024_usd
+          return_2024_usd,
+          return_2025_usd
         `)
         .eq('isin', isin)
         .single();

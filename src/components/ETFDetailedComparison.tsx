@@ -108,19 +108,19 @@ const ETFDetailedComparison: React.FC<ETFDetailedComparisonProps> = ({
 
   const yearlyPerformanceData = [
     {
-      label: 'Výnos 2021',
-      key: 'performance_2021',
+      label: 'Výnos 2025',
+      key: 'performance_2025',
       format: (value: any, etf: ETF) => {
-        const perfValue = getPerformanceValue(etf, '2021');
+        const perfValue = getPerformanceValue(etf, '2025');
         return perfValue !== null ? formatPercentage(perfValue) : '-';
       },
       className: 'font-mono'
     },
     {
-      label: 'Výnos 2022',
-      key: 'performance_2022',
+      label: 'Výnos 2024',
+      key: 'performance_2024',
       format: (value: any, etf: ETF) => {
-        const perfValue = getPerformanceValue(etf, '2022');
+        const perfValue = getPerformanceValue(etf, '2024');
         return perfValue !== null ? formatPercentage(perfValue) : '-';
       },
       className: 'font-mono'
@@ -135,10 +135,19 @@ const ETFDetailedComparison: React.FC<ETFDetailedComparisonProps> = ({
       className: 'font-mono'
     },
     {
-      label: 'Výnos 2024',
-      key: 'performance_2024',
+      label: 'Výnos 2022',
+      key: 'performance_2022',
       format: (value: any, etf: ETF) => {
-        const perfValue = getPerformanceValue(etf, '2024');
+        const perfValue = getPerformanceValue(etf, '2022');
+        return perfValue !== null ? formatPercentage(perfValue) : '-';
+      },
+      className: 'font-mono'
+    },
+    {
+      label: 'Výnos 2021',
+      key: 'performance_2021',
+      format: (value: any, etf: ETF) => {
+        const perfValue = getPerformanceValue(etf, '2021');
         return perfValue !== null ? formatPercentage(perfValue) : '-';
       },
       className: 'font-mono'

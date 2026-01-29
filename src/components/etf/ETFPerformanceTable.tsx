@@ -32,10 +32,11 @@ const ETFPerformanceTable: React.FC<ETFPerformanceTableProps> = ({ etf }) => {
   ];
 
   const yearlyData = [
-    { label: '2021', period: '2021' as const },
-    { label: '2022', period: '2022' as const },
-    { label: '2023', period: '2023' as const },
+    { label: '2025', period: '2025' as const },
     { label: '2024', period: '2024' as const },
+    { label: '2023', period: '2023' as const },
+    { label: '2022', period: '2022' as const },
+    { label: '2021', period: '2021' as const },
   ];
 
   return (

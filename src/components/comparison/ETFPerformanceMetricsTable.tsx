@@ -55,10 +55,26 @@ const ETFPerformanceMetricsTable: React.FC<ETFPerformanceMetricsTableProps> = ({
                 ))}
               </tr>
               <tr className="border-b bg-gray-50">
-                <td className="p-3 font-medium text-gray-800">Výnos 2021</td>
+                <td className="p-3 font-medium text-gray-800">Výnos 2025</td>
                 {selectedETFs.map((etf) => (
-                  <td key={etf.isin} className={`p-3 font-mono ${getReturnColor(etf.return_2021)}`}>
-                    {etf.return_2021 ? formatPercentage(etf.return_2021) : '-'}
+                  <td key={etf.isin} className={`p-3 font-mono ${getReturnColor(etf.return_2025)}`}>
+                    {etf.return_2025 ? formatPercentage(etf.return_2025) : '-'}
+                  </td>
+                ))}
+              </tr>
+              <tr className="border-b bg-gray-50">
+                <td className="p-3 font-medium text-gray-800">Výnos 2024</td>
+                {selectedETFs.map((etf) => (
+                  <td key={etf.isin} className={`p-3 font-mono ${getReturnColor(etf.return_2024)}`}>
+                    {etf.return_2024 ? formatPercentage(etf.return_2024) : '-'}
+                  </td>
+                ))}
+              </tr>
+              <tr className="border-b bg-gray-50">
+                <td className="p-3 font-medium text-gray-800">Výnos 2023</td>
+                {selectedETFs.map((etf) => (
+                  <td key={etf.isin} className={`p-3 font-mono ${getReturnColor(etf.return_2023)}`}>
+                    {etf.return_2023 ? formatPercentage(etf.return_2023) : '-'}
                   </td>
                 ))}
               </tr>
