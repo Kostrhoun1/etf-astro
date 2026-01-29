@@ -162,7 +162,7 @@ const HedgedVsUnhedgedComparison: React.FC = () => {
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800"
                           >
-                            <ExternalLink className="h-3 w-3" />
+                            <ExternalLinkIcon className="h-3 w-3" />
                           </a>
                         </div>
                         <div className="text-xs text-blue-600 font-normal">Nezajištěný</div>
@@ -177,7 +177,7 @@ const HedgedVsUnhedgedComparison: React.FC = () => {
                             rel="noopener noreferrer"
                             className="text-orange-600 hover:text-orange-800"
                           >
-                            <ExternalLink className="h-3 w-3" />
+                            <ExternalLinkIcon className="h-3 w-3" />
                           </a>
                         </div>
                         <div className="text-xs text-orange-600 font-normal">EUR zajištěný</div>
