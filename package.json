@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "node scripts/test-interactive.mjs",
+    "test:js": "node scripts/test-js-errors.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.1",
@@ -50,5 +52,8 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "vaul": "^1.1.2"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.0"
   }
 }
