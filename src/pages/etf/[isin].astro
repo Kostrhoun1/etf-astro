@@ -511,6 +511,7 @@ const alternatives = relatedETFs?.slice(0, 3).map(alt => ({
   title={ticker + ' - ' + etf.name + ' | ETF průvodce'}
   description={'Detailní analýza ETF ' + etf.name + '. TER ' + formatPercent(etf.ter_numeric) + ', výkonnost, složení portfolia.'}
   canonical={'/etf/' + isin}
+  noindex={true}
 >
   <script type="application/ld+json" set:html={JSON.stringify(etfSchema)} />
 

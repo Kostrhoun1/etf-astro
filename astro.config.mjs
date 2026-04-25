@@ -20,11 +20,24 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
-      // ✅ GEMINI STRATEGY: Include ALL pages in sitemap
-      // ETF pages are now high-value content with Czech context
+      // SEO STRATEGY (April 2026): Exclude /etf/[isin] detail pages from sitemap
+      //
+      // Why: 4300+ programmatically-generated ETF detail pages drown out the
+      // ~80 editorial pages and trigger Google's thin/templated-content
+      // quality filter on a young (9-month-old) domain. Result: Google indexes
+      // only the homepage and treats the rest as "Crawled - currently not
+      // indexed". Combined with noindex,follow on the ETF detail pages
+      // themselves (see src/pages/etf/[isin].astro), this refocuses the crawl
+      // budget on the editorial content and lets it accrue authority.
+      //
+      // Once editorial pages are reliably indexed, individual high-traffic
+      // ETF pages can be selectively re-enabled.
       filter: (page) => {
-        // Only exclude API routes and Astro internal files
-        return !page.includes('/api/') && !page.includes('/_');
+        if (page.includes('/api/')) return false;
+        if (page.includes('/_')) return false;
+        // Exclude individual ETF detail pages (kept noindex,follow at the page level)
+        if (/\/etf\/[^/]+\/?$/.test(page)) return false;
+        return true;
       }
     })
   ],

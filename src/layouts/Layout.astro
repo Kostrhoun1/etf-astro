@@ -65,7 +65,12 @@ const currentPath = Astro.url.pathname;
     {keywords && <meta name="keywords" content={keywords} />}
     <link rel="canonical" href={fullCanonical} />
 
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {/*
+      noindex pages still get follow=true so internal link equity flows through
+      to indexed editorial pages (e.g. ETF detail pages link back to nav,
+      footer, related ETFs, broker reviews).
+    */}
+    {noindex && <meta name="robots" content="noindex, follow" />}
     {!noindex && <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />}
 
     <!-- Open Graph -->
