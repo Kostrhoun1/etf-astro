@@ -1,0 +1,32 @@
+# Scraper output and state — never commit these
+justetf_complete_production/
+results/
+logs/
+checkpoints/
+backup_old_files/
+archive_old_files/
+ready_for_upload/
+
+# Generated data files
+*.xlsx
+*.xls
+batch_*.csv
+FINAL_COMPLETE_*.csv
+heatmap_*.json
+market_heatmap_*.json
+
+# But keep ISIN.csv (it's the input, not output)
+!ISIN.csv
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+.claude/
