@@ -8,10 +8,18 @@ import pandas as pd
 from datetime import datetime, timedelta
 from supabase import create_client
 import time
+import os
+import sys
 
-# Supabase connection
-SUPABASE_URL = "https://nbhwnatadyubiuadfakx.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iaHduYXRhZHl1Yml1YWRmYWt4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODg0NDc0NCwiZXhwIjoyMDY0NDIwNzQ0fQ.SI_s72FBMs2qSqhKBsm7ZJSnPOnCEfWn1zQ6nxMtgyo"
+# Supabase connection — credentials come from environment variables in CI
+# (GitHub Actions: VITE_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY) or local .env.
+SUPABASE_URL = os.getenv("VITE_SUPABASE_URL") or os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_SERVICE_KEY")
+if not SUPABASE_URL or not SUPABASE_KEY:
+    sys.exit(
+        "ERROR: Missing Supabase credentials. Set env vars VITE_SUPABASE_URL "
+        "and SUPABASE_SERVICE_ROLE_KEY (in GitHub Secrets, or in a local .env)."
+    )
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
