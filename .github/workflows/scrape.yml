@@ -179,3 +179,30 @@ jobs:
           path: scraper/justetf_complete_production/logs/
           retention-days: 7
           if-no-files-found: ignore
+
+  trigger_rebuild:
+    name: Trigger Vercel rebuild
+    # Runs after both scrape halves and backtest finish. Only fires the deploy
+    # hook if the ETF scrape jobs actually succeeded — no point rebuilding a
+    # site that's about to read the same stale data.
+    needs: [scrape, backtest]
+    if: ${{ needs.scrape.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: POST to Vercel deploy hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK_URL secret is not set — skipping rebuild trigger."
+            exit 0
+          fi
+          # Vercel deploy hook accepts an empty POST and returns 201 with the
+          # queued job ID. Curl with -fsS so HTTP errors fail the step.
+          response=$(curl -fsS -X POST "$DEPLOY_HOOK_URL")
+          echo "Vercel deploy hook response:"
+          echo "$response"
+          echo "::notice::Vercel rebuild triggered. Site should be live with fresh data in ~20 minutes."
