@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect } from 'react';
 import type { ETFListItem } from '../types/etf';
 import { calculateETFRating } from '@/utils/etfRating';
 import { detectHedging, filterByHedging } from '@/utils/hedgingDetection';
+import { canonicalIndexLabel } from '@/utils/indexNormalization';
+import { classifyRegion } from '@/utils/regionClassification';
 
 type AdvancedFilterValue = string | number | boolean | [number, number];
 
@@ -155,10 +157,10 @@ export const useETFTableLogic = (etfs: ETFListItem[], staticCategories?: string[
       .filter(etf => {
         const { distributionPolicy, indexName, fundCurrency, maxTer, replicationMethod, fundSizeRange, region, terRange, fundSizeRangeValues, dividendYieldRange, hedgingType } = advancedFilters;
         const distPolicyMatch = distributionPolicy === 'all' || etf.distribution_policy === distributionPolicy;
-        const indexMatch = indexName === 'all' || etf.index_name === indexName;
+        const indexMatch = indexName === 'all' || canonicalIndexLabel(etf.index_name) === indexName;
         const currencyMatch = fundCurrency === 'all' || etf.fund_currency === fundCurrency;
         const terMatch = (etf.ter_numeric || 0) <= maxTer;
-        const regionMatch = region === 'all' || etf.region === region;
+        const regionMatch = region === 'all' || classifyRegion(etf) === region;
         
         const terRangeMatch = (etf.ter_numeric || 0) >= terRange[0] && (etf.ter_numeric || 0) <= terRange[1];
         const fundSizeRangeMatch = !etf.fund_size_numeric || (etf.fund_size_numeric >= fundSizeRangeValues[0] && etf.fund_size_numeric <= fundSizeRangeValues[1]);

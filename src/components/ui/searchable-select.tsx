@@ -16,8 +16,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+interface SearchableSelectGroup {
+  heading: string;
+  options: string[];
+}
+
 interface SearchableSelectProps {
   options: string[];
+  /** Volitelné seskupení možností (s nadpisy). Když je zadané, má přednost před `options` při vykreslení. */
+  groups?: SearchableSelectGroup[];
   value: string;
   onValueChange: (value: string) => void;
   placeholder?: string;
@@ -29,6 +36,7 @@ interface SearchableSelectProps {
 
 export function SearchableSelect({
   options,
+  groups,
   value,
   onValueChange,
   placeholder = "Vyberte...",
@@ -40,6 +48,31 @@ export function SearchableSelect({
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
   const commandListRef = React.useRef<HTMLDivElement>(null);
+
+  // Sjednocený plochý seznam (pro zobrazení vybrané hodnoty v triggeru)
+  const allOptions = React.useMemo(
+    () => (groups ? groups.flatMap((g) => g.options) : options),
+    [groups, options]
+  );
+
+  const renderOption = (option: string) => (
+    <CommandItem
+      key={option}
+      value={option}
+      onSelect={() => {
+        onValueChange(option);
+        setOpen(false);
+      }}
+    >
+      <CheckIcon
+        className={cn(
+          "mr-2 h-4 w-4",
+          value === option ? "opacity-100" : "opacity-0"
+        )}
+      />
+      {option}
+    </CommandItem>
+  );
 
   React.useEffect(() => {
     if (commandListRef.current) {
@@ -64,7 +97,7 @@ export function SearchableSelect({
           className={cn("w-full justify-between", className)}
         >
           {value && value !== "all"
-            ? options.find((option) => option === value) || placeholder
+            ? allOptions.find((option) => option === value) || value || placeholder
             : placeholder}
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -97,25 +130,16 @@ export function SearchableSelect({
                   {placeholder}
                 </CommandItem>
               )}
-              {options.map((option) => (
-                <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={() => {
-                    onValueChange(option);
-                    setOpen(false);
-                  }}
-                >
-                  <CheckIcon
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === option ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option}
-                </CommandItem>
-              ))}
             </CommandGroup>
+            {groups
+              ? groups.map((group) => (
+                  <CommandGroup key={group.heading} heading={group.heading}>
+                    {group.options.map(renderOption)}
+                  </CommandGroup>
+                ))
+              : (
+                <CommandGroup>{options.map(renderOption)}</CommandGroup>
+              )}
           </CommandList>
         </Command>
       </PopoverContent>

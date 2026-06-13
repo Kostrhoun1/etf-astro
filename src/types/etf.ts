@@ -242,6 +242,7 @@ export interface ETFListItem {
   ticker?: string; // Alias pro primary_ticker pro kompatibilitu
   distribution_policy: string;
   index_name: string;
+  investment_focus?: string;
   fund_currency: string;
   replication: string;
   region: string;
