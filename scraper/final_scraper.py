@@ -3064,70 +3064,51 @@ class CompleteProductionScraper:
         
         return any(re.match(pattern, name.upper()) for pattern in bond_patterns)
     
+    def _extract_holdings_breakdown(self, soup: BeautifulSoup, kind: str):
+        """Parsuje rozložení (kind = 'countries' | 'sectors') z KONKRÉTNÍ justETF
+        tabulky podle data-testid.
+
+        Předchozí verze hledala regexem přes celý text stránky
+        (`soup.get_text()`), takže název země/sektoru spárovala s první procentní
+        hodnotou kdekoliv na stránce – typicky '26.0%' z nesouvisející daňové
+        tabulky ('Italy 26.0%') a názvy z daňové/reporting sekce (UK, Switzerland,
+        Germany). Výsledkem byly nesmyslné hodnoty u ~75 % fondů. Tahle verze čte
+        jen řádky příslušné tabulky rozložení.
+        """
+        results = []
+        table = soup.find(attrs={'data-testid': f'etf-holdings_{kind}_table'})
+        if not table:
+            return results
+
+        rows = table.find_all('tr', attrs={'data-testid': f'etf-holdings_{kind}_row'})
+        for row in rows:
+            name_el = row.find(attrs={'data-testid': f'tl_etf-holdings_{kind}_value_name'})
+            pct_el = row.find(attrs={'data-testid': f'tl_etf-holdings_{kind}_value_percentage'})
+            if not name_el or not pct_el:
+                continue
+            name = name_el.get_text(strip=True)
+            pct_text = pct_el.get_text(strip=True).replace('%', '').replace(',', '.').strip()
+            try:
+                weight = float(pct_text)
+            except ValueError:
+                continue
+            if name and 0 < weight <= 100:
+                results.append((name, weight))
+
+        # justETF vrací řádky už seřazené (s 'Other' na konci) – pořadí zachováme.
+        return results[:5]
+
     def _extract_geographic_enhanced(self, soup: BeautifulSoup, etf: ETFDataComplete):
-        """Geografické rozložení pro fyzické ETF"""
+        """Geografické rozložení pro fyzické ETF (z justETF country tabulky)."""
         if etf.is_synthetic():
             return
-        
-        countries = []
-        text = soup.get_text()
-        
-        country_list = [
-            'United States', 'USA', 'Germany', 'Japan', 'United Kingdom', 'UK',
-            'France', 'China', 'Canada', 'Switzerland', 'Netherlands', 'Australia',
-            'Other', 'Others', 'Bulgaria', 'Croatia', 'Czech Republic', 'Greece',
-            'Hungary', 'Poland', 'Romania', 'Slovakia', 'Slovenia'
-        ]
-        
-        for country in country_list:
-            patterns = [
-                rf'{re.escape(country)}\s*(\d+[.,]\d+)%',
-                rf'{re.escape(country)}[^\d]*(\d+[.,]\d+)%'
-            ]
-            
-            for pattern in patterns:
-                match = re.search(pattern, text, re.I)
-                if match:
-                    weight = float(match.group(1).replace(',', '.'))
-                    if 0.5 <= weight <= 100:
-                        countries.append((country, weight))
-                    break
-        
-        countries.sort(key=lambda x: x[1], reverse=True)
-        etf.countries = countries[:5]
-    
+        etf.countries = self._extract_holdings_breakdown(soup, 'countries')
+
     def _extract_sectors_enhanced(self, soup: BeautifulSoup, etf: ETFDataComplete):
-        """Sektorové rozložení pro fyzické ETF"""
+        """Sektorové rozložení pro fyzické ETF (z justETF sectors tabulky)."""
         if etf.is_synthetic():
             return
-        
-        sectors = []
-        text = soup.get_text()
-        
-        sector_list = [
-            'Technology', 'Information Technology', 'IT',
-            'Financials', 'Financial Services', 'Health Care', 'Healthcare',
-            'Consumer Discretionary', 'Consumer Staples', 'Industrials',
-            'Energy', 'Materials', 'Real Estate', 'Utilities',
-            'Communication Services', 'Telecommunications'
-        ]
-        
-        for sector in sector_list:
-            patterns = [
-                rf'{re.escape(sector)}\s*(\d+[.,]\d+)%',
-                rf'{re.escape(sector)}[^\d]*(\d+[.,]\d+)%'
-            ]
-            
-            for pattern in patterns:
-                match = re.search(pattern, text, re.I)
-                if match:
-                    weight = float(match.group(1).replace(',', '.'))
-                    if 1 <= weight <= 50:
-                        sectors.append((sector, weight))
-                    break
-        
-        sectors.sort(key=lambda x: x[1], reverse=True)
-        etf.sectors = sectors[:5]
+        etf.sectors = self._extract_holdings_breakdown(soup, 'sectors')
 
     def _find_exchange_section_improved(self, soup: BeautifulSoup):
         """Najde exchange sekci pomocí různých strategií"""
