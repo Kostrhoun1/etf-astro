@@ -24,3 +24,6 @@ pnpm-debug.log*
 .idea/
 .vercel
 .env*.local
+
+# zálohy seznamu ISIN z refresh_isin_list.py
+scraper/ISIN.csv.*.bak
