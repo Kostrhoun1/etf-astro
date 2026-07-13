@@ -2000,15 +2000,9 @@ class CompleteProductionScraper:
                     etf.fund_provider = provider
                     break
         
-        # Distribution policy z názvu
-        if etf.name:
-            name_lower = etf.name.lower()
-            
-            if any(pattern in name_lower for pattern in ['(acc)', 'accumulating', '(c)', ' acc']):
-                etf.distribution_policy = 'Accumulating'
-            elif any(pattern in name_lower for pattern in ['(dist)', 'distributing', '(d)', ' dist', ' dis']):
-                etf.distribution_policy = 'Distributing'
-        
+        # Distribuční politika se odvozuje centrálně ve _finalize_distribution_policy()
+        # (po scrapnutí oficiálního pole "Distribution policy" i frekvence),
+        # volá se na konci _extract_table_fields. Zde už nic nehádáme z názvu.
         self._extract_index_name(soup, etf)
     
     def _extract_index_name(self, soup: BeautifulSoup, etf: ETFDataComplete):
@@ -2207,6 +2201,12 @@ class CompleteProductionScraper:
                 r'Fund type\s*([A-Za-z\s,/\(\)]+?)(?:\s*Fund|$|\n)',
                 r'Investment vehicle\s*([A-Za-z\s,/\(\)]+?)(?:\s*Fund|$|\n)',
             ],
+            'distribution_policy': [
+                # Oficiální pole z justETF fund-data tabulky (nejsilnější signál).
+                r'Distribution policy\s*(Accumulating|Distributing)',
+                r'Use of (?:profits|income)\s*(Accumulating|Distributing|Reinvestment|Distribution)',
+                r'Distribution type\s*(Accumulating|Distributing)',
+            ],
             'distribution_frequency': [
                 r'Distribution frequency\s*([A-Za-z\s]+?)(?:\s*Fund|$|\n)',
                 r'Distribution\s*([A-Za-z\s]+?)(?:\s*Fund|$|\n)',
@@ -2298,6 +2298,14 @@ class CompleteProductionScraper:
                         if value:
                             etf.legal_structure = value
                             break
+                    elif field == 'distribution_policy':
+                        v = value.lower()
+                        if 'accumulat' in v or 'reinvest' in v:
+                            etf.distribution_policy = 'Accumulating'
+                            break
+                        elif 'distribut' in v:
+                            etf.distribution_policy = 'Distributing'
+                            break
                     elif field == 'distribution_frequency' and 3 <= len(value) <= 30:
                         value = re.sub(r'(Fund|Investment)', '', value, flags=re.I).strip()
                         if value:
@@ -2334,7 +2342,39 @@ class CompleteProductionScraper:
                         if value:
                             etf.strategy_risk = value
                             break
-    
+
+        # Doplň distribuční politiku, pokud oficiální pole na stránce chybělo.
+        self._finalize_distribution_policy(etf)
+
+    def _finalize_distribution_policy(self, etf: ETFDataComplete):
+        """Odvodí distribution_policy, pokud ji nescrapla oficiální tabulka.
+
+        Priorita: 1) oficiální pole "Distribution policy" (už nastaveno výše),
+        2) značka třídy v názvu (1C/Acc/Thesaurierend vs. 1D/Dist/Income),
+        3) výplatní frekvence – reálná kadence (Quarterly/Monthly/Annually/...)
+        je definiční znak distribuce. Když nic z toho, zůstává prázdná (radši
+        „neuvedeno" než chybný default na akumulační)."""
+        if etf.distribution_policy in ('Accumulating', 'Distributing'):
+            return
+
+        name_lower = (etf.name or '').lower()
+        # Pozor na krátké tokeny: ' dis'/' inc' se záměrně NEpoužívají (chytaly by
+        # „Disruptive", „since inception" apod.). Jen jednoznačné značky tříd.
+        acc_tokens = [' 1c', '(acc)', ' acc', 'accumulating', '(c)', 'thesaur', 'capitalis']
+        dist_tokens = [' 1d', '(dist)', ' dist', 'distributing', '(d)', 'income']
+
+        if any(t in name_lower for t in acc_tokens):
+            etf.distribution_policy = 'Accumulating'
+            return
+        if any(t in name_lower for t in dist_tokens):
+            etf.distribution_policy = 'Distributing'
+            return
+
+        # Fallback: reálná výplatní frekvence => fond vyplácí => distribuční.
+        freq_lower = (etf.distribution_frequency or '').lower()
+        if re.search(r'quarter|month|annual|semi', freq_lower):
+            etf.distribution_policy = 'Distributing'
+
     def _extract_total_holdings_improved(self, soup: BeautifulSoup, etf: ETFDataComplete):
         """Extrakce počtu holdings"""
         text = soup.get_text()
