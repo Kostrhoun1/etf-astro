@@ -184,10 +184,27 @@ jobs:
 
   backtest:
     name: Backtest data (Yahoo Finance)
-    # Runs after both halves complete (or fail) — backtest data is independent
-    # of ETF scraping and only needs to run once.
+    # !! ODSTAVENO 2026-07-15 PO INCIDENTU – NEZAPÍNAT bez opravy skriptu !!
+    #
+    # 15.7.2026 tenhle job smazal 419 řádků `sp500` (celý ocas od 2024-11-06) a
+    # produkční backtest pak ukazoval 611 812 Kč místo 738 487 Kč – živě lidem
+    # přicházejícím z FB postu. Odhalilo se to náhodou přes komentář čtenáře.
+    #
+    # `scraper/fetch_index_data_yahoo.py` je rozbitý ve třech vrstvách:
+    #  1) upload_to_supabase() dělá DELETE celé řady + INSERT po dávkách po 500.
+    #     Když dávkování kdekoli spadne, zůstane useknutá řada (8000 = 16×500).
+    #  2) Konvertuje VŠECHNO do EUR, jenže tabulka drží nativní měnu listingu
+    #     a engine si převádí sám podle INDEX_SOURCE_CURRENCY (viz etf-nextjs-ssr
+    #     src/lib/backtest/engine.ts). Doběhlý běh by zkorumpoval 21 USD indexů.
+    #  3) Má zastaralé GBP tickery (IBGS.L/IBGM.L/IBGL.L) + natvrdo gbp_eur=1.15;
+    #     eurové dluhopisy se přitom ručně přehrávaly z jiných listingů. Ověřeno:
+    #     eur_govt_bond_1_3y ani _3_7y v DB neodpovídají ŽÁDNÉMU tickeru z configu.
+    #
+    # Data jsou dnes správná jen proto, že tenhle job opakovaně padal.
+    # Náhrada se staví ověřeně (upsert, nativní měna, přírůstkově) – do té doby
+    # hlídá integritu scripts/backtest/check_index_integrity.py v druhém repu.
+    if: false
     needs: scrape
-    if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
