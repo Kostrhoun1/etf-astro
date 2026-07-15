@@ -1,4 +1,24 @@
 """
+# ============================================================================
+# !!!  ZASTARALÉ – NESPOUŠTĚT. Odstaveno 15.7.2026 po incidentu.  !!!
+#
+# NÁHRADA:  etf-nextjs-ssr/scripts/backtest/sync-indexes.mjs
+#           (+ manifest src/lib/backtest/indexes.ts, popis BACKTEST-DATA.md)
+#
+# CO PROVEDL: smazal 419 řádků `sp500` (ocas od 2024-11-06). Produkce půl dne
+# ukazovala 611 812 Kč místo 738 487 Kč – živě lidem z FB postu se 724 262 Kč.
+#
+# ROZBITÝ VE TŘECH VRSTVÁCH:
+#  1) upload_to_supabase(): DELETE celé řady + INSERT po dávkách po 500. Spadlé
+#     dávkování nechá usek – zůstalo 8000 = přesně 16×500 úspěšných dávek.
+#  2) Konvertuje VŠECHNO do EUR. Tabulka ale drží NATIVNÍ měnu listingu a engine
+#     převádí sám → doběhlý běh by zkorumpoval všech 21 dolarových indexů.
+#  3) Zastaralé GBP tickery (IBGS.L/IBGM.L/IBGL.L) + natvrdo gbp_eur = 1.15.
+#     Ověřeno: eur_govt_bond_1_3y ani _3_7y v DB neodpovídají ŽÁDNÉMU tickeru zde.
+#
+# Data byla správná jen proto, že job opakovaně padal. `backtest` ve scrape.yml
+# má if:false. Scraping ETF z justETF běží dál – toho se odstavení NETÝKÁ.
+# ============================================================================
 Fetch historical index data from Yahoo Finance and upload to Supabase.
 All data is converted from USD to EUR using historical exchange rates.
 """
