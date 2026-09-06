@@ -2421,12 +2421,28 @@ class CompleteProductionScraper:
         description_lower = (etf.description_en or '').lower()
 
         # 0. PÁKOVÁ ETF DETEKCE
-        leveraged_keywords = ['leveraged', '2x', '3x', '4x', '5x', '10x', 'ultra', 'leverage', 'bear', 'short', 'inverse']
+        # POZOR na 'short' a 'ultra': v názvech dluhopisových fondů znamenají KRÁTKOU
+        # DURACI/SPLATNOST, ne sázku na pokles. Holé 'short'/'ultra' v seznamu klíčových
+        # slov proto označovalo 63 běžných fondů (59 dluhopisových) za pákové – např.
+        # 'iShares EUR Ultrashort Bond', 'PIMCO Euro Short Maturity', 'Xtrackers II EUR
+        # Corporate Bond Short Duration'. Screener pákové ve výchozím stavu skrývá, takže
+        # tyhle fondy byly pro uživatele neviditelné. Zjištěno 6. 9. 2026.
+        leveraged_keywords = ['leveraged', '2x', '3x', '4x', '5x', '10x', 'leverage',
+                              'bear', 'inverse', 'ultrapro', 'shortdax', 'long/short']
+        # 'short' se počítá jen tehdy, když NEJDE o krátkou duraci/splatnost.
+        short_duration_patterns = ['short duration', 'short maturity', 'short-term', 'short term',
+                                   'ultrashort', 'ultra short', 'short dated', 'shortterm']
+        is_short_bet = 'short' in name_lower and not any(p in name_lower for p in short_duration_patterns)
+        # 'ultra' zůstává známkou páky (např. 'YieldMax Ultra Option Income'), ale
+        # 'Ultrashort Bond' je krátká durace, ne páka.
+        is_ultra = 'ultra' in name_lower and 'ultrashort' not in name_lower and 'ultra short' not in name_lower
         # "daily" samo o sobě neznamená pákové - musí být v kombinaci s multiplikátorem
         # "daily hedged" NENÍ pákové, jen "daily leveraged" nebo "2x daily" apod.
         daily_leveraged_patterns = ['5x long', '3x long', '2x long', '5x short', '3x short', '2x short',
                                    'daily leveraged', 'daily short', 'daily inverse']
-        if any(keyword in name_lower for keyword in leveraged_keywords) or any(pattern in name_lower for pattern in daily_leveraged_patterns):
+        if (any(keyword in name_lower for keyword in leveraged_keywords)
+                or any(pattern in name_lower for pattern in daily_leveraged_patterns)
+                or is_short_bet or is_ultra):
             etf.is_leveraged = True
 
         # ===== PRIORITA 0: NÁZEV - PŘÍMÁ DETEKCE ETC/KOMODIT (nejvyšší priorita) =====
