@@ -28,7 +28,7 @@ jobs:
     # Synchronizuje ISIN.csv s aktuálním vesmírem ETF na justETF (přidá nové,
     # odebere delistované) PŘED scrapem. Zdroj = justETF sitemapy.
     if: ${{ github.event.inputs.backtest_only != 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # zafixováno 1.10.2026: ubuntu-latest od 19.10. přechází na Ubuntu 26 – přejít vědomě a otestovaně
     timeout-minutes: 15
     permissions:
       contents: write
@@ -75,7 +75,7 @@ jobs:
     # Čeká na refresh, aby scrapoval aktuální seznam (nové i bez delistovaných).
     needs: refresh_isins
     if: ${{ github.event.inputs.backtest_only != 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # zafixováno 1.10.2026: ubuntu-latest od 19.10. přechází na Ubuntu 26 – přejít vědomě a otestovaně
     # Just under GitHub's hard 6h limit. Each half should finish in ~3h, this
     # is a safety ceiling.
     timeout-minutes: 359
@@ -205,7 +205,7 @@ jobs:
     # hlídá integritu scripts/backtest/check_index_integrity.py v druhém repu.
     if: false
     needs: scrape
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # zafixováno 1.10.2026: ubuntu-latest od 19.10. přechází na Ubuntu 26 – přejít vědomě a otestovaně
     timeout-minutes: 30
 
     defaults:
@@ -260,7 +260,7 @@ jobs:
     # site that's about to read the same stale data.
     needs: [scrape, backtest]
     if: ${{ needs.scrape.result == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # zafixováno 1.10.2026: ubuntu-latest od 19.10. přechází na Ubuntu 26 – přejít vědomě a otestovaně
     timeout-minutes: 5
 
     steps:
