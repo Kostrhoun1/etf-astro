@@ -181,10 +181,34 @@ CHECKPOINTS_DIR = os.path.join(OUTPUT_DIR, "checkpoints")
 CHECKPOINT_MAX_AGE_H = 20  # noční běh trvá < 6 h; cokoli staršího je z jiného (zrušeného) cyklu
 
 
-def checkpoint_neplatny(data, batch_isins=None):
+def _verze_kodu() -> str:
+    """Otisk kódu scraperu (všechny .py ve složce). Checkpoint smí použít jen TENTÝŽ kód.
+
+    17. 10. 2026: plánovaný běh se STARÝM kódem (před opravou ročních výnosů) byl zrušen, nový běh
+    s opraveným kódem převzal jeho checkpointy (mladší 20 h, stejné ISINy) a 550 fondů nahrál se
+    starými – špatnými – ročními výnosy. Stáří + ISINy nestačí; musí sedět i verze kódu.
+    """
+    import hashlib
+    h = hashlib.sha256()
+    slozka = os.path.dirname(os.path.abspath(__file__))
+    for jmeno in sorted(f for f in os.listdir(slozka) if f.endswith('.py')):
+        with open(os.path.join(slozka, jmeno), 'rb') as f:
+            h.update(jmeno.encode())
+            h.update(f.read())
+    return h.hexdigest()[:16]
+
+
+VERZE_KODU = _verze_kodu()
+
+
+def checkpoint_neplatny(data, batch_isins=None, verze=None):
     """Vrátí důvod, proč checkpoint NEpoužít, nebo None, když je v pořádku (viz load_checkpoint)."""
     if not isinstance(data, list) or not data:
         return "prázdný"
+    verze = verze or VERZE_KODU
+    jine = {item.get('_verze_kodu') for item in data if isinstance(item, dict)} - {verze}
+    if jine:
+        return f"z jiné verze kódu ({', '.join(sorted(str(v) for v in jine))} ≠ {verze})"
     nejstarsi = None
     for item in data:
         d = item.get('scraping_date') if isinstance(item, dict) else None
@@ -894,7 +918,7 @@ class CompleteProductionScraper:
         checkpoint_file = os.path.join(CHECKPOINTS_DIR, f"batch_{batch_id:04d}.json")
         
         try:
-            data = [etf.to_dict() for etf in etf_list]
+            data = [{**etf.to_dict(), '_verze_kodu': VERZE_KODU} for etf in etf_list]
             with open(checkpoint_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
             
