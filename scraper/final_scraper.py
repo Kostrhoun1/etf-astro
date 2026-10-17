@@ -2077,7 +2077,17 @@ class CompleteProductionScraper:
                 r'(Crypto)',
             ]
             
+            # Sektorový/faktorový fond („S&P 500 Energy Sector", „MSCI World Value") NESLEDUJE
+            # S&P 500 / MSCI World – krátký vzor by mu ho ale přiřadil (audit 17. 10. 2026: 90 ze
+            # 186 fondů s indexem S&P 500 nebyly čistý S&P 500, u MSCI World 138 z 256).
+            # Pro takové fondy krátké vzory přeskočíme; obecný vzor MSCI pak vezme celý název.
+            specificky = re.search(r'\b(sector|energy|financials?|information technology|technology|health ?care|'
+                                   r'utilities|industrials?|materials|consumer|communication|real estate|equal weight|'
+                                   r'value|growth|momentum|quality|min(imum)? vol|dividend|esg|sri|paris|climate|'
+                                   r'ex[- ]|small ?cap|mid ?cap|leveraged|short|inverse|\dx)\b', name, re.I)
             for pattern in index_patterns:
+                if specificky and pattern in (r'(S&P 500)', r'(MSCI World)'):
+                    continue
                 match = re.search(pattern, name, re.I)
                 if match:
                     index_name = match.group(1).strip()
@@ -2517,7 +2527,11 @@ class CompleteProductionScraper:
             commodity_focus = ['commodity', 'commodities', 'gold', 'silver', 'platinum', 'palladium',
                              'oil', 'energy', 'precious metal', 'precious metals', 'metals',
                              'agriculture', 'natural gas', 'copper', 'aluminium', 'wheat', 'corn']
-            if any(keyword in investment_focus_lower for keyword in commodity_focus):
+            # Akciový fond se zaměřením na sektor („Equity, United States, Energy", „Equity, World,
+            # Gold Mining") NENÍ komodita – jinak 29 energetických akciových ETF skončilo v
+            # „Komodity" a chybělo v „Energetické" (audit 17. 10. 2026).
+            is_equity_focus = investment_focus_lower.lstrip().startswith(('equity', 'equities'))
+            if not is_equity_focus and any(keyword in investment_focus_lower for keyword in commodity_focus):
                 etf.category = 'Komodity'
                 return
 
@@ -4046,6 +4060,52 @@ class CompleteProductionScraper:
             
         return self._upload_chunk_to_database(etfs, chunk_size=5)
     
+    # Pole, která parser občas nenajde (změna HTML na justETF, timeout) – prázdná hodnota se pak
+    # dřív zapsala PŘES starou správnou. Audit 17. 10. 2026: index chyběl u 59 % fondů, tickery
+    # u 20 % (i CNDX, EQQQ), FAQ pak psalo „fond sledující index  …" a „Je — vhodný".
+    CHRANENA_POLE = ['index_name', 'distribution_policy', 'distribution_frequency', 'replication',
+                     'fund_domicile', 'fund_currency', 'fund_provider', 'inception_date', 'investment_focus']
+
+    @staticmethod
+    def _prazdne(v) -> bool:
+        return v is None or (isinstance(v, str) and v.strip() in ('', '-', 'N/A'))
+
+    def _chran_stavajici_hodnoty(self, rows: List[Dict]) -> List[Dict]:
+        """Prázdné hodnoty doplní z toho, co už je v DB; řádek bez názvu nezapíše vůbec."""
+        # Fond bez názvu = rozbitý scrape (bez TER, měny, data vzniku) – na webu dělal stránky „ETF fond".
+        bez_nazvu = [r.get('isin') for r in rows if self._prazdne(r.get('name'))]
+        if bez_nazvu:
+            safe_log("warning", f"⚠️ Nezapisuji {len(bez_nazvu)} fondů bez názvu: {', '.join(map(str, bez_nazvu))}")
+        rows = [r for r in rows if not self._prazdne(r.get('name'))]
+        if not rows:
+            return rows
+        burzy = [k for k in rows[0].keys() if k.startswith('exchange_')] + ['primary_ticker', 'primary_exchange', 'total_exchanges']
+        sloupce = ['isin'] + [k for k in self.CHRANENA_POLE + burzy if k in rows[0]]
+        try:
+            stare = self.supabase.table('etf_funds').select(','.join(sloupce)).in_('isin', [r['isin'] for r in rows]).execute().data or []
+        except Exception as e:
+            safe_log("warning", f"⚠️ Nelze načíst stávající hodnoty pro ochranu prázdných polí: {e}")
+            return rows
+        podle_isin = {x['isin']: x for x in stare}
+        for r in rows:
+            old = podle_isin.get(r['isin'])
+            if not old:
+                continue
+            for k in self.CHRANENA_POLE:
+                if k in r and self._prazdne(r[k]) and not self._prazdne(old.get(k)):
+                    # „S&P 500"/„MSCI World" holé = výsledek starého chybného odhadu z názvu
+                    # (dával je i sektorovým fondům). Neobnovovat – skutečným S&P 500/MSCI World
+                    # fondům je odhad z názvu (_extract_index_name) vytvoří znovu.
+                    if k == 'index_name' and str(old[k]).strip() in ('S&P 500', 'MSCI World'):
+                        continue
+                    r[k] = old[k]
+            # Burzy jako celek: parser burz buď najde všechny, nebo žádnou (total_exchanges=0).
+            if self._prazdne(r.get('exchange_1_ticker')) and not self._prazdne(old.get('exchange_1_ticker')):
+                for k in burzy:
+                    if k in r and k in old:
+                        r[k] = old[k]
+        return rows
+
     def _upload_chunk_to_database(self, etfs: List[ETFDataComplete], chunk_size: int = 5) -> bool:
         """Upload ETFs to database in smaller chunks to avoid timeout"""
         success_count = 0
@@ -4063,6 +4123,9 @@ class CompleteProductionScraper:
                 
                 # Transform data for database
                 transformed_chunk = [self.transform_etf_for_database(etf) for etf in chunk]
+                transformed_chunk = self._chran_stavajici_hodnoty(transformed_chunk)
+                if not transformed_chunk:
+                    continue
                 
                 # Try upload with rating fields first
                 try:

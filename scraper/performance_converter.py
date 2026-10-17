@@ -91,6 +91,27 @@ class PerformanceConverter:
         if cache_key in self.rates_cache:
             return self.rates_cache[cache_key]
         
+        # KALENDÁŘNÍ ROK (např. '2025'): kurz k 31. 12. předchozího roku → k 31. 12. daného roku
+        # (u běžícího roku → dnešní kurz). Dřív se i tady bral kurz „před 365 dny → dnes", takže
+        # roční výnosy v Kč/USD byly o 2–4 p. b. vedle (audit 17. 10. 2026: SXR8 2025 v Kč web
+        # +4,2 %, správně +0,1 %; 2024 v USD +27,9 % vs. S&P 500 TR ≈ +25 %).
+        if period.isdigit() and len(period) == 4:
+            year = int(period)
+            start = datetime(year - 1, 12, 31)
+            end = datetime(year, 12, 31) if year < datetime.now().year else None
+            if target_currency == 'CZK':
+                historical_rate = self.exchange_fetcher.fetch_cnb_rate(start, 'EUR')
+                end_rate = self.exchange_fetcher.fetch_cnb_rate(end, 'EUR') if end else self.exchange_fetcher.get_current_rates().get('EUR_CZK')
+            elif target_currency == 'USD':
+                historical_rate = self.exchange_fetcher.fetch_frankfurter_rate(start, 'USD')
+                end_rate = self.exchange_fetcher.fetch_frankfurter_rate(end, 'USD') if end else self.exchange_fetcher.get_current_rates().get('EUR_USD')
+            else:
+                safe_log("error", f"Nepodporovaná měna: {target_currency}")
+                return None, None
+            result = (historical_rate, end_rate)
+            self.rates_cache[cache_key] = result
+            return result
+
         days_ago = self.get_period_days(period)
         if days_ago == 0:
             safe_log("warning", f"Neznámé období: {period}")
