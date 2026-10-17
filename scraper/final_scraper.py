@@ -1001,8 +1001,10 @@ class CompleteProductionScraper:
                 etf.retry_count = attempt
                 
                 # NOVÉ: Currency Performance Conversion
-                if (self.currency_integrator and self.currency_integrator.is_available() and 
-                    hasattr(etf, 'return_1y') and etf.return_1y is not None):
+                # Převádět, když má fond JAKÝKOLI výnos – dřív jen s return_1y, takže 172 fondům
+                # mladším 1 roku chyběl YTD v Kč a web pak ukazoval EUR jako Kč (audit 17. 10. 2026).
+                if (self.currency_integrator and self.currency_integrator.is_available() and
+                    any(getattr(etf, k, None) is not None for k in ('return_ytd', 'return_1m', 'return_3m', 'return_6m', 'return_1y'))):
                     safe_log("debug", f"💱 Přidávám currency performance pro {isin}")
                     currency_success = self.currency_integrator.enhance_etf_with_currency_performance(etf)
                     
