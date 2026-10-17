@@ -9,8 +9,12 @@ name: ETF Scraper
 
 on:
   schedule:
-    # Daily at 03:00 UTC (= 04:00 CET / 05:00 CEST). JustETF is quietest then.
-    - cron: '0 3 * * *'
+    # Denně 00:37 UTC (= 01:37 CET / 02:37 CEST). ZÁMĚRNĚ mimo celou hodinu: při '0 3 * * *'
+    # GitHub plánované běhy 18. 9.–17. 10. 2026 KAŽDÝ den zdržel o 4–7 h (start 9:10–12:01
+    # našeho času), protože v celou hodinu je fronta plánovaných workflow nejdelší. Běh trvá
+    # ~3,7 h; i se zpožděním mají být data hotová ráno. Kontrola dat (fund-data-check.yml
+    # v etf-nextjs-ssr) běží 15:30 UTC.
+    - cron: '37 0 * * *'
   workflow_dispatch:
     inputs:
       backtest_only:
