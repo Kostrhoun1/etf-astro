@@ -178,6 +178,31 @@ except ImportError:
 # Výstupní složky
 OUTPUT_DIR = "justetf_complete_production"
 CHECKPOINTS_DIR = os.path.join(OUTPUT_DIR, "checkpoints")
+CHECKPOINT_MAX_AGE_H = 20  # noční běh trvá < 6 h; cokoli staršího je z jiného (zrušeného) cyklu
+
+
+def checkpoint_neplatny(data, batch_isins=None):
+    """Vrátí důvod, proč checkpoint NEpoužít, nebo None, když je v pořádku (viz load_checkpoint)."""
+    if not isinstance(data, list) or not data:
+        return "prázdný"
+    nejstarsi = None
+    for item in data:
+        d = item.get('scraping_date') if isinstance(item, dict) else None
+        if not d:
+            return "chybí scraping_date"
+        try:
+            t = datetime.fromisoformat(str(d).replace('Z', '+00:00')).replace(tzinfo=None)
+        except ValueError:
+            return f"nečitelné scraping_date {d!r}"
+        nejstarsi = t if nejstarsi is None or t < nejstarsi else nejstarsi
+    stari_h = (datetime.now() - nejstarsi).total_seconds() / 3600
+    if stari_h > CHECKPOINT_MAX_AGE_H:
+        return f"starý {stari_h:.0f} h"
+    if batch_isins is not None:
+        cizi = {item.get('isin') for item in data} - set(batch_isins)
+        if cizi:
+            return f"{len(cizi)} ISINů nepatří do dávky"
+    return None
 RESULTS_DIR = os.path.join(OUTPUT_DIR, "results")
 LOGS_DIR = os.path.join(OUTPUT_DIR, "logs")
 
@@ -788,14 +813,27 @@ class CompleteProductionScraper:
         safe_log("info", f"OK: Načteno {len(isins)} validních ISIN kódů")
         return isins
     
-    def load_checkpoint(self, batch_id: int) -> Optional[List[ETFDataComplete]]:
-        """Načte checkpoint pro batch"""
+    def load_checkpoint(self, batch_id: int, batch_isins: Optional[List[str]] = None) -> Optional[List[ETFDataComplete]]:
+        """Načte checkpoint pro batch.
+
+        POZOR – checkpoint se smí použít jen z PRÁVĚ PROBÍHAJÍCÍHO cyklu. CI ho obnovuje z GitHub
+        cache přes restore-keys, a ta vrátí i cache z dávno zrušeného běhu. Od 26. 4. do 17. 10. 2026
+        se tak každou noc znovu nahrávala dubnová data ~640 fondů (VUAA, Xetra-Gold, …) a upsert
+        jim přepsal updated_at na dnešek – web je ukazoval jako čerstvá. Proto: checkpoint starší
+        než CHECKPOINT_MAX_AGE_H nebo s ISINy, které do dávky nepatří (seznam ISINů se mezitím
+        změnil), se zahodí a dávka se scrapuje znovu.
+        """
         checkpoint_file = os.path.join(CHECKPOINTS_DIR, f"batch_{batch_id:04d}.json")
         
         if os.path.exists(checkpoint_file):
             try:
                 with open(checkpoint_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
+                
+                duvod = checkpoint_neplatny(data, batch_isins)
+                if duvod:
+                    safe_log("warning", f"CHECKPOINT: batch {batch_id} zahozen ({duvod}) – scrapuji znovu")
+                    return None
                 
                 etf_list = []
                 for item in data:
@@ -864,14 +902,14 @@ class CompleteProductionScraper:
         except Exception as e:
             safe_log("error", f"ERROR: Chyba při ukládání checkpoint: {e}")
     
-    def is_batch_completed(self, batch_id: int, expected_count: int) -> bool:
-        """Zkontroluje, zda je batch dokončený"""
-        checkpoint = self.load_checkpoint(batch_id)
+    def is_batch_completed(self, batch_id: int, batch_isins: List[str]) -> bool:
+        """Zkontroluje, zda je batch dokončený (v tomto cyklu a pro tytéž ISINy)"""
+        checkpoint = self.load_checkpoint(batch_id, batch_isins)
         if not checkpoint:
             return False
         
         completed = sum(1 for etf in checkpoint if etf.scraping_status in ['success', 'error', 'not_found'])
-        return completed == expected_count
+        return completed == len(batch_isins)
     
     def cleanup_checkpoints(self):
         """Smaže všechny checkpoint soubory po dokončení scrapingu"""
@@ -1005,7 +1043,7 @@ class CompleteProductionScraper:
         
         # Pokus o načtení checkpointu
         if resume:
-            checkpoint = self.load_checkpoint(batch_id)
+            checkpoint = self.load_checkpoint(batch_id, batch_isins)
             if checkpoint:
                 completed = sum(1 for etf in checkpoint if etf.scraping_status in ['success', 'error', 'not_found'])
                 if completed == len(batch_isins):
@@ -1106,9 +1144,9 @@ class CompleteProductionScraper:
                     safe_log("info", f"📦 Processing batch {batch_id + 1}/{total_batches} ({len(batch_isins)} ETFs)")
                 
                 # Zkontroluj, zda už je batch dokončený
-                if resume and self.is_batch_completed(batch_id, len(batch_isins)):
+                if resume and self.is_batch_completed(batch_id, batch_isins):
                     safe_log("info", f"SKIP: Batch {batch_id} už je dokončený, přeskakuji")
-                    checkpoint = self.load_checkpoint(batch_id)
+                    checkpoint = self.load_checkpoint(batch_id, batch_isins)
                     if checkpoint:
                         all_results.extend(checkpoint)
                     continue
