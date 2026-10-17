@@ -1,5 +1,17 @@
 # CLAUDE.md - Instrukce pro AI asistenta
 
+## ⛔ PRAVIDLO Č. 1 CELÉHO PROJEKTU: DATA MUSÍ BÝT SPRÁVNĚ
+
+Rozhodnutí majitele (17. 10. 2026), platí pro scraper, noční joby i web. Má přednost před vším
+ostatním. Plné znění: `/Users/tomaskostrhoun/Documents/etf-nextjs-ssr/CLAUDE.md`. Pro scraper hlavně:
+
+- Raději prázdná hodnota než špatná; prázdný výsledek parsování NIKDY nepřepíše dobrou starou hodnotu.
+- `scraping_date` = kdy byla data opravdu stažena; nikdy nenahrávej stará data jako nová
+  (incident 17. 10. 2026: checkpointy z dubnové cache → 640 fondů s půl roku starými čísly).
+- Každý přepočet (měny, období) ověř nezávisle: kurzy ČNB/ECB, hodnoty na justETF, benchmark indexu.
+- Každá opravená chyba v datech dostane automatickou kontrolu (`etf-nextjs-ssr/scripts/check-fund-data.mjs`).
+
+
 ## 🎯 HLAVNÍ CÍL PROJEKTU
 
 **KRITICKÝ POŽADAVEK**: Nové Astro stránky MUSÍ být z pohledu:
