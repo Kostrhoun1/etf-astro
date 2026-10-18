@@ -2042,56 +2042,31 @@ class CompleteProductionScraper:
         self._extract_index_name(soup, etf)
     
     def _extract_index_name(self, soup: BeautifulSoup, etf: ETFDataComplete):
-        """Extrahuje název indexu - nejprve z webové stránky, pak z názvu ETF"""
-        
-        # PRIORITA 1: Scrapuj index z webové stránky (už implementováno v _extract_detailed_table_data)
-        # Pokud už máme index_name z tabulek, nepřepisuj ho
-        if etf.index_name and len(etf.index_name) >= 3:
-            return
-        
-        # PRIORITA 2: Fallback - extrakce z názvu ETF
-        if etf.name:
-            name = etf.name.replace('UCITS ETF', '').replace('ETP', '').replace('ETF', '')
-            
-            index_patterns = [
-                r'(S&P 500)',
-                r'(MSCI World)',
-                r'(STOXX® Europe 600)',
-                r'(STOXX Europe 600)',
-                r'(EURO STOXX 50)',
-                r'(STOXX [\w\s®©™&-]+)',
-                r'(FTSE [\w\s®©™&-]+)',
-                r'(NASDAQ [\w\s®©™&-]+)',
-                r'(Nasdaq[\s-]100)',   # Specificky pro Nasdaq-100 nebo Nasdaq 100
-                r'(NASDAQ[\s-]100)',   # Specificky pro NASDAQ-100 nebo NASDAQ 100
-                r'(MSCI Europe)',
-                r'(MSCI Emerging Markets)',
-                r'(MSCI [\w\s®©™&-]+)',
-                r'(Bloomberg [\w\s®©™&-]+)',
-                r'(Euro Corporate)',
-                r'(Government Bond)',
-                r'(Bitcoin)',
-                r'(Ethereum)',
-                r'(Crypto)',
-            ]
-            
-            # Sektorový/faktorový fond („S&P 500 Energy Sector", „MSCI World Value") NESLEDUJE
-            # S&P 500 / MSCI World – krátký vzor by mu ho ale přiřadil (audit 17. 10. 2026: 90 ze
-            # 186 fondů s indexem S&P 500 nebyly čistý S&P 500, u MSCI World 138 z 256).
-            # Pro takové fondy krátké vzory přeskočíme; obecný vzor MSCI pak vezme celý název.
-            specificky = re.search(r'\b(sector|energy|financials?|information technology|technology|health ?care|'
-                                   r'utilities|industrials?|materials|consumer|communication|real estate|equal weight|'
-                                   r'value|growth|momentum|quality|min(imum)? vol|dividend|esg|sri|paris|climate|'
-                                   r'ex[- ]|small ?cap|mid ?cap|leveraged|short|inverse|\dx)\b', name, re.I)
-            for pattern in index_patterns:
-                if specificky and pattern in (r'(S&P 500)', r'(MSCI World)'):
-                    continue
-                match = re.search(pattern, name, re.I)
-                if match:
-                    index_name = match.group(1).strip()
-                    if 3 <= len(index_name) <= 50:
-                        etf.index_name = index_name
-                        return
+        """Sledovaný index = řádek „Index“ v tabulce základních údajů na justETF. Nic jiného.
+
+        Do 18. 10. 2026:
+        - index se nejdřív ODHADOVAL Z NÁZVU fondu (regex „S&P 500“, „MSCI [slova]“, „Bloomberg [slova]“)
+          a skutečný řádek z tabulky se pak už nečetl → VIX futures fond měl index „S&P 500“, energetický
+          sektor „MSCI Europe“, regex se zastavil na „.“/„+“ („FTSE All-World Ex-U“, „Bloomberg 10“);
+        - čtení tabulky regexem nad get_text() čekalo „\n“ za hodnotou a „<div“ (v textu nejsou HTML značky)
+          → nenašlo nic; 3 083 z 5 124 fondů bez indexu (Amundi Prime All Country World, SPYI…).
+        Když řádek chybí (změna HTML), index zůstane prázdný a v DB se nepřepíše (_chran_stavajici_hodnoty).
+        """
+        etf.index_name = self._index_from_basics_table(soup)
+
+    def _index_from_basics_table(self, soup: BeautifulSoup) -> str:
+        el = soup.select_one('[data-testid="tl_etf-basics_value_index-name"]')
+        if el is None:
+            # Záloha při změně data-testid: řádek tabulky základních údajů s popiskem přesně „Index“.
+            for row in soup.select('table.etf-data-table tr'):
+                cells = row.find_all('td')
+                if len(cells) >= 2 and cells[0].get_text(' ', strip=True) == 'Index':
+                    el = cells[1]
+                    break
+        if el is None:
+            safe_log("warning", "INDEX: řádek „Index“ na profilu nenalezen (změna HTML na justETF?)")
+            return ''
+        return self._bez_pomlcky(el.get_text(' ', strip=True))
 
     def _extract_investment_focus_from_html(self, soup: BeautifulSoup) -> Optional[str]:
         """
@@ -2260,16 +2235,7 @@ class CompleteProductionScraper:
                 r'Payment frequency\s*([A-Za-z\s]+?)(?:\s*Fund|$|\n)',
                 r'Frequency\s*([A-Za-z\s]+?)(?:\s*Fund|$|\n)',
             ],
-            'index_name': [
-                r'Index.*?<div.*?val.*?>([^<]+)',  # HTML structure: Index ... <div class="val">Nasdaq 100®</div>
-                r'Index\s*([A-Za-z0-9\s®®©™&\.-]+?)(?:\s*$|\n|[A-Z]{2}\d)',  # Text format
-                r'Benchmark.*?<div.*?val.*?>([^<]+)',
-                r'Benchmark\s*([A-Za-z0-9\s®®©™&\.-]+?)(?:\s*$|\n|[A-Z]{2}\d)',
-                r'Underlying index.*?<div.*?val.*?>([^<]+)',
-                r'Underlying index\s*([A-Za-z0-9\s®®©™&\.-]+?)(?:\s*$|\n|[A-Z]{2}\d)',
-                r'Tracks\s*([A-Za-z0-9\s®®©™&\.-]+?)(?:\s*$|\n|[A-Z]{2}\d)',
-                r'Replicates\s*([A-Za-z0-9\s®®©™&\.-]+?)(?:\s*$|\n|[A-Z]{2}\d)',
-            ],
+            # index_name: jen z řádku „Index“ (_extract_index_name), regexy nad textem dávaly smetí.
             'investment_focus': [
                 r'Investment focus\s*([A-Za-z\s,\./-]+?)(?:\s*Fund|$|\n)',
                 r'Focus\s*([A-Za-z\s,\./-]+?)(?:\s*Fund|$|\n)',
@@ -2356,14 +2322,6 @@ class CompleteProductionScraper:
                         value = re.sub(r'(Fund|Investment)', '', value, flags=re.I).strip()
                         if value:
                             etf.distribution_frequency = value
-                            break
-                    elif field == 'index_name' and 3 <= len(value) <= 100:
-                        # Čištění index name - zachová speciální znaky jako ®, ©, ™
-                        value = re.sub(r'(Fund|Investment|ETF|UCITS|ETP)(?:\s|$)', '', value, flags=re.I).strip()
-                        # Odstraň trailing data jako "ISIN:" nebo country codes
-                        value = re.sub(r'\s+[A-Z]{2}\d.*$', '', value).strip()
-                        if value and len(value) >= 3:
-                            etf.index_name = value
                             break
                     elif field == 'investment_focus' and 3 <= len(value) <= 200:
                         value = re.sub(r'(Fund|Investment|ETF)', '', value, flags=re.I).strip()
@@ -2516,6 +2474,14 @@ class CompleteProductionScraper:
         )
 
         if is_valid_focus:
+            # 1.0 PENĚŽNÍ TRH (investment_focus „Money Market, EUR“ – overnight/€STR/T-bill fondy).
+            # Dřív nezapadly nikam a skončily fallbackem v „Akcie“ (45 fondů) nebo podle popisu
+            # v „Dluhopisy“ (9) – 18. 10. 2026. Web je ve srovnávači řadí do záložky „Peněžní trh“
+            # (src/lib/etf-data.ts, kategorieSrovnavace) – stejné pravidlo: focus začíná „Money Market“.
+            if re.match(r'\s*money market\b', investment_focus_lower):
+                etf.category = 'Peněžní trh'
+                return
+
             # 1.1 KRYPTO
             crypto_focus = ['crypto', 'cryptocurrency', 'cryptocurrencies', 'bitcoin', 'ethereum', 'solana', 'blockchain', 'digital asset']
             if any(keyword in investment_focus_lower for keyword in crypto_focus):
@@ -4097,8 +4063,8 @@ class CompleteProductionScraper:
             for k in self.CHRANENA_POLE:
                 if k in r and self._prazdne(r[k]) and not self._prazdne(old.get(k)):
                     # „S&P 500"/„MSCI World" holé = výsledek starého chybného odhadu z názvu
-                    # (dával je i sektorovým fondům). Neobnovovat – skutečným S&P 500/MSCI World
-                    # fondům je odhad z názvu (_extract_index_name) vytvoří znovu.
+                    # (dával je i sektorovým fondům). Neobnovovat – skutečný index dá řádek „Index“
+                    # na justETF (_extract_index_name), odhad z názvu se od 18. 10. 2026 nedělá.
                     if k == 'index_name' and str(old[k]).strip() in ('S&P 500', 'MSCI World'):
                         continue
                     r[k] = old[k]
