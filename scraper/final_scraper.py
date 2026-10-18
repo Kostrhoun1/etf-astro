@@ -3114,7 +3114,9 @@ class CompleteProductionScraper:
         if holdings_section:
             table = holdings_section.find('table')
             if table:
-                rows = table.find_all('tr')[1:]  # Skip header
+                # Tabulka „Top 10 Holdings“ na justETF NEMÁ řádek záhlaví – dřívější [1:] zahodil největší pozici
+                # (NVIDIA u S&P 500 / světa, oprava 18. 10. 2026). Záhlaví (th) vyřadí podmínka len(td) >= 2 níže.
+                rows = [r for r in table.find_all('tr') if len(r.find_all('td')) >= 2]
                 for row in rows[:10]:
                     cells = row.find_all('td')
                     if len(cells) >= 2:
