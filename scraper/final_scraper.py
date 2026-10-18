@@ -2505,11 +2505,12 @@ class CompleteProductionScraper:
                               'bear', 'inverse', 'ultrapro', 'shortdax', 'long/short']
         # 'short' se počítá jen tehdy, když NEJDE o krátkou duraci/splatnost.
         short_duration_patterns = ['short duration', 'short maturity', 'short-term', 'short term',
-                                   'ultrashort', 'ultra short', 'short dated', 'shortterm']
+                                   'ultrashort', 'ultra short', 'ultra-short', 'short dated', 'shortterm']
         is_short_bet = 'short' in name_lower and not any(p in name_lower for p in short_duration_patterns)
         # 'ultra' zůstává známkou páky (např. 'YieldMax Ultra Option Income'), ale
         # 'Ultrashort Bond' je krátká durace, ne páka.
-        is_ultra = 'ultra' in name_lower and 'ultrashort' not in name_lower and 'ultra short' not in name_lower
+        # 'Ultra-Short' (s pomlčkou, JPMorgan/UBS Ultra-Short Income) je taky krátká durace (oprava 18. 10. 2026).
+        is_ultra = 'ultra' in name_lower and not any(p in name_lower for p in ('ultrashort', 'ultra short', 'ultra-short'))
         # "daily" samo o sobě neznamená pákové - musí být v kombinaci s multiplikátorem
         # "daily hedged" NENÍ pákové, jen "daily leveraged" nebo "2x daily" apod.
         daily_leveraged_patterns = ['5x long', '3x long', '2x long', '5x short', '3x short', '2x short',
