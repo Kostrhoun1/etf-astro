@@ -479,17 +479,14 @@ class ETFDataComplete:
     def add_exchange_listing(self, listing: ExchangeListing):
         """Přidá nové stock exchange listing"""
         self.exchange_listings.append(listing)
-        
-        # Smarter primary ticker selection - preferuj známé tickery
-        if not self.primary_exchange:
-            self.primary_exchange = listing.exchange_name
+
+        # Hlavní ticker = PRVNÍ burza (v pořadí justETF), která ticker opravdu má.
+        # Do 18. 10. 2026 se bral ticker 1. burzy i když to byla „-“ (Bolsa Mexicana nemá ticker,
+        # jen Bloomberg kód) → 57 fondů mělo na webu ticker „-“ (UBS MSCI ACWI SF místo ACWIA).
+        if not self.primary_ticker and listing.ticker:
             self.primary_ticker = listing.ticker
-        else:
-            # Pokud nový ticker je více "preference" než current primary
-            if self._is_preferred_ticker_static(listing.ticker, self.primary_ticker):
-                self.primary_ticker = listing.ticker
-                self.primary_exchange = listing.exchange_name
-        
+            self.primary_exchange = listing.exchange_name
+
         self.total_exchanges = len(self.exchange_listings)
     
     @staticmethod
@@ -1786,78 +1783,51 @@ class CompleteProductionScraper:
             # Default pro většinu ETF
             etf.region = 'Celosvětově'
     
+    @staticmethod
+    def _bez_pomlcky(value: str) -> str:
+        """justETF píše „-“ / „- -“ tam, kde hodnota NENÍ (burza bez tickeru, chybí iNAV kód).
+        To není ticker – raději prázdno než „-“ (web ho jinak ukázal jako ticker)."""
+        v = re.sub(r'\s+', ' ', value or '').strip()
+        return '' if re.fullmatch(r'[-–—\s]*', v) else v
+
+    @staticmethod
+    def _find_listing_table(soup: BeautifulSoup):
+        """Tabulka burz a tickerů (Listing | Trade Currency | Ticker | Bloomberg | Reuters | Market Maker).
+
+        Hledá se PŘÍMO tabulka, ne „sekce s textem exchange“. Do 18. 10. 2026 se hledal prvek s textem
+        „Stock exchange“/„exchange“ a bral se jeho rodič – jenže ten text je i v POPISU fondu
+        („…listed on a stock exchange…“) a u fondů na Bloomberg indexy (dluhopisy, komodity) vyhrála
+        tabulka základních údajů (má „Listing Date“, „Fund currency“ i „Bloomberg“ v názvu indexu).
+        Parser pak nenašel ani jednu burzu: 988 fondů bez tickeru (iShares Nasdaq 100, Core DAX,
+        746 dluhopisových fondů…), přestože justETF burzy ukazuje.
+        """
+        table = soup.select_one('table[data-testid="etf-trade-data-panel_table"]')
+        if table:
+            return table
+        # Záloha při změně data-testid: tabulka, jejíž ZÁHLAVÍ má „Listing“ i „Ticker“.
+        for t in soup.find_all('table'):
+            first = t.find('tr')
+            if not first:
+                continue
+            hlavicka = ' | '.join(c.get_text(' ', strip=True).lower() for c in first.find_all(['th', 'td']))
+            if 'listing' in hlavicka and 'ticker' in hlavicka:
+                return t
+        return None
+
     def _extract_stock_exchange_data(self, soup: BeautifulSoup, etf: ETFDataComplete):
-        """Rychlá extrakce stock exchange dat s opravami"""
-        exchange_section = None
-        
-        
-        # Hledej Stock Exchange sekci - více metod
-        exchange_elements = soup.find_all(['section', 'div', 'table'], 
-                                        string=re.compile(r'Stock\s+exchange', re.I))
-        
-        if self.current_etf_index <= 3:
-            safe_log("debug", f"EXCHANGE: Found {len(exchange_elements)} elements with 'Stock exchange' text")
-        
-        # Pokus 2: Hledej jen "exchange" 
-        if not exchange_elements:
-            exchange_elements = soup.find_all(['section', 'div', 'table'], 
-                                            string=re.compile(r'exchange', re.I))
-            if self.current_etf_index <= 3:
-                safe_log("debug", f"EXCHANGE: Found {len(exchange_elements)} elements with 'exchange' text")
-        
-        # Pokus 3: Hledej tabulky s typickými exchange headers
-        if not exchange_elements:
-            tables = soup.find_all('table')
-            for table in tables:
-                text = table.get_text().lower()
-                # Musí mít kombinaci listing/exchange AND ticker/bloomberg
-                has_exchange = any(keyword in text for keyword in ['listing', 'stock exchange'])
-                has_ticker = any(keyword in text for keyword in ['ticker', 'bloomberg', 'reuters'])
-                has_currency = 'currency' in text
-                
-                if has_exchange and has_ticker and has_currency:
-                    exchange_elements = [table]
-                    if self.current_etf_index <= 3:
-                        safe_log("debug", f"EXCHANGE: Found exchange table with listing+ticker+currency keywords")
-                    break
-                elif has_ticker and has_currency and ('xetra' in text or 'london' in text):
-                    # Fallback - pokud najde ticker+currency+známou burzu
-                    exchange_elements = [table]
-                    if self.current_etf_index <= 3:
-                        safe_log("debug", f"EXCHANGE: Found exchange table with ticker+currency+exchange names")
-                    break
-        
-        for element in exchange_elements:
-            parent = element.find_parent(['section', 'div', 'article'])
-            if parent:
-                exchange_section = parent
-                if self.current_etf_index <= 3:
-                    safe_log("debug", f"EXCHANGE: Found parent section for stock exchange")
-                break
-        
-        if exchange_section:
-            if self.current_etf_index <= 3:
-                safe_log("debug", f"EXCHANGE: Found exchange section, calling _parse_exchange_table")
-            self._parse_exchange_table(exchange_section, etf)
-        else:
-            if self.current_etf_index <= 3:
-                safe_log("debug", f"EXCHANGE: No exchange section found, calling _extract_exchange_from_text")
-            self._extract_exchange_from_text(soup, etf)
-        
-        # Metoda 2: Nastav primary ticker z nejlepšího table kandidáta
-        if not etf.primary_ticker and etf.exchange_listings:
-            # Najdi první listing s tickerem
-            for listing in etf.exchange_listings:
-                if listing.ticker:
-                    etf.primary_ticker = listing.ticker
-                    etf.primary_exchange = listing.exchange_name
-                    break
-        
-        # Metoda 3: Fallback - hledej ticker v celém textu pouze pokud tabulky selhaly
-        if not etf.primary_ticker:
-            self._extract_ticker_from_full_text(soup, etf)
-        
-    
+        """Burzy a tickery z tabulky burz na profilu justETF.
+
+        Když tabulka chybí, fond nedostane ŽÁDNOU burzu ani ticker (raději prázdno než odhad):
+        dřívější záložní cesty vymýšlely burzy podle zmínky v textu stránky (s odhadnutou měnou)
+        a ticker z textu regexem („BLOOMBER“ u WisdomTree Brent). Prázdné burzy v DB nepřepíšou
+        staré dobré hodnoty (_chran_stavajici_hodnoty).
+        """
+        table = self._find_listing_table(soup)
+        if table is None:
+            safe_log("warning", f"EXCHANGE: {etf.isin} – tabulka burz nenalezena (změna HTML na justETF, nebo fond bez burzy)")
+            return
+        self._parse_exchange_table(table, etf)
+
     def _parse_exchange_table(self, section: BeautifulSoup, etf: ETFDataComplete):
         """Parsuje tabulku s exchange daty s DEBUG výstupem"""
         table = section if section.name == 'table' else section.find('table')
@@ -1890,6 +1860,11 @@ class CompleteProductionScraper:
                 col_mapping['bloomberg'] = i
             elif 'reuters' in header:
                 col_mapping['reuters'] = i
+
+        def hodnota(cell):
+            # Buňka Bloomberg/Reuters má 2 hodnoty pod sebou (kód burzy, iNAV kód) – bereme první.
+            span = cell.find('span')
+            return self._bez_pomlcky((span or cell).get_text(' ', strip=True))
         
         if self.current_etf_index <= 3:
             safe_log("debug", f"EXCHANGE: Column mapping: {col_mapping}")
@@ -1915,17 +1890,14 @@ class CompleteProductionScraper:
                 raw_ticker = cells[col_mapping['ticker']].get_text().strip()
                 if self.current_etf_index <= 3:
                     safe_log("debug", f"EXCHANGE: Raw ticker from cell {col_mapping['ticker']}: '{raw_ticker}'")
-                listing.ticker = raw_ticker
+                # „-“ = burza bez tickeru (např. Bolsa Mexicana) → prázdno, ne ticker „-“.
+                listing.ticker = self._bez_pomlcky(raw_ticker)
             
             if 'bloomberg' in col_mapping and col_mapping['bloomberg'] < len(cells):
-                bloomberg_raw = cells[col_mapping['bloomberg']].get_text().strip()
-                if bloomberg_raw and bloomberg_raw != '--':
-                    listing.bloomberg_code = bloomberg_raw
+                listing.bloomberg_code = hodnota(cells[col_mapping['bloomberg']])
             
             if 'reuters' in col_mapping and col_mapping['reuters'] < len(cells):
-                reuters_raw = cells[col_mapping['reuters']].get_text().strip()
-                if reuters_raw and reuters_raw != '--':
-                    listing.reuters_code = reuters_raw
+                listing.reuters_code = hodnota(cells[col_mapping['reuters']])
             
             if self.current_etf_index <= 3:
                 safe_log("debug", f"EXCHANGE: Created listing - Exchange: '{listing.exchange_name}', Ticker: '{listing.ticker}', Currency: '{listing.trade_currency}'")
@@ -3709,8 +3681,10 @@ class CompleteProductionScraper:
             'correlation': self.safe_numeric(etf.correlation),
             'tracking_error': self.safe_numeric(etf.tracking_error),
             'information_ratio': self.safe_numeric(etf.information_ratio),
-            'primary_exchange': etf_dict.get('exchange_1_name', etf.primary_exchange),
-            'primary_ticker': etf_dict.get('exchange_1_ticker', etf.primary_ticker),
+            # Hlavní ticker = první burza S tickerem (add_exchange_listing). Dřív se sem dával ticker
+            # 1. burzy, i když to byla „-“ (Bolsa Mexicana) → 57 fondů s tickerem „-“ (18. 10. 2026).
+            'primary_exchange': etf.primary_exchange,
+            'primary_ticker': etf.primary_ticker,
             'total_exchanges': self.safe_integer(etf.total_exchanges),
             # Dividend fields
             'current_dividend_yield': etf.current_dividend_yield,
@@ -4129,7 +4103,10 @@ class CompleteProductionScraper:
                         continue
                     r[k] = old[k]
             # Burzy jako celek: parser burz buď najde všechny, nebo žádnou (total_exchanges=0).
-            if self._prazdne(r.get('exchange_1_ticker')) and not self._prazdne(old.get('exchange_1_ticker')):
+            # Selhání parseru = žádná burza (prázdný NÁZEV 1. burzy). Ne prázdný ticker 1. burzy:
+            # ten je prázdný oprávněně, když 1. burza ticker nemá (Bolsa Mexicana) – pak by se
+            # čerstvé burzy přepsaly starými.
+            if self._prazdne(r.get('exchange_1_name')) and not self._prazdne(old.get('exchange_1_name')):
                 for k in burzy:
                     if k in r and k in old:
                         r[k] = old[k]
