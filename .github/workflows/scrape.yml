@@ -9,8 +9,9 @@ name: ETF Scraper
 
 on:
   schedule:
-    # ZÁLOHA (od 20. 10. 2026). Hlavní spouštění = Supabase pg_cron job „scraper-spusteni“
-    # ('0 5 * * 1-5' UTC = 7:00 SELČ / 6:00 SEČ) přes workflow_dispatch s tokenem z Vault
+    # ZÁLOHA (od 20. 10. 2026). Hlavní spouštění = Supabase pg_cron: „scraper-spusteni“ út–pá
+    # '30 1 * * 2-5' UTC (hotovo ~6:00 UTC před otevřením Xetry) a „scraper-spusteni-pondeli“
+    # '0 5 * * 1' UTC (páteční bod zdroj přepisuje přes víkend) – přes workflow_dispatch s tokenem z Vault
     # (github_scraper_dispatch, fine-grained, jen etf-astro, Actions: write; platnost 1 rok).
     # Proč: GitHub plánované běhy zdržuje o 4–7 h (00:37 UTC startovalo ~05:10 UTC, '0 3' až 10:00 UTC).
     # Proč ráno a jen v pracovní dny: zdroj (justETF) má poslední obchodní den finální až ráno
