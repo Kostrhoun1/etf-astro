@@ -9,12 +9,14 @@ name: ETF Scraper
 
 on:
   schedule:
-    # Denně 00:37 UTC (= 01:37 CET / 02:37 CEST). ZÁMĚRNĚ mimo celou hodinu: při '0 3 * * *'
-    # GitHub plánované běhy 18. 9.–17. 10. 2026 KAŽDÝ den zdržel o 4–7 h (start 9:10–12:01
-    # našeho času), protože v celou hodinu je fronta plánovaných workflow nejdelší. Běh trvá
-    # ~3,7 h; i se zpožděním mají být data hotová ráno. Kontrola dat (fund-data-check.yml
-    # v etf-nextjs-ssr) běží 15:30 UTC.
-    - cron: '37 0 * * *'
+    # ZÁLOHA (od 20. 10. 2026). Hlavní spouštění = Supabase pg_cron job „scraper-spusteni“
+    # ('0 5 * * 1-5' UTC = 7:00 SELČ / 6:00 SEČ) přes workflow_dispatch s tokenem z Vault
+    # (github_scraper_dispatch, fine-grained, jen etf-astro, Actions: write; platnost 1 rok).
+    # Proč: GitHub plánované běhy zdržuje o 4–7 h (00:37 UTC startovalo ~05:10 UTC, '0 3' až 10:00 UTC).
+    # Proč ráno a jen v pracovní dny: zdroj (justETF) má poslední obchodní den finální až ráno
+    # po něm; víkendový scrape 18. 10. stáhl předběžný bod pátku → výnosy za období o ~1 p. b. vedle.
+    # Tahle záloha běží jen, když se ten den scrape ještě nespustil (job hlidac níže).
+    - cron: '23 8 * * 1-5'
   workflow_dispatch:
     inputs:
       backtest_only:
@@ -26,12 +28,39 @@ on:
           - 'false'
           - 'true'
 
+concurrency:
+  group: etf-scraper
+  cancel-in-progress: false
+
 jobs:
+  hlidac:
+    name: Záloha – neběžel už dnes scrape?
+    # Ruční / pg_cron spuštění (workflow_dispatch) běží vždy. Plánovaná záloha (schedule) se
+    # přeskočí, pokud dnes (UTC) už existuje jiný běh, který není „skipped“ ani zrušený.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      spustit: ${{ steps.rozhodnuti.outputs.spustit }}
+    steps:
+      - id: rozhodnuti
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "spustit=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          dnes=$(date -u +%Y-%m-%d)
+          pocet=$(gh run list -R "$GITHUB_REPOSITORY" -w scrape.yml -L 20 --json databaseId,createdAt,conclusion \
+            --jq "[.[] | select(.databaseId != ${{ github.run_id }}) | select(.createdAt | startswith(\"$dnes\")) | select(.conclusion != \"skipped\" and .conclusion != \"cancelled\")] | length")
+          echo "Dnešních jiných běhů: $pocet"
+          if [ "$pocet" -gt 0 ]; then echo "spustit=false" >> "$GITHUB_OUTPUT"; else echo "spustit=true" >> "$GITHUB_OUTPUT"; fi
+
   refresh_isins:
     name: Refresh ISIN list from justETF sitemap
     # Synchronizuje ISIN.csv s aktuálním vesmírem ETF na justETF (přidá nové,
     # odebere delistované) PŘED scrapem. Zdroj = justETF sitemapy.
-    if: ${{ github.event.inputs.backtest_only != 'true' }}
+    needs: hlidac
+    if: ${{ needs.hlidac.outputs.spustit == 'true' && github.event.inputs.backtest_only != 'true' }}
     runs-on: ubuntu-24.04  # zafixováno 1.10.2026: ubuntu-latest od 19.10. přechází na Ubuntu 26 – přejít vědomě a otestovaně
     timeout-minutes: 15
     permissions:
