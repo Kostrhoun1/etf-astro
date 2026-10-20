@@ -36,7 +36,9 @@ jobs:
   hlidac:
     name: Záloha – neběžel už dnes scrape?
     # Ruční / pg_cron spuštění (workflow_dispatch) běží vždy. Plánovaná záloha (schedule) se
-    # přeskočí, pokud dnes (UTC) už existuje jiný běh, který není „skipped“ ani zrušený.
+    # přeskočí, pokud dnes (UTC) už existuje jiný běh, který neskončil skipped/cancelled/failure
+    # (tj. běží nebo uspěl). Selhaný ranní běh tak záloha zopakuje (scraper má --resume).
+    # Pozn.: i ruční běh s backtest_only=true (nic nestahuje) končí „success“ a zálohu ten den vypne.
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -51,7 +53,7 @@ jobs:
           if [ "${{ github.event_name }}" != "schedule" ]; then echo "spustit=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           dnes=$(date -u +%Y-%m-%d)
           pocet=$(gh run list -R "$GITHUB_REPOSITORY" -w scrape.yml -L 20 --json databaseId,createdAt,conclusion \
-            --jq "[.[] | select(.databaseId != ${{ github.run_id }}) | select(.createdAt | startswith(\"$dnes\")) | select(.conclusion != \"skipped\" and .conclusion != \"cancelled\")] | length")
+            --jq "[.[] | select(.databaseId != ${{ github.run_id }}) | select(.createdAt | startswith(\"$dnes\")) | select(.conclusion != \"skipped\" and .conclusion != \"cancelled\" and .conclusion != \"failure\")] | length")
           echo "Dnešních jiných běhů: $pocet"
           if [ "$pocet" -gt 0 ]; then echo "spustit=false" >> "$GITHUB_OUTPUT"; else echo "spustit=true" >> "$GITHUB_OUTPUT"; fi
 
