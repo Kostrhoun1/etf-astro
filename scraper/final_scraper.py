@@ -29,7 +29,7 @@ import pandas as pd
 import json
 import time
 import re
-from datetime import datetime
+from datetime import date, datetime, timedelta
 import os
 import random
 from typing import List, Dict, Optional, Tuple
@@ -199,6 +199,21 @@ def _verze_kodu() -> str:
 
 
 VERZE_KODU = _verze_kodu()
+
+
+PAKA_INDEX = re.compile(
+    r'\blev[a-z]*dax'                            # LevDAX®, LevMDAX
+    r'|\(\s*[-–]?\s*\d+(?:[.,]\d+)?\s*x\s*\)'    # „(2x)“, „(-2x)“, „(3x)“
+    r'|(?<![\w.,])[-–]?(?:[2-9]|1[05])x\b'          # „2x“, „-3x“, „10x“ (ne „0.5x“, ne „(x7)“)
+    r'|\bleveraged?\b'                            # „Leveraged“, „Leverage“
+    r'|\bdaily\s+(?:short|inverse)\b|\b(?:short|inverse)\s+daily\b'
+    r'|\bshortdax\b|\bbear\b',
+    re.I)
+
+
+def index_je_pakovy(index_name) -> bool:
+    """Index pákového/inverzního produktu (LevDAX® (2x), S&P 500 2x Leveraged Daily, ShortDAX x2…)."""
+    return bool(PAKA_INDEX.search(index_name or ''))
 
 
 def checkpoint_neplatny(data, batch_isins=None, verze=None):
@@ -373,6 +388,10 @@ class ETFDataComplete:
         
         # Leveraged ETF flag
         self.is_leveraged = False
+        # „Investment approach“ ze zdroje (Long-only / Leverage / Short) – zatím jen pro kontrolu páky (neukládá se)
+        self.investment_approach = ""
+        # Datum, ke kterému platí složení fondu (top pozice, země, sektory) – justETF „As of 31/08/2026“
+        self.holdings_as_of = None
         
         # Region
         self.region = ""
@@ -489,6 +508,32 @@ class ETFDataComplete:
 
         self.total_exchanges = len(self.exchange_listings)
     
+    # Burzy mimo Evropu – pro české investory nedostupné, při nedostatku míst v DB jdou ven první.
+    MIMOEVROPSKE_BURZY = re.compile(r'mexic|hong kong|singapore|tokyo|toronto|australia|\basx\b|nyse|nasdaq|'
+                                    r'johannesburg|santiago|lima|colombia|tel aviv|taiwan|korea|india|bombay', re.I)
+
+    def burzy_k_ulozeni(self, mist: int = 10) -> list:
+        """Které burzy uložit do exchange_1..10 (DB má jen 10 míst).
+
+        KOLO 6 (20. 10. 2026): justETF řadí burzy zhruba abecedně a XETRA je vždy POSLEDNÍ. Fondy s 11–12
+        burzami (VWRL, VHYL, VUSA, EUNM…) proto XETRA v DB neměly – místa zabírala 2× Bolsa Mexicana.
+        Pro české investory je XETRA hlavní burza (DEGIRO, XTB, Trading 212). Při víc než 10 burzách se
+        proto uloží: XETRA vždy, pak evropské burzy, mimoevropské (Mexiko, Hongkong, Singapur…) až nakonec.
+        Pořadí uložených burz zůstává podle zdroje; fondy s ≤ 10 burzami se nemění. Hlavní ticker
+        (primary_ticker) se tím NEmění – bere se dál z první burzy s tickerem v pořadí zdroje.
+        """
+        burzy = list(self.exchange_listings)
+        if len(burzy) <= mist:
+            return burzy
+        def priorita(ix_l):
+            ix, l = ix_l
+            jmeno = (l.exchange_name or '').strip()
+            if jmeno.upper() == 'XETRA':
+                return (0, ix)
+            return (2 if self.MIMOEVROPSKE_BURZY.search(jmeno) else 1, ix)
+        vybrane = sorted(sorted(enumerate(burzy), key=priorita)[:mist])
+        return [l for _, l in vybrane]
+
     @staticmethod
     def _is_preferred_ticker_static(new_ticker: str, current_ticker: str) -> bool:
         """Určuje, zda je nový ticker preferovanější než současný"""
@@ -550,6 +595,7 @@ class ETFDataComplete:
             'is_leveraged': self.is_leveraged,
             'region': self.region,
             'total_holdings': self.total_holdings,
+            'holdings_as_of': self.holdings_as_of,
             'return_1y': self.return_1y,
             'return_3y': self.return_3y,
             'return_5y': self.return_5y,
@@ -645,9 +691,10 @@ class ETFDataComplete:
             base_dict[f'sector_{i+1}_weight'] = self.sectors[i][1] if i < len(self.sectors) else None
         
         # Exchange Listings (top 10 - ROZŠÍŘENO)
+        ulozit = self.burzy_k_ulozeni()
         for i in range(10):
-            if i < len(self.exchange_listings):
-                listing = self.exchange_listings[i]
+            if i < len(ulozit):
+                listing = ulozit[i]
                 base_dict[f'exchange_{i+1}_name'] = listing.exchange_name
                 base_dict[f'exchange_{i+1}_currency'] = listing.trade_currency
                 base_dict[f'exchange_{i+1}_ticker'] = listing.ticker
@@ -996,6 +1043,7 @@ class CompleteProductionScraper:
                 self._extract_performance_robust(soup, etf)
                 self._extract_comprehensive_risk_metrics_improved(soup, etf)
                 self._extract_description_improved(soup, etf)
+                self._extract_investment_approach(soup, etf)
                 self._categorize_etf(etf)
                 self._determine_region(etf)
                 
@@ -1012,6 +1060,7 @@ class CompleteProductionScraper:
                     self._extract_holdings_enhanced(soup, etf)
                     self._extract_geographic_enhanced(soup, etf)
                     self._extract_sectors_enhanced(soup, etf)
+                    self._extract_holdings_reference_date(soup, etf)
                 else:
                     etf.holdings = []
                     etf.countries = []
@@ -2449,6 +2498,17 @@ class CompleteProductionScraper:
                 or any(pattern in name_lower for pattern in daily_leveraged_patterns)
                 or is_short_bet or is_ultra):
             etf.is_leveraged = True
+        # KOLO 6 (20. 10. 2026): páka podle INDEXU. Xtrackers LevDAX Daily Swap (LU0411075376, index
+        # „LevDAX® (2x)“) neměl páku v názvu → is_leveraged = false a fond se ukazoval mezi běžnými.
+        # Pravidlo nechytá krátkou duraci („Euro Short Treasury“, „Ultrashort“), „Daily Capped“ ani
+        # „Inverse Volatility“ (vážení) – ověřeno na celé DB: nově jen LevDAX + 5× UBS CMCI Commodity
+        # Carry (index „… 2.5 Leveraged“, zdroj je vede jako „Leverage“).
+        if not etf.is_leveraged and index_je_pakovy(etf.index_name):
+            etf.is_leveraged = True
+        # Zdroj má vlastní „Investment approach“ (Leverage / Short). Zatím jen hlásíme rozdíl (po prvním běhu
+        # vyhodnotit, kolika fondů se týká – např. Amundi US Curve Steepening „(x7)“), ne přepisujeme.
+        if not etf.is_leveraged and re.search(r'leverag|short', etf.investment_approach or '', re.I):
+            safe_log("warning", f"PÁKA? {etf.isin} – zdroj uvádí „{etf.investment_approach}“, is_leveraged=False (index: {etf.index_name})")
 
         # ===== PRIORITA 0: NÁZEV - PŘÍMÁ DETEKCE ETC/KOMODIT (nejvyšší priorita) =====
         # ETC (Exchange Traded Commodities) a fyzické komodity - detekce z názvu
@@ -3173,6 +3233,27 @@ class CompleteProductionScraper:
         # justETF vrací řádky už seřazené (s 'Other' na konci) – pořadí zachováme.
         return results[:5]
 
+    @staticmethod
+    def _extract_holdings_reference_date(soup: BeautifulSoup, etf: ETFDataComplete):
+        """Datum, ke kterému platí složení (justETF: <div data-testid="tl_etf-holdings_reference-date">
+        As of 31/08/2026</div> pod tabulkou sektorů). Bez data / nesmyslné datum → None (raději nic)."""
+        el = soup.find(attrs={'data-testid': 'tl_etf-holdings_reference-date'})
+        m = re.search(r'(\d{1,2})/(\d{1,2})/(\d{4})', el.get_text(' ', strip=True) if el else '')
+        if not m:
+            return
+        try:
+            d = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))  # DD/MM/YYYY
+        except ValueError:
+            return
+        if date(2000, 1, 1) <= d <= date.today() + timedelta(days=1):
+            etf.holdings_as_of = d.isoformat()
+
+    @staticmethod
+    def _extract_investment_approach(soup: BeautifulSoup, etf: ETFDataComplete):
+        """„Investment approach“ ze základních údajů zdroje (Long-only / Leverage / Short)."""
+        el = soup.find(attrs={'data-testid': 'tl_etf-basics_value_strategy-risk'})
+        etf.investment_approach = el.get_text(' ', strip=True) if el else ""
+
     def _extract_geographic_enhanced(self, soup: BeautifulSoup, etf: ETFDataComplete):
         """Geografické rozložení pro fyzické ETF (z justETF country tabulky)."""
         if etf.is_synthetic():
@@ -3616,6 +3697,9 @@ class CompleteProductionScraper:
             'is_leveraged': etf.is_leveraged,
             'region': etf.region,
             'total_holdings': self.safe_integer(etf.total_holdings),
+            # Datum složení (top pozice, země, sektory) ze zdroje; None = zdroj ho neuvádí → web datum neukáže.
+            # Sloupec etf_funds.holdings_as_of (date) přidán migrací 20. 10. 2026 (kolo 6).
+            'holdings_as_of': etf.holdings_as_of,
             # Performance - krátká období
             'return_1m': self.safe_numeric(etf.return_1m),
             'return_3m': self.safe_numeric(etf.return_3m),
