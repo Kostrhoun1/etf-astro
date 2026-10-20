@@ -83,7 +83,13 @@ class ExchangeRatesFetcher:
             
             content = response.text
             lines = content.strip().split('\n')
-            
+
+            # ČNB vrací kurz platný k požadovanému dni = poslední vyhlášený ≤ ten den (víkend/svátek →
+            # předchozí pracovní den). Ověř to podle záhlaví („18.09.2026 #181“): kurz z budoucnosti nebo
+            # starší než 7 dní (výpadek) radši nepoužít – raději žádné číslo než špatné (pravidlo č. 1).
+            if not self._datum_kurzu_ok(lines[0].split(' ')[0] if lines else '', '%d.%m.%Y', target_date, 'CNB', currency):
+                return None
+
             # Skip první 2 řádky (header)
             for line in lines[2:]:
                 parts = line.split('|')
@@ -109,6 +115,19 @@ class ExchangeRatesFetcher:
             safe_log("error", f"CNB fetch error: {e}")
             return None
     
+    @staticmethod
+    def _datum_kurzu_ok(datum_txt: str, fmt: str, target_date: datetime, zdroj: str, currency: str) -> bool:
+        try:
+            skutecne = datetime.strptime(datum_txt.strip(), fmt).date()
+        except ValueError:
+            safe_log("warning", f"{zdroj}: neznámé datum kurzu {currency} ({datum_txt!r}) pro {target_date:%Y-%m-%d}")
+            return False
+        pozadovane = target_date.date() if isinstance(target_date, datetime) else target_date
+        if skutecne > pozadovane or (pozadovane - skutecne).days > 7:
+            safe_log("warning", f"{zdroj}: kurz {currency} pro {pozadovane} je z {skutecne} – nepoužiji")
+            return False
+        return True
+
     def fetch_frankfurter_rate(self, target_date: datetime, currency: str = 'USD') -> Optional[float]:
         """
         Získá kurz z Frankfurter API pro konkrétní datum
@@ -130,6 +149,9 @@ class ExchangeRatesFetcher:
             
             data = response.json()
             
+            if not self._datum_kurzu_ok(str(data.get('date', '')), '%Y-%m-%d', target_date, 'Frankfurter', currency):
+                return None
+
             if 'rates' in data and currency in data['rates']:
                 rate = float(data['rates'][currency])
                 self.rates_cache[cache_key] = rate

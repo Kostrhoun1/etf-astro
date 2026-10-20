@@ -4,8 +4,9 @@ Performance Converter - přepočet EUR performance na CZK/USD s ohledem na změn
 Stejná logika jako má justETF pro různé měny
 """
 
+import calendar
 from typing import Dict, Optional, Tuple
-from datetime import datetime
+from datetime import date, datetime, timedelta, timezone
 from exchange_rates_fetcher import ExchangeRatesFetcher
 
 def _get_verbose_mode() -> bool:
@@ -39,111 +40,98 @@ def safe_log(level: str, message: str):
     timestamp = datetime.now().strftime("%H:%M:%S")
     print(f"[{timestamp}] {level.upper()}: {message}")
 
+# ── Den, ke kterému platí data zdroje, a začátky období ──────────────────────────────────────────
+# KOLO 6 (20. 10. 2026): výnosy v Kč/USD za 3 m, 6 m, 1 r, 3 r a 5 let nesouhlasily s výnosem v EUR
+# přepočteným kurzem ČNB ke stejným dnům (5 let o 0,4–1,0 p. b., 3 roky o 0,2–0,3 p. b.). Příčina: začátek
+# období se bral jako „dnes − 30/90/180/365×N dní“ (5 let = 21. 10. 2021 místo 19. 10. 2021) a konec jako
+# „dnešní“ kurz (před 14:30 ČNB vrátí včerejší, po 14:30 dnešní → podle hodiny běhu). justETF ale počítá
+# EUR výnos od dne dat − N kalendářních měsíců do dne dat (ověřeno kontrolou kolo5 C na 0,00 p. b.).
+# Teď: konec = kurz ke dni dat (poslední obchodní den před stažením – stejná logika jako web
+# src/lib/datumCen.ts), začátek = kurz ke dni (den dat − N měsíců; YTD 31. 12. předchozího roku);
+# o víkendu/svátku platí poslední kurz ≤ ten den (ČNB i Frankfurter tak odpovídají samy).
+
+MESICU = {'1m': 1, '3m': 3, '6m': 6, '1y': 12, '3y': 36, '5y': 60}
+
+
+def datum_dat(stazeno: Optional[datetime] = None) -> date:
+    """Den, ke kterému platí ceny zdroje při stažení v čase `stazeno` (výchozí: teď).
+
+    Kopie web src/lib/datumCen.ts: stažení před 18:00 pražského času (nebo o víkendu) → předchozí
+    pracovní den; později v pracovní den → týž den. Svátky burz neznáme (jako web)."""
+    if stazeno is None:
+        stazeno = datetime.now(timezone.utc)
+    if stazeno.tzinfo is None:  # naivní čas bereme jako UTC (GitHub Actions běží v UTC)
+        stazeno = stazeno.replace(tzinfo=timezone.utc)
+    try:
+        from zoneinfo import ZoneInfo
+        praha = stazeno.astimezone(ZoneInfo('Europe/Prague'))
+    except Exception:  # bez tzdata: SEČ (v létě o hodinu vedle – na hranici 18:00 nevadí)
+        praha = stazeno.astimezone(timezone(timedelta(hours=1)))
+    d = praha.date()
+    if praha.hour < 18 or d.weekday() >= 5:
+        d -= timedelta(days=1)
+        while d.weekday() >= 5:
+            d -= timedelta(days=1)
+    return d
+
+
+def mesice_zpet(d: date, mesicu: int) -> date:
+    """d − N kalendářních měsíců, den oříznutý na konec měsíce (31. 3. − 1 m = 28./29. 2.)."""
+    t = d.year * 12 + (d.month - 1) - mesicu
+    rok, mes = divmod(t, 12)
+    return date(rok, mes + 1, min(d.day, calendar.monthrange(rok, mes + 1)[1]))
+
+
+def obdobi_dny(period: str, den_dat: date) -> Optional[Tuple[date, date]]:
+    """(začátek, konec) období pro přepočet kurzem, nebo None pro neznámé/budoucí období."""
+    if period in MESICU:
+        return mesice_zpet(den_dat, MESICU[period]), den_dat
+    if period == 'ytd':
+        return date(den_dat.year - 1, 12, 31), den_dat
+    if period.isdigit() and len(period) == 4:
+        rok = int(period)
+        if rok > den_dat.year:
+            return None
+        return date(rok - 1, 12, 31), (date(rok, 12, 31) if rok < den_dat.year else den_dat)
+    return None
+
+
 class PerformanceConverter:
     def __init__(self):
         self.exchange_fetcher = ExchangeRatesFetcher()
         self.rates_cache = {}
-    
-    def get_period_days(self, period: str) -> int:
-        """Převede období na počet dní"""
-        period_map = {
-            '1m': 30,
-            '3m': 90,
-            '6m': 180,
-            'ytd': self._get_ytd_days(),
-            '1y': 365,
-            '3y': 365 * 3,
-            '5y': 365 * 5,
-            # Roční výnosy
-            '2021': self._get_year_days(2021),
-            '2022': self._get_year_days(2022),
-            '2023': self._get_year_days(2023),
-            '2024': self._get_year_days(2024),
-            '2025': self._get_year_days(2025),
-        }
-        return period_map.get(period, 0)
-    
-    def _get_ytd_days(self) -> int:
-        """Počet dní od začátku roku"""
-        now = datetime.now()
-        start_of_year = datetime(now.year, 1, 1)
-        return (now - start_of_year).days
-    
-    def _get_year_days(self, year: int) -> int:
-        """Počet dní od začátku konkrétního roku do konce roku"""
-        now = datetime.now()
-        start_of_year = datetime(year, 1, 1)
-        end_of_year = datetime(year, 12, 31)
-        
-        if year < now.year:
-            # Celý rok
-            return (end_of_year - start_of_year).days + 1
-        else:
-            # Pouze do současnosti
-            return (now - start_of_year).days
-    
-    def get_exchange_rates_for_period(self, period: str, target_currency: str) -> Tuple[Optional[float], Optional[float]]:
-        """
-        Získá kurzy na začátku a konci období
-        Returns: (historical_rate, current_rate)
-        """
-        cache_key = f"{period}_{target_currency}"
+
+    def _kurz(self, den: date, target_currency: str) -> Optional[float]:
+        d = datetime(den.year, den.month, den.day)
+        if target_currency == 'CZK':
+            return self.exchange_fetcher.fetch_cnb_rate(d, 'EUR')        # Kč za 1 EUR (ČNB)
+        if target_currency == 'USD':
+            return self.exchange_fetcher.fetch_frankfurter_rate(d, 'USD')  # USD za 1 EUR (ECB)
+        safe_log("error", f"Nepodporovaná měna: {target_currency}")
+        return None
+
+    def get_exchange_rates_for_period(self, period: str, target_currency: str,
+                                      den_dat: Optional[date] = None) -> Tuple[Optional[float], Optional[float]]:
+        """Kurzy EUR→cílová měna na začátku a konci období. Returns: (kurz_zacatek, kurz_konec)"""
+        den_dat = den_dat or datum_dat()
+        cache_key = f"{period}_{target_currency}_{den_dat.isoformat()}"
         if cache_key in self.rates_cache:
             return self.rates_cache[cache_key]
-        
-        # KALENDÁŘNÍ ROK (např. '2025'): kurz k 31. 12. předchozího roku → k 31. 12. daného roku
-        # (u běžícího roku → dnešní kurz). Dřív se i tady bral kurz „před 365 dny → dnes", takže
-        # roční výnosy v Kč/USD byly o 2–4 p. b. vedle (audit 17. 10. 2026: SXR8 2025 v Kč web
-        # +4,2 %, správně +0,1 %; 2024 v USD +27,9 % vs. S&P 500 TR ≈ +25 %).
-        if period.isdigit() and len(period) == 4:
-            year = int(period)
-            start = datetime(year - 1, 12, 31)
-            end = datetime(year, 12, 31) if year < datetime.now().year else None
-            if target_currency == 'CZK':
-                historical_rate = self.exchange_fetcher.fetch_cnb_rate(start, 'EUR')
-                end_rate = self.exchange_fetcher.fetch_cnb_rate(end, 'EUR') if end else self.exchange_fetcher.get_current_rates().get('EUR_CZK')
-            elif target_currency == 'USD':
-                historical_rate = self.exchange_fetcher.fetch_frankfurter_rate(start, 'USD')
-                end_rate = self.exchange_fetcher.fetch_frankfurter_rate(end, 'USD') if end else self.exchange_fetcher.get_current_rates().get('EUR_USD')
-            else:
-                safe_log("error", f"Nepodporovaná měna: {target_currency}")
-                return None, None
-            result = (historical_rate, end_rate)
-            self.rates_cache[cache_key] = result
-            return result
-
-        days_ago = self.get_period_days(period)
-        if days_ago == 0:
+        dny = obdobi_dny(period, den_dat)
+        if dny is None:
             safe_log("warning", f"Neznámé období: {period}")
             return None, None
-        
-        # Aktuální kurz
-        current_rates = self.exchange_fetcher.get_current_rates()
-        current_rate = current_rates.get(f'EUR_{target_currency}')
-        
-        # Historický kurz
-        historical_date = self.exchange_fetcher.get_date_days_ago(days_ago)
-        
-        if target_currency == 'CZK':
-            historical_rate = self.exchange_fetcher.fetch_cnb_rate(historical_date, 'EUR')
-        elif target_currency == 'USD':
-            historical_rate = self.exchange_fetcher.fetch_frankfurter_rate(historical_date, 'USD')
-            # Frankfurter dává EUR/USD přímo
-            # Pro přepočet: 1 EUR = historical_rate USD
-        else:
-            safe_log("error", f"Nepodporovaná měna: {target_currency}")
-            return None, None
-        
-        result = (historical_rate, current_rate)
+        result = (self._kurz(dny[0], target_currency), self._kurz(dny[1], target_currency))
         self.rates_cache[cache_key] = result
         return result
-    
+
     def convert_performance_eur_to_target(
         self, 
         performance_eur: float, 
         period: str, 
         target_currency: str,
-        base_investment: float = 1000.0
+        base_investment: float = 1000.0,
+        den_dat: Optional[date] = None
     ) -> Optional[float]:
         """
         Přepočítá EUR performance na target currency s ohledem na změnu směnného kurzu
@@ -162,7 +150,7 @@ class PerformanceConverter:
             return None
         
         # Získej kurzy
-        historical_rate, current_rate = self.get_exchange_rates_for_period(period, target_currency)
+        historical_rate, current_rate = self.get_exchange_rates_for_period(period, target_currency, den_dat)
         
         if historical_rate is None or current_rate is None:
             safe_log("warning", f"Kurzy nedostupné pro {period} -> {target_currency}")
@@ -186,7 +174,8 @@ class PerformanceConverter:
     def convert_all_performance_periods(
         self, 
         etf_performance_eur: Dict[str, float], 
-        target_currency: str
+        target_currency: str,
+        den_dat: Optional[date] = None
     ) -> Dict[str, float]:
         """
         Přepočítá všechna performance období z EUR na target currency
@@ -206,7 +195,7 @@ class PerformanceConverter:
         for period, performance_eur in etf_performance_eur.items():
             if performance_eur is not None:
                 converted = self.convert_performance_eur_to_target(
-                    performance_eur, period, target_currency
+                    performance_eur, period, target_currency, den_dat=den_dat
                 )
                 result[period] = converted
             else:
@@ -290,11 +279,14 @@ def create_performance_conversion_for_scraper():
                 period = field.replace('return_', '')
                 eur_performance[period] = etf_data[field]
         
+        # Den, ke kterému platí stažené výnosy (poslední obchodní den před stažením) – kurzy ke stejným dnům.
+        den_dat = datum_dat()
+
         # Konverze na CZK
-        czk_performance = converter.convert_all_performance_periods(eur_performance, 'CZK')
+        czk_performance = converter.convert_all_performance_periods(eur_performance, 'CZK', den_dat)
         
         # Konverze na USD
-        usd_performance = converter.convert_all_performance_periods(eur_performance, 'USD')
+        usd_performance = converter.convert_all_performance_periods(eur_performance, 'USD', den_dat)
         
         # Přidej do ETF dat
         for period, czk_val in czk_performance.items():
