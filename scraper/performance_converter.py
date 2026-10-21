@@ -279,8 +279,19 @@ def create_performance_conversion_for_scraper():
                 period = field.replace('return_', '')
                 eur_performance[period] = etf_data[field]
         
-        # Den, ke kterému platí stažené výnosy (poslední obchodní den před stažením) – kurzy ke stejným dnům.
-        den_dat = datum_dat()
+        # Den, ke kterému platí výnosy za období – kurzy ke stejným dnům (konec i začátky období).
+        # 21. 10. 2026: výnosy se počítají z denní řady zdroje ke dni returns_as_of (poslední jistě konečný den
+        # TOHOTO fondu – u fondů se zpožděnou řadou starší, ESEA/PSP5 16. 10. místo 19. 10.). Globální datum_dat()
+        # by u nich vzal kurz ke špatnému dni. Bez returns_as_of jsou výnosy za období None → převádí se jen
+        # kalendářní roky, kterým den dat nevadí (celý rok ≤ 31. 12.).
+        den_dat = None
+        if etf_data.get('returns_as_of'):
+            try:
+                den_dat = date.fromisoformat(str(etf_data['returns_as_of'])[:10])
+            except ValueError:
+                den_dat = None
+        if den_dat is None:
+            den_dat = datum_dat()
 
         # Konverze na CZK
         czk_performance = converter.convert_all_performance_periods(eur_performance, 'CZK', den_dat)

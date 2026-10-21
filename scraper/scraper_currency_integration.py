@@ -227,6 +227,8 @@ class CurrencyPerformanceIntegrator:
             'return_2023': etf.return_2023,
             'return_2024': etf.return_2024,
             'return_2025': etf.return_2025,
+            # Den, ke kterému platí výnosy za období (z denní řady, vynosy_z_rady.py) – kurzy se berou k TOMUTO dni
+            'returns_as_of': getattr(etf, 'returns_as_of', None),
         }
     
     def _apply_currency_performance_to_etf(self, etf, enhanced_dict):

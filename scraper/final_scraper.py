@@ -41,6 +41,7 @@ from dataclasses import dataclass
 from etf_rating import calculate_etf_rating
 from market_heatmap_generator import MarketHeatmapGenerator
 from scraper_currency_integration import CurrencyPerformanceIntegrator
+from vynosy_z_rady import vynosy_konecne
 
 # Potlačení warningů
 import warnings
@@ -425,6 +426,9 @@ class ETFDataComplete:
         # Performance - inception (celková životnost)
         self.return_inception = None
         self.performance_last_updated = None
+        # Den, ke kterému platí výnosy za období (letos, 1 m … 5 let, od vzniku) = poslední JISTĚ KONEČNÝ obchodní
+        # den řady zdroje (vynosy_z_rady.py). Liší se fond od fondu (zpožděné řady). None = výnosy nejsou.
+        self.returns_as_of = None
         
         # Currency Performance - CZK (přepočteno z EUR)
         self.return_1m_czk = None
@@ -610,6 +614,7 @@ class ETFDataComplete:
             'return_2024': self.return_2024,
             'return_2025': self.return_2025,
             'return_inception': self.return_inception,
+            'returns_as_of': self.returns_as_of,
             
             # Currency Performance - CZK
             'return_1m_czk': self.return_1m_czk,
@@ -805,6 +810,8 @@ class CompleteProductionScraper:
         self.batch_size = batch_size
         self.current_etf_index = 0  # For reduced logging
         self.keep_awake_manager = KeepAwakeManager()
+        # Výnosy za období z denní řady (vynosy_z_rady.py): kolik fondů prošlo / selhalo (a profil přitom výnosy měl)
+        self.stat_rada = {'ok': 0, 'chyba': 0, 'chyba_s_profilem': 0}
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -1041,6 +1048,7 @@ class CompleteProductionScraper:
                 self._extract_detailed_table_data(soup, etf)
                 self._extract_total_holdings_improved(soup, etf)
                 self._extract_performance_robust(soup, etf)
+                self._vynosy_z_denni_rady(etf)
                 self._extract_comprehensive_risk_metrics_improved(soup, etf)
                 self._extract_description_improved(soup, etf)
                 self._extract_investment_approach(soup, etf)
@@ -1073,8 +1081,10 @@ class CompleteProductionScraper:
                 # NOVÉ: Currency Performance Conversion
                 # Převádět, když má fond JAKÝKOLI výnos – dřív jen s return_1y, takže 172 fondům
                 # mladším 1 roku chyběl YTD v Kč a web pak ukazoval EUR jako Kč (audit 17. 10. 2026).
+                # Včetně kalendářních roků: když denní řada selže (výnosy za období = None), roky v Kč/USD zůstanou.
                 if (self.currency_integrator and self.currency_integrator.is_available() and
-                    any(getattr(etf, k, None) is not None for k in ('return_ytd', 'return_1m', 'return_3m', 'return_6m', 'return_1y'))):
+                    any(getattr(etf, k, None) is not None for k in ('return_ytd', 'return_1m', 'return_3m', 'return_6m', 'return_1y',
+                                                                    'return_2021', 'return_2022', 'return_2023', 'return_2024', 'return_2025'))):
                     safe_log("debug", f"💱 Přidávám currency performance pro {isin}")
                     currency_success = self.currency_integrator.enhance_etf_with_currency_performance(etf)
                     
@@ -1158,6 +1168,8 @@ class CompleteProductionScraper:
         with_exchanges = sum(1 for etf in etf_list if etf.total_exchanges > 0)
         with_dividends = sum(1 for etf in etf_list if etf.current_dividend_yield)
         safe_log("info", f"OK: Batch {batch_id} dokončen: {successful}/{len(etf_list)} úspěšně, {with_exchanges} s exchange daty, {with_dividends} s dividend daty")
+        safe_log("info", f"VÝNOSY z denní řady (celkem za běh): {self.stat_rada['ok']} ok, {self.stat_rada['chyba']} bez řady "
+                         f"(z toho {self.stat_rada['chyba_s_profilem']} fondů, u nichž profil výnosy měl → None)")
         
         return etf_list
     
@@ -2650,11 +2662,13 @@ class CompleteProductionScraper:
                 label = label_cell.get_text(strip=True).lower()
                 value_text = value_cell.get_text(strip=True)
                 
-                # Extraktuj číslo z hodnoty
-                value_match = re.search(r'([+-]?\d+[.,]\d+)', value_text)
+                # Extraktuj číslo z hodnoty. Anglický profil píše tisíce s čárkou („+2,141.66%“) – dřív se z toho
+                # četlo 2,141 → 2.141 % (SXRV/EQQQ „od vzniku +2,16 %“ místo +2 159 %, nalezeno 21. 10. 2026).
+                value_match = re.search(r'([+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?|[+-]?\d+[.,]\d+)', value_text)
                 if value_match:
                     try:
-                        value = float(value_match.group(1).replace(',', '.'))
+                        cislo = value_match.group(1)
+                        value = float(cislo.replace(',', '') if re.search(r',\d{3}(?:\.|$)', cislo) else cislo.replace(',', '.'))
                         
                         # Mapování labelů na pole
                         if '1 month' in label:
@@ -2687,6 +2701,33 @@ class CompleteProductionScraper:
                     except ValueError:
                         continue
     
+    POLE_OBDOBI = {'ytd': 'return_ytd', '1m': 'return_1m', '3m': 'return_3m', '6m': 'return_6m', '1y': 'return_1y',
+                   '3y': 'return_3y', '5y': 'return_5y', 'inception': 'return_inception'}
+
+    def _vynosy_z_denni_rady(self, etf: ETFDataComplete):
+        """Výnosy za období (letos, 1 m … 5 let, od vzniku) z denní řady zdroje ke dni returns_as_of.
+
+        21. 10. 2026: tabulka výnosů na HTML profilu se počítá k POSLEDNÍMU bodu řady, který je v době stažení
+        předběžný (zdroj ho přepíše konečnou hodnotou až během dalšího dne) – u fondů na USA to dělalo 0,2–0,9 p. b.
+        u všech období; u části fondů profil navíc nebyl přepočítaný k poslednímu dni. Teď se výnosy počítají
+        z řady ke dni, který je jistě konečný (vynosy_z_rady.py). Kalendářní roky zůstávají z profilu (sedí).
+        Selže-li řada, výnosy za období = None (web ukáže „—“), ne tichá náhrada z HTML profilu."""
+        profil = {o: getattr(etf, pole) for o, pole in self.POLE_OBDOBI.items()}
+        try:
+            konec, vynosy, poznamka = vynosy_konecne(self.session, etf.isin)
+        except Exception as e:  # nikdy neshodit scrape fondu kvůli výnosům
+            konec, vynosy, poznamka = None, {o: None for o in self.POLE_OBDOBI}, f'výjimka: {e}'
+        self.stat_rada['ok' if konec else 'chyba'] += 1
+        if konec is None:
+            if any(v is not None for v in profil.values()):
+                self.stat_rada['chyba_s_profilem'] += 1
+                safe_log("warning", f"VÝNOSY: {etf.isin} – denní řadu nejde použít ({poznamka}); výnosy za období = None (profil je měl)")
+        elif poznamka:
+            safe_log("warning", f"VÝNOSY: {etf.isin} k {konec}: {poznamka}")
+        for o, pole in self.POLE_OBDOBI.items():
+            setattr(etf, pole, vynosy.get(o))
+        etf.returns_as_of = konec.isoformat() if konec else None
+
     def _extract_comprehensive_risk_metrics_improved(self, soup: BeautifulSoup, etf: ETFDataComplete):
         """Extrakce risk metrik"""
         text = soup.get_text()
@@ -3716,6 +3757,9 @@ class CompleteProductionScraper:
             'return_2025': self.safe_numeric(etf.return_2025),
             # Performance - inception
             'return_inception': self.safe_numeric(etf.return_inception),
+            # Den, ke kterému platí výnosy za období (date, sloupec přidán migrací 21. 10. 2026). None = výnosy nejsou
+            # (chart API selhalo) – pak jsou None i return_ytd … return_5y, web ukáže „—“.
+            'returns_as_of': etf.returns_as_of,
             'performance_last_updated': etf.performance_last_updated,
             'volatility_1y': self.safe_numeric(etf.volatility_1y),
             'volatility_3y': self.safe_numeric(etf.volatility_3y),
