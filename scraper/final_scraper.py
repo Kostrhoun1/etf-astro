@@ -41,7 +41,7 @@ from dataclasses import dataclass
 from etf_rating import calculate_etf_rating
 from market_heatmap_generator import MarketHeatmapGenerator
 from scraper_currency_integration import CurrencyPerformanceIntegrator
-from vynosy_z_rady import vynosy_konecne
+from vynosy_z_rady import vynosy_konecne, MAX_VYNOS_PCT
 
 # Potlačení warningů
 import warnings
@@ -812,6 +812,8 @@ class CompleteProductionScraper:
         self.keep_awake_manager = KeepAwakeManager()
         # Výnosy za období z denní řady (vynosy_z_rady.py): kolik fondů prošlo / selhalo (a profil přitom výnosy měl)
         self.stat_rada = {'ok': 0, 'chyba': 0, 'chyba_s_profilem': 0}
+        # Nahrání do DB: nenahrané fondy (ISIN + chyba), záměrně nezapsané (bez názvu), hodnoty mimo rozsah sloupce
+        self.stat_nahrani = {'nenahrane': [], 'bez_nazvu': [], 'oriznuto': []}
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -1312,9 +1314,11 @@ class CompleteProductionScraper:
                     safe_log("error", f"❌ DATABÁZE: Chyba při automatickém nahrávání do databáze")
             else:
                 safe_log("warning", f"⚠️  DATABÁZE: Žádné úspěšné ETF fondy k nahrání")
+                self._zapis_souhrn_nahrani(0, 0, 'žádné úspěšně stažené fondy')
         else:
             if AUTO_UPLOAD_TO_DB:
                 safe_log("info", f"📤 DATABÁZE: Automatické nahrávání je zapnuté, ale Supabase klient není dostupný")
+                self._zapis_souhrn_nahrani(len(all_results), 0, 'Supabase klient není dostupný')
             else:
                 safe_log("info", f"💾 DATABÁZE: Automatické nahrávání je vypnuté (AUTO_UPLOAD_TO_DB=False)")
         
@@ -2669,7 +2673,16 @@ class CompleteProductionScraper:
                     try:
                         cislo = value_match.group(1)
                         value = float(cislo.replace(',', '') if re.search(r',\d{3}(?:\.|$)', cislo) else cislo.replace(',', '.'))
-                        
+                        # Nesmysl zdroje: roční výnos ≥ 9 999 % u pákových ETP s nulovou / 0,01 € cenou v řadě
+                        # (22. 10. 2026: 3SNV 2023 +84 848 916 %, NVIS 2023 +2,1·10^14 %, PLT3 2023 +230 300 %,
+                        # VIXL 2024 +104 450 %, 3LFB 2022 +16 381 %, 3SCR 2024 +12 680 %). Do 21. 10. se z „16,381.12“
+                        # četlo 16,381 → +16,38 % (věrohodně vypadající špatné číslo na webu); od opravy čtení tisíců
+                        # hodnota přetekla sloupec v Kč/USD (numeric(8,4)) a shodila upload celé dávky 5 fondů.
+                        # Raději „—“ než nesmysl; stejná mez jako u výnosů za období (vynosy_z_rady.MAX_VYNOS_PCT).
+                        if abs(value) >= MAX_VYNOS_PCT:
+                            safe_log("warning", f"VÝNOSY: {etf.isin} – profil „{label}“ = {value} % je nesmysl zdroje (|x| ≥ {MAX_VYNOS_PCT:.0f} %) → None")
+                            continue
+
                         # Mapování labelů na pole
                         if '1 month' in label:
                             etf.return_1m = value
@@ -4206,71 +4219,126 @@ class CompleteProductionScraper:
                         r[k] = old[k]
         return rows
 
+    # ── Rozsahy číselných sloupců etf_funds (information_schema, ověřeno 22. 10. 2026) ──────────────────────
+    # Hodnota mimo rozsah sloupce shodí upsert CELÉ dávky („numeric field overflow“, 22003): 21.–22. 10. 2026
+    # denně 25 fondů bez aktualizace (5 dávek po 5; vadné byly jen DIS3, 3LFB, PLT3, VIXL, 3SNV, 3SCR, NVIS).
+    # Číslo mimo rozsah je vždy nesmysl ze zdroje → None + varování (raději „—“ než špatné číslo).
+    # Při změně schématu (ALTER COLUMN … TYPE) uprav i tuhle tabulku. Neuvedené numeric sloupce jsou bez omezení.
+    # numeric(p, s): |round(x, s)| < 10^(p − s).
+    _N84 = [f'return_{o}_{m}' for o in ('1m', '3m', '6m', 'ytd', '1y', '3y', '5y', '2021', '2022', '2023', '2024')
+            for m in ('czk', 'usd')]
+    _N104 = ['return_1m', 'return_3m', 'return_6m', 'return_2021', 'return_2022', 'return_2023', 'return_2024',
+             'return_inception']
+    _INT4 = ['rating', 'rating_score', 'rating_ter_score', 'rating_size_score', 'rating_track_record_score',
+             'rating_provider_score', 'rating_performance_score', 'retry_count', 'total_exchanges', 'total_holdings']
+    LIMITY_SLOUPCU = {**{k: ('numeric(8,4)', 4, 10 ** 4) for k in _N84},
+                      **{k: ('numeric(10,4)', 4, 10 ** 6) for k in _N104},
+                      **{k: ('integer', 0, 2 ** 31) for k in _INT4}}
+    NAHRANI_SOUHRN = os.path.join(LOGS_DIR, 'nahrani_souhrn.json')
+
+    def _hlidej_rozsah(self, row: Dict) -> Dict:
+        """Číselná hodnota mimo rozsah sloupce (nebo NaN/∞, které JSON neunese) → None + varování s ISINem."""
+        for k, v in row.items():
+            if isinstance(v, bool) or not isinstance(v, (int, float)):
+                continue
+            duvod = None
+            if isinstance(v, float) and (v != v or v in (float('inf'), float('-inf'))):
+                duvod = 'NaN/nekonečno'
+            elif k in self.LIMITY_SLOUPCU:
+                typ, mist, mez = self.LIMITY_SLOUPCU[k]
+                if typ == 'integer':
+                    if not (-mez <= v < mez):
+                        duvod = f'mimo rozsah {typ}'
+                elif abs(round(v, mist)) >= mez:
+                    duvod = f'mimo rozsah {typ} (|x| < {mez:g})'
+            if duvod:
+                safe_log("warning", f"ROZSAH: {row.get('isin')} {k} = {v} – {duvod} → None (nesmysl ze zdroje)")
+                self.stat_nahrani['oriznuto'].append(f"{row.get('isin')}:{k}")
+                row[k] = None
+        return row
+
+    def _upsert(self, rows: List[Dict]):
+        return self.supabase.table('etf_funds').upsert(rows, on_conflict='isin').execute()
+
+    def _zapis_souhrn_nahrani(self, celkem: int, nahrano: int, chyba: Optional[str] = None):
+        """Souhrn nahrání pro workflow (job kontrola_nahrani) a GitHub step summary."""
+        s = self.stat_nahrani
+        souhrn = {'celkem': celkem, 'nahrano': nahrano, 'nenahrano': len(s['nenahrane']),
+                  'nenahrane': s['nenahrane'], 'bez_nazvu': s['bez_nazvu'], 'oriznuto': s['oriznuto'],
+                  'chyba': chyba, 'cas_utc': datetime.utcnow().isoformat(timespec='seconds')}
+        try:
+            with open(self.NAHRANI_SOUHRN, 'w', encoding='utf-8') as f:
+                json.dump(souhrn, f, ensure_ascii=False, indent=1)
+        except Exception as e:
+            safe_log("error", f"❌ Souhrn nahrání nejde uložit: {e}")
+        cesta = os.getenv('GITHUB_STEP_SUMMARY')
+        if cesta:
+            try:
+                with open(cesta, 'a', encoding='utf-8') as f:
+                    f.write(f"### Nahrání do etf_funds\n\nNahráno **{nahrano}/{celkem}**, nenahráno **{len(s['nenahrane'])}**"
+                            f", hodnot mimo rozsah sloupce → None: {len(s['oriznuto'])}"
+                            + (f", chyba: {chyba}" if chyba else '') + "\n\n")
+                    for x in s['nenahrane'][:50]:
+                        f.write(f"- `{x['isin']}`: {x['chyba'][:200]}\n")
+            except Exception:
+                pass
+
     def _upload_chunk_to_database(self, etfs: List[ETFDataComplete], chunk_size: int = 5) -> bool:
-        """Upload ETFs to database in smaller chunks to avoid timeout"""
+        """Nahraje fondy po dávkách. Spadne-li dávka, nahrává její fondy po jednom – jeden vadný fond nesmí
+        shodit čtyři další (21.–22. 10. 2026: 25 fondů bez aktualizace kvůli 7 vadným). Vadný fond se zaloguje
+        (ISIN + chyba) a počítá do „nenahráno“ – souhrn jde do NAHRANI_SOUHRN, workflow při > 5 selže."""
+        self.stat_nahrani = {'nenahrane': [], 'bez_nazvu': [], 'oriznuto': []}
         success_count = 0
         total_etfs = len(etfs)
-        
+
         safe_log("info", f"📤 Uploading {total_etfs} ETFs in chunks of {chunk_size}...")
-        
+
         for i in range(0, total_etfs, chunk_size):
             chunk = etfs[i:i + chunk_size]
             chunk_num = (i // chunk_size) + 1
             total_chunks = (total_etfs + chunk_size - 1) // chunk_size
-            
+            rows: List[Dict] = []
             try:
                 safe_log("info", f"📦 Chunk {chunk_num}/{total_chunks}: Uploading {len(chunk)} ETFs...")
-                
-                # Transform data for database
-                transformed_chunk = [self.transform_etf_for_database(etf) for etf in chunk]
-                transformed_chunk = self._chran_stavajici_hodnoty(transformed_chunk)
-                if not transformed_chunk:
+                for etf in chunk:
+                    try:
+                        rows.append(self._hlidej_rozsah(self.transform_etf_for_database(etf)))
+                    except Exception as e:
+                        safe_log("error", f"❌ NENAHRÁNO {etf.isin}: chyba převodu pro DB: {e}")
+                        self.stat_nahrani['nenahrane'].append({'isin': etf.isin, 'chyba': f'převod: {e}'})
+                isiny = {r['isin'] for r in rows}
+                rows = self._chran_stavajici_hodnoty(rows)
+                self.stat_nahrani['bez_nazvu'] += sorted(isiny - {r['isin'] for r in rows})
+                if not rows:
                     continue
-                
-                # Try upload with rating fields first
-                try:
-                    response = self.supabase.table('etf_funds').upsert(
-                        transformed_chunk,
-                        on_conflict='isin'
-                    ).execute()
-                    
-                    if response.data:
-                        success_count += len(chunk)
-                        safe_log("info", f"✅ Chunk {chunk_num}: Successfully uploaded {len(chunk)} ETFs with rating fields")
-                    else:
-                        safe_log("warning", f"⚠️ Chunk {chunk_num}: No data returned from upload")
-                        
-                except Exception as rating_error:
-                    safe_log("warning", f"⚠️ Chunk {chunk_num}: Rating fields failed: {rating_error}")
-                    safe_log("info", f"🔄 Chunk {chunk_num}: Retrying without rating fields...")
-                    
-                    # Remove rating fields and retry
-                    transformed_chunk_no_rating = []
-                    for etf_data in transformed_chunk:
-                        etf_copy = etf_data.copy()
-                        etf_copy.pop('rating', None)
-                        etf_copy.pop('rating_score', None)
-                        transformed_chunk_no_rating.append(etf_copy)
-                    
-                    response = self.supabase.table('etf_funds').upsert(
-                        transformed_chunk_no_rating,
-                        on_conflict='isin'
-                    ).execute()
-                    
-                    if response.data:
-                        success_count += len(chunk)
-                        safe_log("info", f"✅ Chunk {chunk_num}: Successfully uploaded {len(chunk)} ETFs without rating fields")
-                    else:
-                        safe_log("error", f"❌ Chunk {chunk_num}: Failed to upload even without rating fields")
-                
-                # Small delay between chunks to be respectful to the database
-                time.sleep(0.5)
-                
-            except Exception as e:
-                safe_log("error", f"❌ Chunk {chunk_num}: Failed to upload: {e}")
-                
+                self._upsert(rows)
+                success_count += len(rows)
+                safe_log("info", f"✅ Chunk {chunk_num}: Successfully uploaded {len(rows)} ETFs")
+            except Exception as chunk_error:
+                if not rows:
+                    safe_log("error", f"❌ Chunk {chunk_num}: Failed before upload: {chunk_error}")
+                    for etf in chunk:
+                        self.stat_nahrani['nenahrane'].append({'isin': etf.isin, 'chyba': str(chunk_error)})
+                    continue
+                safe_log("warning", f"⚠️ Chunk {chunk_num}: dávka selhala ({chunk_error}) – nahrávám {len(rows)} fondů po jednom")
+                for row in rows:
+                    try:
+                        self._upsert([row])
+                        success_count += 1
+                    except Exception as e:
+                        safe_log("error", f"❌ NENAHRÁNO {row.get('isin')} ({row.get('primary_ticker')}): {e}")
+                        self.stat_nahrani['nenahrane'].append({'isin': row.get('isin'), 'chyba': str(e)})
+            # Small delay between chunks to be respectful to the database
+            time.sleep(0.5)
+
+        nenahrano = len(self.stat_nahrani['nenahrane'])
         safe_log("info", f"🎯 Upload complete: {success_count}/{total_etfs} ETFs uploaded successfully")
-        return success_count == total_etfs
+        if nenahrano:
+            safe_log("error", f"❌ NENAHRÁNO {nenahrano} fondů: " + ', '.join(x['isin'] for x in self.stat_nahrani['nenahrane']))
+        if self.stat_nahrani['oriznuto']:
+            safe_log("warning", f"⚠️ ROZSAH: {len(self.stat_nahrani['oriznuto'])} hodnot mimo rozsah sloupce → None")
+        self._zapis_souhrn_nahrani(total_etfs, success_count)
+        return nenahrano == 0
     
     def _ensure_rating_columns_exist(self):
         """Zajistí, že rating sloupce existují v databázi"""
