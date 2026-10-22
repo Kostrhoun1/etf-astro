@@ -23,6 +23,18 @@ Kde by chyba zaokrouhlení přesáhla MAX_CHYBA_PB (fond od začátku okna spadl
 stáhne se řada znovu s počátkem přímo v začátku období (úroveň ≈ 100 %, chyba ≤ 0,01 p. b.).
 
 Selže-li API, výnosy za období = None (web ukáže „—"), NIKDY ne tichá náhrada z HTML profilu.
+
+PORUCHY ŘADY U ZDROJE (22. 10. 2026, kontrolní kolo 7):
+- NULOVÁ CENA v historii: BTCW (GB00BJYDH287, 1,4 mld. €) má u zdroje 25. 5.–15. 8. 2021 cenu 0 / 0,01 €. Relativní
+  řada celé historie je od první nuly navždy −100 % → body se zahazovaly, řada „končila“ 24. 5. 2021 a fond měl
+  VŠECHNY výnosy None (stejně dalších 12 pákových ETP). Teď se nulové body drží (úroveň 0) a období, které díru
+  nezahrnuje, se spočítá z řady s kotvou v začátku období. Období přes díru (a od vzniku) zůstane None.
+- SKOK, KTERÝ NEMŮŽE BÝT SKUTEČNÝ: jednodenní změna úrovně víc než ×MAX_SKOK nebo pod ×1/MAX_SKOK (−90 %).
+  HASH/HAMO (Hashdex) 21.→22. 9. 2026 49,55 → 1,70 (−96,6 %; burza ani bitcoin nic takového nemají – obchodování
+  na Xetře stojí od 11. 9. na 49,61 €), DIS3 16.→17. 9. 2026 0,13 → 26,37 (×200, neupravená konsolidace) → výnos
+  za 1 m +22 208 %. Výnos období, které takový den obsahuje, = None.
+- PŘETEČENÍ SLOUPCE: |výnos| ≥ MAX_VYNOS_PCT se do DB nevejde (numeric(8,4)) a shodí upload CELÉ dávky 5 fondů
+  (21.–22. 10. 2026 denně 25 fondů bez aktualizace, mj. BTCN, SPUT, SGLS) → None.
 """
 
 import calendar
@@ -43,6 +55,8 @@ OD_POCATKU = date(1990, 1, 1)   # dateFrom celé historie (první ETF v Evropě 
 MAX_MEZERA_ZACATKU = 7   # dní: bod začátku smí být nejvýš týden před požadovaným dnem (jinak fond tehdy neexistoval)
 MAX_CHYBA_PB = 0.02      # p. b.: nejvyšší přípustná chyba zaokrouhlení zdroje u výnosu (jinak přesnější řada / None)
 ZAOKROUHLENI = 0.005     # zdroj dává relativní změnu v % na 2 desetinná místa → ±0,005 p. b.
+MAX_SKOK = 10.0          # jednodenní změna úrovně > ×10 nebo < ×0,1 = porucha řady u zdroje (ne trh)
+MAX_VYNOS_PCT = 9999.0   # sloupce výnosů numeric(8,4) pojmou |x| < 10 000 → větší = None (jinak spadne celá dávka)
 
 Rada = List[Tuple[date, float]]   # (datum, úroveň; 1.0 = první bod okna)
 
@@ -85,8 +99,9 @@ def stahni_radu(session: requests.Session, isin: str, od: date, do: date,
                     d = date.fromisoformat(str(b.get('date'))[:10])
                 except (TypeError, ValueError):
                     continue
-                if v > -100:
-                    rada.append((d, 1 + v / 100))
+                # ≤ −100 % = nulová cena u zdroje (díra v datech). Bod se DRŽÍ s úrovní 0 (dřív se zahazoval a řada
+                # pak „končila“ před dírou → všechny výnosy None, BTCW); období přes něj vyřadí _porucha.
+                rada.append((d, max(0.0, 1 + v / 100)))
             rada.sort(key=lambda x: x[0])
             return rada or None
         except (requests.exceptions.RequestException, ValueError):
@@ -131,6 +146,22 @@ def _bod(rada: Rada, d: date) -> Optional[Tuple[date, float]]:
     return vysl
 
 
+def _porucha(rada: Rada, od: date, do: date) -> Optional[date]:
+    """První den v (od, do], kdy je řada u zdroje porušená: nulová úroveň, nebo jednodenní skok víc než ×MAX_SKOK
+    / pod ×1/MAX_SKOK proti předchozímu bodu. None = řada je v okně v pořádku."""
+    pred = None
+    for d, u in rada:
+        if d > do:
+            break
+        if d >= od:
+            if u <= 0:
+                return d
+            if pred is not None and pred[0] >= od and (u / pred[1] > MAX_SKOK or u / pred[1] < 1 / MAX_SKOK):
+                return d
+        pred = (d, u)
+    return None
+
+
 def vynos_obdobi(rada: Rada, konec: date, obdobi: str) -> Tuple[Optional[float], float, Optional[date]]:
     """(výnos v % nebo None, odhad chyby zaokrouhlení zdroje v p. b., datum bodu začátku).
 
@@ -145,6 +176,8 @@ def vynos_obdobi(rada: Rada, konec: date, obdobi: str) -> Tuple[Optional[float],
         if s and (z - s[0]).days > MAX_MEZERA_ZACATKU:
             s = None
     if not e or e[0] != konec or not s or s[1] <= 0 or e[1] <= 0:
+        return None, 0.0, None
+    if _porucha(rada, s[0], e[0]) is not None:   # díra nebo nemožný skok uvnitř období → raději „—“
         return None, 0.0, None
     pomer = e[1] / s[1]
     chyba = 100 * pomer * (ZAOKROUHLENI / 100) * (1 / e[1] + (0 if s is rada[0] else 1 / s[1]))
@@ -174,8 +207,17 @@ def vynosy_konecne(session: requests.Session, isin: str, dnes: Optional[date] = 
         return None, prazdne, f'řada končí {rada[-1][0]} (víc než měsíc stará)'
     vysl: Dict[str, Optional[float]] = {}
     poznamky = []
+    nulova = next((d for d, u in rada if u <= 0), None)   # nulová cena u zdroje → řada celé historie od ní −100 %
+    if nulova:
+        poznamky.append(f'nulová cena u zdroje od {nulova}')
     for o in OBDOBI:
         v, chyba, den_zacatku = vynos_obdobi(rada, konec, o)
+        if v is None and nulova and o != 'inception':
+            # Díra v historii zdroje (BTCW 2021). Řada s kotvou těsně před začátkem období díru neobsahuje, pokud
+            # období začíná až po ní; jinak _porucha výnos odmítne (raději None než výnos přes díru).
+            z = zacatek_obdobi(konec, o)
+            rada2 = stahni_radu(session, isin, z - timedelta(days=MAX_MEZERA_ZACATKU), konec + timedelta(days=1))
+            v, chyba, den_zacatku = vynos_obdobi(rada2, konec, o) if rada2 else (None, 0.0, None)
         if v is not None and chyba > MAX_CHYBA_PB:
             # Úroveň řady je u začátku/konce malá (fond od vzniku hodně spadl – páka, krypto) → řada s kotvou
             # přímo v bodě začátku období (ten je pak přesně 0,00 %, chyba jen z konce ≈ 0,005 p. b.).
@@ -186,6 +228,9 @@ def vynosy_konecne(session: requests.Session, isin: str, dnes: Optional[date] = 
             else:
                 poznamky.append(f'{o}: chyba zaokrouhlení {chyba:.3f} p. b. → None')
                 v = None
+        if v is not None and abs(v) >= MAX_VYNOS_PCT:
+            poznamky.append(f'{o}: {v:.0f} % se nevejde do DB → None')
+            v = None
         vysl[o] = None if v is None else round(v, 4)
     return konec, vysl, '; '.join(poznamky)
 

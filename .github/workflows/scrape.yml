@@ -40,6 +40,8 @@ jobs:
     # přeskočí, pokud dnes (UTC) už existuje jiný běh, který neskončil skipped/cancelled/failure
     # (tj. běží nebo uspěl). Selhaný ranní běh tak záloha zopakuje (scraper má --resume).
     # Pozn.: i ruční běh s backtest_only=true (nic nestahuje) končí „success“ a zálohu ten den vypne.
+    # Běh, který skončil „failure“ JEN kvůli jobu kontrola_nahrani (obě půlky scrapu uspěly, ale > 5 fondů se
+    # nenahrálo do DB), se počítá jako proběhlý – opakovaný 3h scrape by stejné vadné fondy nenahrál znovu.
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -53,8 +55,14 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" != "schedule" ]; then echo "spustit=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           dnes=$(date -u +%Y-%m-%d)
-          pocet=$(gh run list -R "$GITHUB_REPOSITORY" -w scrape.yml -L 20 --json databaseId,createdAt,conclusion \
-            --jq "[.[] | select(.databaseId != ${{ github.run_id }}) | select(.createdAt | startswith(\"$dnes\")) | select(.conclusion != \"skipped\" and .conclusion != \"cancelled\" and .conclusion != \"failure\")] | length")
+          dnesni=$(gh run list -R "$GITHUB_REPOSITORY" -w scrape.yml -L 20 --json databaseId,createdAt,conclusion \
+            --jq "[.[] | select(.databaseId != ${{ github.run_id }}) | select(.createdAt | startswith(\"$dnes\"))]")
+          pocet=$(echo "$dnesni" | jq '[.[] | select(.conclusion != "skipped" and .conclusion != "cancelled" and .conclusion != "failure")] | length')
+          for id in $(echo "$dnesni" | jq -r '.[] | select(.conclusion == "failure") | .databaseId'); do
+            scrape_ok=$(gh run view "$id" -R "$GITHUB_REPOSITORY" --json jobs \
+              --jq '[.jobs[] | select(.name | startswith("Scrape half"))] | (length > 0 and all(.conclusion == "success"))')
+            if [ "$scrape_ok" = "true" ]; then echo "Běh $id selhal, ale scrape obou půlek uspěl (kontrola nahrání) – počítám jako proběhlý"; pocet=$((pocet + 1)); fi
+          done
           echo "Dnešních jiných běhů: $pocet"
           if [ "$pocet" -gt 0 ]; then echo "spustit=false" >> "$GITHUB_OUTPUT"; else echo "spustit=true" >> "$GITHUB_OUTPUT"; fi
 
@@ -197,6 +205,26 @@ jobs:
       - name: ETF scrape (this half)
         run: python final_scraper.py --csv ISIN_split.csv --batch-size 50 --resume
 
+      - name: Souhrn nahrání do DB (tahle půlka)
+        # Scraper zapisuje počet nenahraných fondů (ISIN + chyba) do logs/nahrani_souhrn.json. Celkový práh
+        # hlídá job kontrola_nahrani (obě půlky dohromady); tady jen výpis + varování u konkrétní půlky.
+        if: ${{ always() }}
+        run: |
+          f=justetf_complete_production/logs/nahrani_souhrn.json
+          if [ ! -f "$f" ]; then echo "::warning::Půlka ${{ matrix.part }}: souhrn nahrání chybí (scraper nedoběhl k nahrání?)"; exit 0; fi
+          cat "$f"
+          n=$(jq '.nenahrano' "$f")
+          if [ "$n" -gt 0 ]; then echo "::warning::Půlka ${{ matrix.part }}: $n fondů se nenahrálo do DB: $(jq -r '[.nenahrane[].isin] | join(", ")' "$f")"; fi
+
+      - name: Upload souhrnu nahrání
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahrani-half${{ matrix.part }}
+          path: scraper/justetf_complete_production/logs/nahrani_souhrn.json
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: Save scraper checkpoints
         # Always save, even on failure/timeout — that's the whole point of
         # caching: next run can resume.
@@ -217,6 +245,41 @@ jobs:
             scraper/heatmap_output_${{ matrix.part }}/
           retention-days: 7
           if-no-files-found: ignore
+
+  kontrola_nahrani:
+    name: Kontrola – nahrály se fondy do DB?
+    # 21.–22. 10. 2026 se denně 25 fondů nenahrálo (numeric field overflow shodil 5 dávek po 5) a běh přesto
+    # skončil „success“ – zjistilo se to až z webu. Teď: > 5 nenahraných fondů (obě půlky dohromady) nebo chybějící
+    # souhrn = job selže (GitHub pošle e-mail o selhaném běhu); 1–5 = varování v shrnutí běhu.
+    needs: scrape
+    if: ${{ always() && needs.scrape.result != 'skipped' && needs.scrape.result != 'cancelled' }}
+    runs-on: ubuntu-24.04  # zafixováno jako ostatní joby
+    timeout-minutes: 5
+    steps:
+      - name: Stáhnout souhrny obou půlek
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nahrani-half*
+          path: souhrny
+      - name: Vyhodnotit
+        run: |
+          PRAH=5
+          celkem=0; chybi=""
+          for part in 1 2; do
+            f="souhrny/nahrani-half$part/nahrani_souhrn.json"
+            if [ ! -f "$f" ]; then chybi="$chybi $part"; continue; fi
+            n=$(jq '.nenahrano' "$f"); celkem=$((celkem + n))
+            echo "Půlka $part: nahráno $(jq '.nahrano' "$f")/$(jq '.celkem' "$f"), nenahráno $n, mimo rozsah → None: $(jq '.oriznuto | length' "$f"), chyba: $(jq -r '.chyba // "-"' "$f")"
+            jq -r '.nenahrane[] | "  \(.isin): \(.chyba[0:200])"' "$f"
+          done
+          {
+            echo "### Kontrola nahrání do DB"
+            echo "Nenahráno celkem: **$celkem** (práh $PRAH)${chybi:+, chybí souhrn půlky:$chybi}"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$chybi" ]; then echo "::error::Chybí souhrn nahrání půlky:$chybi – nevíme, co se nahrálo"; exit 1; fi
+          if [ "$celkem" -gt "$PRAH" ]; then echo "::error::Do DB se nenahrálo $celkem fondů (> $PRAH) – viz log výše"; exit 1; fi
+          if [ "$celkem" -gt 0 ]; then echo "::warning::Do DB se nenahrálo $celkem fondů"; fi
+          echo "OK"
 
   backtest:
     name: Backtest data (Yahoo Finance)
