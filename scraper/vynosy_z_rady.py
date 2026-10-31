@@ -10,8 +10,9 @@ odchylka 0,2–0,9 p. b. u všech období. Profil navíc u části fondů není 
 (ESEA, PSP5, S5USAS, WSPX končily 16. 10.), web je ale značil globálním datem.
 
 JAK: jedno volání chart API na fond (EUR, s dividendami – stejné parametry jako graf na profilu zdroje, celá
-historie fondu, ~60–530 kB, tj. méně než samotný HTML profil ~440 kB), konec období = poslední pracovní den ≥ 2 prac. dny před stažením a zároveň ne poslední bod řady (viz konec_konecny)
-řady (= poslední jistě konečný; víkendové kopie se přeskakují podle data), začátek = poslední bod ≤ (konec − N
+historie fondu, ~60–530 kB, tj. méně než samotný HTML profil ~440 kB), konec období = poslední pracovní den
+≥ 2 prac. dny před stažením (před 05:00 UTC ≥ 3, viz mez_konecnosti) a zároveň ne poslední bod řady
+(= poslední jistě konečný, viz konec_konecny; víkendové kopie se přeskakují podle data), začátek = poslední bod ≤ (konec − N
 kalendářních měsíců), letos = poslední bod ≤ 31. 12. předchozího roku, od vzniku = první bod řady (= profil
 „Since inception (MAX)“, ověřeno: SXR8 862,35 % = profil 862,35 %, EXSA 413,93 = 413,93).
 
@@ -40,7 +41,7 @@ PORUCHY ŘADY U ZDROJE (22. 10. 2026, kontrolní kolo 7):
 import calendar
 import random
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
 import requests
@@ -57,6 +58,7 @@ MAX_CHYBA_PB = 0.02      # p. b.: nejvyšší přípustná chyba zaokrouhlení z
 ZAOKROUHLENI = 0.005     # zdroj dává relativní změnu v % na 2 desetinná místa → ±0,005 p. b.
 MAX_SKOK = 10.0          # jednodenní změna úrovně > ×10 nebo < ×0,1 = porucha řady u zdroje (ne trh)
 MAX_VYNOS_PCT = 9999.0   # sloupce výnosů numeric(8,4) pojmou |x| < 10 000 → větší = None (jinak spadne celá dávka)
+HODINA_KONECNOSTI_UTC = 5   # zdroj přepisuje bod D konečným ~04:00 UTC dne D+2 (+1 h rezerva), viz mez_konecnosti
 
 Rada = List[Tuple[date, float]]   # (datum, úroveň; 1.0 = první bod okna)
 
@@ -119,18 +121,48 @@ def _pracovni_den_zpet(d: date, n: int) -> date:
     return d
 
 
-def konec_konecny(rada: Rada, dnes: Optional[date] = None) -> Optional[date]:
+def mez_konecnosti(ted: datetime) -> date:
+    """Nejnovější den, jehož bod je u zdroje v okamžiku `ted` jistě KONEČNÝ.
+
+    Zdroj přepisuje předběžný bod dne D konečným (NAV) až kolem 04:00 UTC dne D+2: 30. 10. 2026 se bod 28. 10.
+    změnil mezi 03:59 a 04:01 UTC. Dřívější mez „2 pracovní dny před dnem stažení“ bez ohledu na hodinu proto
+    neplatila pro začátek běhu (pg_cron út–pá 01:30 UTC, stahuje do ~05:55 UTC): 29. 10. 2026 vzalo 2 373 fondů
+    stažených před ~04:00 UTC předběžný bod 28. 10. → úroveň typicky o 0,1–0,5 % vedle (nejhůř SPGP IE00B6R52036
+    −1,43 %, EMIM letos o 1,12 p. b.; úroveň 28. 10. v DB vs konečná: VWCE 140,06 vs 140,27, EXSA 417,83 vs 417,50,
+    EMIM 155,52 vs 155,35). Fondy stažené po 04:01 UTC seděly se zdrojem přesně.
+
+    Proto: od HODINA_KONECNOSTI_UTC (05:00 UTC, 1 h rezerva po přepisu) 2 pracovní dny zpět, dřív 3.
+    Pátek 01:30 UTC → úterý, pátek 05:30 UTC → středa, pondělí 05:00 UTC → čtvrtek (pondělí 04:59 → středa).
+    Raději o den starší konečný bod než předběžný (pravidlo č. 1)."""
+    if ted.tzinfo is None:
+        # Naivní čas může být místní (Mac v Praze) i UTC – hodina by pak byla o 1–2 h vedle. Nehádat.
+        raise ValueError('mez_konecnosti potřebuje čas s časovou zónou (UTC)')
+    ted = ted.astimezone(timezone.utc)
+    return _pracovni_den_zpet(ted.date(), 2 if ted.hour >= HODINA_KONECNOSTI_UTC else 3)
+
+
+def konec_konecny(rada: Rada, dnes: Optional[date] = None, ted: Optional[datetime] = None) -> Optional[date]:
     """Poslední JISTĚ KONEČNÝ obchodní den řady.
 
-    Zdroj (ověřeno 20.–21. 10. 2026, SXR8): bod dne D je večer PŘEDBĚŽNÝ (≈ evropská závěrečná cena) a konečnou
-    hodnotou ho přepíše až během D+1 / v noci na D+2; během obchodování navíc přidává PRŮBĚŽNÝ bod dneška. Proto
-    nestačí „předposlední bod řady“ (21. 10. po 07:20 UTC to byl předběžný 20. 10.). Konec = nejnovější pracovní
-    den, který (a) není posledním pracovním bodem řady a (b) je aspoň 2 pracovní dny před dnem stažení
-    (stažení ve středu → pondělí). Víkendové body jsou kopie pátku a přeskakují se podle data."""
+    Zdroj (ověřeno 20.–21. 10. 2026, SXR8; přesný čas přepisu 30. 10. 2026, viz mez_konecnosti): bod dne D je
+    večer PŘEDBĚŽNÝ (≈ evropská závěrečná cena) a konečnou hodnotou ho přepíše až ~04:00 UTC dne D+2; během
+    obchodování navíc přidává PRŮBĚŽNÝ bod dneška. Proto nestačí „předposlední bod řady“ (21. 10. po 07:20 UTC
+    to byl předběžný 20. 10.). Konec = nejnovější pracovní den, který (a) není posledním pracovním bodem řady
+    a (b) je ≤ mez_konecnosti(ted) (stažení ve středu od 05:00 UTC → pondělí, dřív → pátek). Víkendové body
+    jsou kopie pátku a přeskakují se podle data.
+
+    `ted` = okamžik stažení (s časovou zónou), výchozí teď v UTC. Jen `dnes` bez hodiny (31. 10. 2026: nikdo
+    nevolá, zůstává kvůli zpětné kompatibilitě) → konzervativně 3 pracovní dny, protože nevíme, zda už zdroj
+    bod přepsal."""
     prac = [d for d, _ in rada if d.weekday() < 5]
     if len(prac) < 2:
         return None
-    mez = _pracovni_den_zpet(dnes or date.today(), 2)
+    if ted is not None:
+        mez = mez_konecnosti(ted)
+    elif dnes is not None:
+        mez = _pracovni_den_zpet(dnes, 3)
+    else:
+        mez = mez_konecnosti(datetime.now(timezone.utc))
     kandidati = [d for d in prac[:-1] if d <= mez]
     return kandidati[-1] if kandidati else None
 
@@ -189,17 +221,26 @@ def vynosy_k_datu(rada: Rada, konec: date) -> Dict[str, Optional[float]]:
     return {o: (None if (v := vynos_obdobi(rada, konec, o)[0]) is None else round(v, 4)) for o in OBDOBI}
 
 
-def vynosy_konecne(session: requests.Session, isin: str, dnes: Optional[date] = None
-                   ) -> Tuple[Optional[date], Dict[str, Optional[float]], str]:
+def vynosy_konecne(session: requests.Session, isin: str, dnes: Optional[date] = None,
+                   ted: Optional[datetime] = None) -> Tuple[Optional[date], Dict[str, Optional[float]], str]:
     """(returns_as_of, výnosy EUR v % podle období, poznámka do logu).
 
+    `ted` = okamžik stažení s časovou zónou (výchozí teď v UTC); na hodině závisí, který bod je už konečný
+    (mez_konecnosti). `dnes` bez hodiny → konzervativní mez (viz konec_konecny).
+
     Při neúspěchu (None, {všechna None}, důvod) – volající NESMÍ výnosy nahradit hodnotami z HTML profilu."""
-    dnes = dnes or date.today()
+    if ted is None and dnes is None:
+        ted = datetime.now(timezone.utc)
+    if ted is not None:
+        if ted.tzinfo is None:
+            raise ValueError('vynosy_konecne: ted potřebuje časovou zónu (UTC)')
+        ted = ted.astimezone(timezone.utc)
+        dnes = ted.date()   # den v UTC (dřív date.today() = místní den; na runneru GitHubu je to totéž)
     prazdne: Dict[str, Optional[float]] = {o: None for o in OBDOBI}
     rada = stahni_radu(session, isin, OD_POCATKU, dnes + timedelta(days=1))
     if not rada:
         return None, prazdne, 'chart API nevrátilo řadu'
-    konec = konec_konecny(rada, dnes)
+    konec = konec_konecny(rada, dnes, ted)
     if konec is None:
         return None, prazdne, f'řada má méně než 2 obchodní dny ({len(rada)} bodů)'
     if (dnes - konec).days > 31:
