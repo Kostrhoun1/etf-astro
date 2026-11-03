@@ -133,12 +133,19 @@ def mez_konecnosti(ted: datetime) -> date:
 
     Proto: od HODINA_KONECNOSTI_UTC (05:00 UTC, 1 h rezerva po přepisu) 2 pracovní dny zpět, dřív 3.
     Pátek 01:30 UTC → úterý, pátek 05:30 UTC → středa, pondělí 05:00 UTC → čtvrtek (pondělí 04:59 → středa).
-    Raději o den starší konečný bod než předběžný (pravidlo č. 1)."""
+    Raději o den starší konečný bod než předběžný (pravidlo č. 1).
+
+    Víkend (3. 11. 2026): přepis běží jen v PRACOVNÍ dny (D + 2 pracovní dny) – čtvrteční bod 29. 10. byl v sobotu 31. 10.
+    06:07 UTC ještě předběžný (YTD SXR8 k 29. 10. 19,61 % → po přepisu 19,94 %). Sobota/neděle = jako pátek po 05:00 UTC
+    → středa."""
     if ted.tzinfo is None:
         # Naivní čas může být místní (Mac v Praze) i UTC – hodina by pak byla o 1–2 h vedle. Nehádat.
         raise ValueError('mez_konecnosti potřebuje čas s časovou zónou (UTC)')
     ted = ted.astimezone(timezone.utc)
-    return _pracovni_den_zpet(ted.date(), 2 if ted.hour >= HODINA_KONECNOSTI_UTC else 3)
+    den = ted.date()
+    if den.weekday() >= 5:   # o víkendu zdroj nepřepisuje → stav jako v pátek po přepisu
+        return _pracovni_den_zpet(den - timedelta(days=den.weekday() - 4), 2)
+    return _pracovni_den_zpet(den, 2 if ted.hour >= HODINA_KONECNOSTI_UTC else 3)
 
 
 def konec_konecny(rada: Rada, dnes: Optional[date] = None, ted: Optional[datetime] = None) -> Optional[date]:

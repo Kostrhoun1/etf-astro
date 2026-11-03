@@ -62,6 +62,13 @@ class MezKonecnosti(unittest.TestCase):
         # Út 3. 11. 01:30 UTC: po, pá, čt → čtvrtek 29. 10. (páteční bod se v mezi ještě nebere – rezerva)
         self.assertEqual(v.mez_konecnosti(utc(2026, 11, 3, 1, 30)), date(2026, 10, 29))
 
+    def test_vikend_je_streda(self):
+        # So 31. 10. 06:07 UTC (ruční běh): čtvrteční bod 29. 10. byl ještě předběžný (zdroj ho přepsal až v pondělí),
+        # takže nejvýš středa 28. 10. – i v neděli a v sobotu před 05:00 UTC.
+        self.assertEqual(v.mez_konecnosti(utc(2026, 10, 31, 6, 7)), date(2026, 10, 28))
+        self.assertEqual(v.mez_konecnosti(utc(2026, 10, 31, 1, 0)), date(2026, 10, 28))
+        self.assertEqual(v.mez_konecnosti(utc(2026, 11, 1, 23, 59)), date(2026, 10, 28))
+
     def test_cas_v_jine_zone_se_prevede_na_utc(self):
         # 05:30 SEČ = 04:30 UTC → ještě před přepisem+rezervou; 06:30 SEČ = 05:30 UTC → po
         self.assertEqual(v.mez_konecnosti(datetime(2026, 10, 30, 5, 30, tzinfo=SEC)), date(2026, 10, 27))
