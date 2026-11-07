@@ -73,6 +73,9 @@ jobs:
     needs: hlidac
     if: ${{ needs.hlidac.outputs.spustit == 'true' && github.event.inputs.backtest_only != 'true' }}
     runs-on: ubuntu-24.04  # zafixováno 1.10.2026: ubuntu-latest od 19.10. přechází na Ubuntu 26 – přejít vědomě a otestovaně
+    # Selhání neposílá e-mail majiteli (7. 11. 2026): běh skončí zeleně, neúspěšný job vyhodnotí denní úloha Claude
+    # „Denní kontrola webu“ (etf-nextjs-ssr/scripts/denni-kontrola.md) a opraví ho. Čerstvost dat hlídá i check-fund-data.
+    continue-on-error: true
     timeout-minutes: 15
     permissions:
       contents: write
@@ -120,6 +123,9 @@ jobs:
     needs: refresh_isins
     if: ${{ github.event.inputs.backtest_only != 'true' }}
     runs-on: ubuntu-24.04  # zafixováno 1.10.2026: ubuntu-latest od 19.10. přechází na Ubuntu 26 – přejít vědomě a otestovaně
+    # Selhání neposílá e-mail majiteli (7. 11. 2026): běh skončí zeleně, neúspěšný job vyhodnotí denní úloha Claude
+    # „Denní kontrola webu“ (etf-nextjs-ssr/scripts/denni-kontrola.md) a opraví ho. Čerstvost dat hlídá i check-fund-data.
+    continue-on-error: true
     # Just under GitHub's hard 6h limit. Each half should finish in ~3h, this
     # is a safety ceiling.
     timeout-minutes: 359
@@ -254,6 +260,9 @@ jobs:
     needs: scrape
     if: ${{ always() && needs.scrape.result != 'skipped' && needs.scrape.result != 'cancelled' }}
     runs-on: ubuntu-24.04  # zafixováno jako ostatní joby
+    # Selhání neposílá e-mail majiteli (7. 11. 2026): běh skončí zeleně, neúspěšný job vyhodnotí denní úloha Claude
+    # „Denní kontrola webu“ (etf-nextjs-ssr/scripts/denni-kontrola.md) a opraví ho. Čerstvost dat hlídá i check-fund-data.
+    continue-on-error: true
     timeout-minutes: 5
     steps:
       - name: Stáhnout souhrny obou půlek
