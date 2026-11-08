@@ -222,6 +222,12 @@ jobs:
           cat "$f"
           n=$(jq '.nenahrano' "$f")
           if [ "$n" -gt 0 ]; then echo "::warning::Půlka ${{ matrix.part }}: $n fondů se nenahrálo do DB: $(jq -r '[.nenahrane[].isin] | join(", ")' "$f")"; fi
+          # Výpadek kurzu ČNB/Frankfurter: období s výnosem v EUR, kde převod do Kč/USD vyšel None (od 8. 11. 2026)
+          p=$(jq '.prevod_kurzu_chybi // 0' "$f")
+          if [ "$p" -gt 0 ]; then echo "::warning::Půlka ${{ matrix.part }}: $p období bez převodu do Kč/USD (chybí kurz): $(jq -r '[(.prevod_kurzu_fondy // [])[].isin] | .[0:30] | join(", ")' "$f")"; fi
+          # Zdroj uvádí kalendářní rok, pro který v etf_funds není sloupec (leden 2027: rok 2026) → přidat sloupce
+          r=$(jq -r '(.roky_bez_sloupce // {}) | to_entries | map("\(.key): \(.value) fondů") | join(", ")' "$f")
+          if [ -n "$r" ]; then echo "::warning::Půlka ${{ matrix.part }}: rok bez sloupce v etf_funds (nenahráno, přidat migrací): $r"; fi
 
       - name: Upload souhrnu nahrání
         if: ${{ always() }}

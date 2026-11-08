@@ -5,7 +5,7 @@ Přidává currency conversion funkcionalitu do existujícího scraperu
 """
 
 # Importy potřebné pro integraci
-from performance_converter import create_performance_conversion_for_scraper
+from performance_converter import create_performance_conversion_for_scraper, KALENDARNI_ROKY, OBDOBI_ZA_OBDOBI
 from datetime import datetime
 
 def _get_verbose_mode() -> bool:
@@ -23,12 +23,13 @@ def safe_log(level: str, message: str):
     """Utility logging function - respects VERBOSE_MODE from final_scraper"""
     VERBOSE_MODE = _get_verbose_mode()
     
-    # V non-verbose módu skryj VŠECHNY debug zprávy a všechny currency zprávy
-    if not VERBOSE_MODE:
+    # V non-verbose módu skryj debug zprávy a běžné (info) zprávy o měnách. Chyby a varování NIKDY
+    # (do 8. 11. 2026 filtr podle slov „CZK“, „USD“, „kurz“, „Currency“ zahazoval i je).
+    if not VERBOSE_MODE and level not in ('error', 'warning'):
         # Žádné debug zprávy vůbec
         if level == 'debug':
             return
-        # Žádné currency-related zprávy
+        # Žádné currency-related info zprávy
         if any(keyword in message for keyword in [
             '💱', 'Currency', 'Convert', 'EUR ->', 'CZK', 'USD', 'pp)', 'CNB:', 'Frankfurter:', 
             'Přepočítávám performance', 'performance přidána', 'Přidány CZK/USD', 'k 2025-', 'k 2024-',
@@ -38,119 +39,6 @@ def safe_log(level: str, message: str):
     
     timestamp = datetime.now().strftime("%H:%M:%S")
     print(f"[{timestamp}] {level.upper()}: {message}")
-
-# ==================================================
-# PATCH 1: Rozšířit ETFDataComplete třídu
-# ==================================================
-
-# Toto se přidá do __init__ metody ETFDataComplete za performance sekci:
-
-ETFDATA_CURRENCY_FIELDS = """
-        # Currency Performance - CZK (přepočteno z EUR)
-        self.return_1m_czk = None
-        self.return_3m_czk = None
-        self.return_6m_czk = None
-        self.return_ytd_czk = None
-        self.return_1y_czk = None
-        self.return_3y_czk = None
-        self.return_5y_czk = None
-        self.return_2021_czk = None
-        self.return_2022_czk = None
-        self.return_2023_czk = None
-        self.return_2024_czk = None
-        self.return_2025_czk = None
-
-        # Currency Performance - USD (přepočteno z EUR)
-        self.return_1m_usd = None
-        self.return_3m_usd = None
-        self.return_6m_usd = None
-        self.return_ytd_usd = None
-        self.return_1y_usd = None
-        self.return_3y_usd = None
-        self.return_5y_usd = None
-        self.return_2021_usd = None
-        self.return_2022_usd = None
-        self.return_2023_usd = None
-        self.return_2024_usd = None
-        self.return_2025_usd = None
-
-        # Metadata
-        self.currency_performance_updated_at = None
-"""
-
-# ==================================================
-# PATCH 2: Rozšířit to_dict metodu
-# ==================================================
-
-TO_DICT_CURRENCY_FIELDS = """
-            # Currency Performance - CZK
-            'return_1m_czk': self.safe_numeric(etf.return_1m_czk),
-            'return_3m_czk': self.safe_numeric(etf.return_3m_czk),
-            'return_6m_czk': self.safe_numeric(etf.return_6m_czk),
-            'return_ytd_czk': self.safe_numeric(etf.return_ytd_czk),
-            'return_1y_czk': self.safe_numeric(etf.return_1y_czk),
-            'return_3y_czk': self.safe_numeric(etf.return_3y_czk),
-            'return_5y_czk': self.safe_numeric(etf.return_5y_czk),
-            'return_2021_czk': self.safe_numeric(etf.return_2021_czk),
-            'return_2022_czk': self.safe_numeric(etf.return_2022_czk),
-            'return_2023_czk': self.safe_numeric(etf.return_2023_czk),
-            'return_2024_czk': self.safe_numeric(etf.return_2024_czk),
-            'return_2025_czk': self.safe_numeric(etf.return_2025_czk),
-
-            # Currency Performance - USD
-            'return_1m_usd': self.safe_numeric(etf.return_1m_usd),
-            'return_3m_usd': self.safe_numeric(etf.return_3m_usd),
-            'return_6m_usd': self.safe_numeric(etf.return_6m_usd),
-            'return_ytd_usd': self.safe_numeric(etf.return_ytd_usd),
-            'return_1y_usd': self.safe_numeric(etf.return_1y_usd),
-            'return_3y_usd': self.safe_numeric(etf.return_3y_usd),
-            'return_5y_usd': self.safe_numeric(etf.return_5y_usd),
-            'return_2021_usd': self.safe_numeric(etf.return_2021_usd),
-            'return_2022_usd': self.safe_numeric(etf.return_2022_usd),
-            'return_2023_usd': self.safe_numeric(etf.return_2023_usd),
-            'return_2024_usd': self.safe_numeric(etf.return_2024_usd),
-            'return_2025_usd': self.safe_numeric(etf.return_2025_usd),
-
-            # Metadata
-            'currency_performance_updated_at': etf.currency_performance_updated_at,
-"""
-
-# ==================================================
-# PATCH 3: Rozšířit convert_to_supabase_format
-# ==================================================
-
-SUPABASE_CURRENCY_FIELDS = """
-            # Currency Performance - CZK
-            'return_1m_czk': etf_dict.get('return_1m_czk', 0) or 0,
-            'return_3m_czk': etf_dict.get('return_3m_czk', 0) or 0,
-            'return_6m_czk': etf_dict.get('return_6m_czk', 0) or 0,
-            'return_ytd_czk': etf_dict.get('return_ytd_czk', 0) or 0,
-            'return_1y_czk': etf_dict.get('return_1y_czk', 0) or 0,
-            'return_3y_czk': etf_dict.get('return_3y_czk', 0) or 0,
-            'return_5y_czk': etf_dict.get('return_5y_czk', 0) or 0,
-            'return_2021_czk': etf_dict.get('return_2021_czk', 0) or 0,
-            'return_2022_czk': etf_dict.get('return_2022_czk', 0) or 0,
-            'return_2023_czk': etf_dict.get('return_2023_czk', 0) or 0,
-            'return_2024_czk': etf_dict.get('return_2024_czk', 0) or 0,
-            'return_2025_czk': etf_dict.get('return_2025_czk', 0) or 0,
-
-            # Currency Performance - USD
-            'return_1m_usd': etf_dict.get('return_1m_usd', 0) or 0,
-            'return_3m_usd': etf_dict.get('return_3m_usd', 0) or 0,
-            'return_6m_usd': etf_dict.get('return_6m_usd', 0) or 0,
-            'return_ytd_usd': etf_dict.get('return_ytd_usd', 0) or 0,
-            'return_1y_usd': etf_dict.get('return_1y_usd', 0) or 0,
-            'return_3y_usd': etf_dict.get('return_3y_usd', 0) or 0,
-            'return_5y_usd': etf_dict.get('return_5y_usd', 0) or 0,
-            'return_2021_usd': etf_dict.get('return_2021_usd', 0) or 0,
-            'return_2022_usd': etf_dict.get('return_2022_usd', 0) or 0,
-            'return_2023_usd': etf_dict.get('return_2023_usd', 0) or 0,
-            'return_2024_usd': etf_dict.get('return_2024_usd', 0) or 0,
-            'return_2025_usd': etf_dict.get('return_2025_usd', 0) or 0,
-
-            # Metadata
-            'currency_performance_updated_at': etf_dict.get('currency_performance_updated_at', ''),
-"""
 
 # ==================================================
 # PATCH 4: Hlavní integrační funkce
@@ -208,114 +96,30 @@ class CurrencyPerformanceIntegrator:
             
         except Exception as e:
             safe_log("error", f"💱 Currency conversion selhala pro {etf.isin}: {e}")
+            # Celý převod spadl → všechna období s EUR výnosem jsou bez Kč/USD; započítat do souhrnu běhu
+            try:
+                chybi = [f"{o}/{m}" for o in OBDOBI_ZA_OBDOBI + KALENDARNI_ROKY
+                         if getattr(etf, f'return_{o}', None) is not None
+                         for m in ('CZK', 'USD') if getattr(etf, f'return_{o}_{m.lower()}', None) is None]
+                self.converter.zaznamenej_chybejici_prevod(etf.isin, chybi)
+            except Exception:
+                pass
             return False
     
     def _etf_to_dict_for_conversion(self, etf):
         """Konverze ETF objektu na dict pro currency conversion"""
-        return {
-            'isin': etf.isin,
-            'name': etf.name,
-            'return_1m': etf.return_1m,
-            'return_3m': etf.return_3m,
-            'return_6m': etf.return_6m,
-            'return_ytd': etf.return_ytd,
-            'return_1y': etf.return_1y,
-            'return_3y': etf.return_3y,
-            'return_5y': etf.return_5y,
-            'return_2021': etf.return_2021,
-            'return_2022': etf.return_2022,
-            'return_2023': etf.return_2023,
-            'return_2024': etf.return_2024,
-            'return_2025': etf.return_2025,
-            # Den, ke kterému platí výnosy za období (z denní řady, vynosy_z_rady.py) – kurzy se berou k TOMUTO dni
-            'returns_as_of': getattr(etf, 'returns_as_of', None),
-        }
-    
+        d = {'isin': etf.isin, 'name': etf.name}
+        for o in OBDOBI_ZA_OBDOBI + KALENDARNI_ROKY:
+            d[f'return_{o}'] = getattr(etf, f'return_{o}', None)
+        # Den, ke kterému platí výnosy za období (z denní řady, vynosy_z_rady.py) – kurzy se berou k TOMUTO dni
+        d['returns_as_of'] = getattr(etf, 'returns_as_of', None)
+        return d
+
     def _apply_currency_performance_to_etf(self, etf, enhanced_dict):
-        """Aplikuje currency performance zpět na ETF objekt"""
-        
-        # CZK fields
-        etf.return_1m_czk = enhanced_dict.get('return_1m_czk')
-        etf.return_3m_czk = enhanced_dict.get('return_3m_czk')
-        etf.return_6m_czk = enhanced_dict.get('return_6m_czk')
-        etf.return_ytd_czk = enhanced_dict.get('return_ytd_czk')
-        etf.return_1y_czk = enhanced_dict.get('return_1y_czk')
-        etf.return_3y_czk = enhanced_dict.get('return_3y_czk')
-        etf.return_5y_czk = enhanced_dict.get('return_5y_czk')
-        etf.return_2021_czk = enhanced_dict.get('return_2021_czk')
-        etf.return_2022_czk = enhanced_dict.get('return_2022_czk')
-        etf.return_2023_czk = enhanced_dict.get('return_2023_czk')
-        etf.return_2024_czk = enhanced_dict.get('return_2024_czk')
-        etf.return_2025_czk = enhanced_dict.get('return_2025_czk')
-
-        # USD fields
-        etf.return_1m_usd = enhanced_dict.get('return_1m_usd')
-        etf.return_3m_usd = enhanced_dict.get('return_3m_usd')
-        etf.return_6m_usd = enhanced_dict.get('return_6m_usd')
-        etf.return_ytd_usd = enhanced_dict.get('return_ytd_usd')
-        etf.return_1y_usd = enhanced_dict.get('return_1y_usd')
-        etf.return_3y_usd = enhanced_dict.get('return_3y_usd')
-        etf.return_5y_usd = enhanced_dict.get('return_5y_usd')
-        etf.return_2021_usd = enhanced_dict.get('return_2021_usd')
-        etf.return_2022_usd = enhanced_dict.get('return_2022_usd')
-        etf.return_2023_usd = enhanced_dict.get('return_2023_usd')
-        etf.return_2024_usd = enhanced_dict.get('return_2024_usd')
-        etf.return_2025_usd = enhanced_dict.get('return_2025_usd')
-
-# ==================================================
-# PATCH 5: Funkce pro integraci do scraperu
-# ==================================================
-
-def create_scraper_integration_patch():
-    """
-    Vytvoří všechny potřebné komponenty pro integraci do scraperu
-    """
-    
-    integrator = CurrencyPerformanceIntegrator()
-    
-    def patch_scraper_class(scraper_class):
-        """
-        Patch pro CompleteProductionScraper třídu
-        """
-        
-        # Přidej integrator jako atribut
-        scraper_class.currency_integrator = integrator
-        
-        # Uložíme původní scrape_etf_complete_with_retry metodu
-        original_scrape = scraper_class.scrape_etf_complete_with_retry
-        
-        def enhanced_scrape_etf_complete_with_retry(self, isin: str, max_retries: int = 3):
-            """
-            Rozšířená verze scrapingu s currency conversion
-            """
-            # Zavolej původní scraping
-            etf = original_scrape(self, isin, max_retries)
-            
-            # Pokud scraping byl úspěšný, přidej currency performance
-            if etf.scraping_status == "success" and hasattr(etf, 'return_1y') and etf.return_1y is not None:
-                safe_log("info", f"💱 Přidávám currency performance pro {isin}")
-                currency_success = self.currency_integrator.enhance_etf_with_currency_performance(etf)
-                
-                if currency_success:
-                    safe_log("info", f"✅ Currency performance úspěšně přidána pro {isin}")
-                else:
-                    safe_log("warning", f"⚠️ Currency performance selhala pro {isin}")
-            else:
-                safe_log("debug", f"⏭️ Přeskakuji currency conversion pro {isin} (no performance data)")
-            
-            return etf
-        
-        # Nahradíme metodu
-        scraper_class.scrape_etf_complete_with_retry = enhanced_scrape_etf_complete_with_retry
-        
-        safe_log("info", "🔧 Scraper patched with currency conversion functionality")
-        
-        return scraper_class
-    
-    return {
-        'integrator': integrator,
-        'patch_scraper_class': patch_scraper_class
-    }
+        """Aplikuje currency performance zpět na ETF objekt (chybějící převod = None, nikdy EUR hodnota)."""
+        for o in OBDOBI_ZA_OBDOBI + KALENDARNI_ROKY:
+            for mena in ('czk', 'usd'):
+                setattr(etf, f'return_{o}_{mena}', enhanced_dict.get(f'return_{o}_{mena}'))
 
 # ==================================================
 # PATCH 6: Testovací funkce

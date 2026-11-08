@@ -41,6 +41,7 @@ from dataclasses import dataclass
 from etf_rating import calculate_etf_rating
 from market_heatmap_generator import MarketHeatmapGenerator
 from scraper_currency_integration import CurrencyPerformanceIntegrator
+from performance_converter import KALENDARNI_ROKY, OBDOBI_ZA_OBDOBI
 from vynosy_z_rady import vynosy_konecne, MAX_VYNOS_PCT
 
 # Potlačení warningů
@@ -422,6 +423,8 @@ class ETFDataComplete:
         self.return_2023 = None
         self.return_2024 = None
         self.return_2025 = None
+        self.return_2026 = None   # justETF přidá v lednu 2027 (sloupec v DB zatím není – viz _roky_se_sloupci)
+        self.return_2027 = None
 
         # Performance - inception (celková životnost)
         self.return_inception = None
@@ -443,6 +446,8 @@ class ETFDataComplete:
         self.return_2023_czk = None
         self.return_2024_czk = None
         self.return_2025_czk = None
+        self.return_2026_czk = None
+        self.return_2027_czk = None
 
         # Currency Performance - USD (přepočteno z EUR)
         self.return_1m_usd = None
@@ -457,6 +462,8 @@ class ETFDataComplete:
         self.return_2023_usd = None
         self.return_2024_usd = None
         self.return_2025_usd = None
+        self.return_2026_usd = None
+        self.return_2027_usd = None
 
         # Metadata
         self.currency_performance_updated_at = None
@@ -613,6 +620,8 @@ class ETFDataComplete:
             'return_2023': self.return_2023,
             'return_2024': self.return_2024,
             'return_2025': self.return_2025,
+            'return_2026': self.return_2026,
+            'return_2027': self.return_2027,
             'return_inception': self.return_inception,
             'returns_as_of': self.returns_as_of,
             
@@ -629,6 +638,8 @@ class ETFDataComplete:
             'return_2023_czk': self.return_2023_czk,
             'return_2024_czk': self.return_2024_czk,
             'return_2025_czk': self.return_2025_czk,
+            'return_2026_czk': self.return_2026_czk,
+            'return_2027_czk': self.return_2027_czk,
 
             # Currency Performance - USD
             'return_1m_usd': self.return_1m_usd,
@@ -643,6 +654,8 @@ class ETFDataComplete:
             'return_2023_usd': self.return_2023_usd,
             'return_2024_usd': self.return_2024_usd,
             'return_2025_usd': self.return_2025_usd,
+            'return_2026_usd': self.return_2026_usd,
+            'return_2027_usd': self.return_2027_usd,
 
             # Metadata
             'currency_performance_updated_at': self.currency_performance_updated_at,
@@ -813,7 +826,7 @@ class CompleteProductionScraper:
         # Výnosy za období z denní řady (vynosy_z_rady.py): kolik fondů prošlo / selhalo (a profil přitom výnosy měl)
         self.stat_rada = {'ok': 0, 'chyba': 0, 'chyba_s_profilem': 0}
         # Nahrání do DB: nenahrané fondy (ISIN + chyba), záměrně nezapsané (bez názvu), hodnoty mimo rozsah sloupce
-        self.stat_nahrani = {'nenahrane': [], 'bez_nazvu': [], 'oriznuto': []}
+        self.stat_nahrani = {'nenahrane': [], 'bez_nazvu': [], 'oriznuto': [], 'roky_bez_sloupce': {}, 'zachovane_roky': {}}
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -1085,8 +1098,8 @@ class CompleteProductionScraper:
                 # mladším 1 roku chyběl YTD v Kč a web pak ukazoval EUR jako Kč (audit 17. 10. 2026).
                 # Včetně kalendářních roků: když denní řada selže (výnosy za období = None), roky v Kč/USD zůstanou.
                 if (self.currency_integrator and self.currency_integrator.is_available() and
-                    any(getattr(etf, k, None) is not None for k in ('return_ytd', 'return_1m', 'return_3m', 'return_6m', 'return_1y',
-                                                                    'return_2021', 'return_2022', 'return_2023', 'return_2024', 'return_2025'))):
+                    any(getattr(etf, f'return_{o}', None) is not None
+                        for o in ('ytd', '1m', '3m', '6m', '1y') + KALENDARNI_ROKY)):
                     safe_log("debug", f"💱 Přidávám currency performance pro {isin}")
                     currency_success = self.currency_integrator.enhance_etf_with_currency_performance(etf)
                     
@@ -2690,16 +2703,13 @@ class CompleteProductionScraper:
                             etf.return_3m = value
                         elif '6 months' in label:
                             etf.return_6m = value
-                        elif label == '2021':
-                            etf.return_2021 = value
-                        elif label == '2022':
-                            etf.return_2022 = value
-                        elif label == '2023':
-                            etf.return_2023 = value
-                        elif label == '2024':
-                            etf.return_2024 = value
-                        elif label == '2025':
-                            etf.return_2025 = value
+                        elif label in KALENDARNI_ROKY:
+                            # Kalendářní rok („2021“ … „2027“, seznam v performance_converter.KALENDARNI_ROKY).
+                            # Rok, který justETF přestane ukazovat (v lednu vyřadí nejstarší), zůstane None a upload
+                            # ho v DB nepřepíše (_chran_stavajici_hodnoty – uzavřené roky).
+                            setattr(etf, f'return_{label}', value)
+                        elif re.fullmatch(r'(19|20)\d\d', label):
+                            safe_log("warning", f"VÝNOSY: {etf.isin} – rok „{label}“ není v KALENDARNI_ROKY (performance_converter.py) → nečtu; přidej ho tam + sloupce v DB")
                         elif 'since inception' in label or label == 'max':
                             etf.return_inception = value
                         elif label == 'ytd':
@@ -3768,6 +3778,9 @@ class CompleteProductionScraper:
             'return_2023': self.safe_numeric(etf.return_2023),
             'return_2024': self.safe_numeric(etf.return_2024),
             'return_2025': self.safe_numeric(etf.return_2025),
+            # 2026/2027: sloupce v DB zatím nejsou – _odeber_chybejici_sloupce je z řádku vyřadí, dokud v DB nebudou
+            'return_2026': self.safe_numeric(etf.return_2026),
+            'return_2027': self.safe_numeric(etf.return_2027),
             # Performance - inception
             'return_inception': self.safe_numeric(etf.return_inception),
             # Den, ke kterému platí výnosy za období (date, sloupec přidán migrací 21. 10. 2026). None = výnosy nejsou
@@ -3932,6 +3945,8 @@ class CompleteProductionScraper:
             'return_2023_czk': self.safe_numeric(etf_dict.get('return_2023_czk')),
             'return_2024_czk': self.safe_numeric(etf_dict.get('return_2024_czk')),
             'return_2025_czk': self.safe_numeric(etf_dict.get('return_2025_czk')),
+            'return_2026_czk': self.safe_numeric(etf_dict.get('return_2026_czk')),
+            'return_2027_czk': self.safe_numeric(etf_dict.get('return_2027_czk')),
 
             # Currency Performance - USD
             'return_1m_usd': self.safe_numeric(etf_dict.get('return_1m_usd')),
@@ -3946,6 +3961,8 @@ class CompleteProductionScraper:
             'return_2023_usd': self.safe_numeric(etf_dict.get('return_2023_usd')),
             'return_2024_usd': self.safe_numeric(etf_dict.get('return_2024_usd')),
             'return_2025_usd': self.safe_numeric(etf_dict.get('return_2025_usd')),
+            'return_2026_usd': self.safe_numeric(etf_dict.get('return_2026_usd')),
+            'return_2027_usd': self.safe_numeric(etf_dict.get('return_2027_usd')),
 
             # Currency Metadata
             'currency_performance_updated_at': etf_dict.get('currency_performance_updated_at'),
@@ -4180,6 +4197,44 @@ class CompleteProductionScraper:
     def _prazdne(v) -> bool:
         return v is None or (isinstance(v, str) and v.strip() in ('', '-', 'N/A'))
 
+    @staticmethod
+    def _aktualni_rok() -> int:
+        return datetime.utcnow().year
+
+    def _uzavrene_roky(self) -> List[str]:
+        """Kalendářní roky, které už skončily (< letošní rok) – jejich výnos se nemění."""
+        rok = self._aktualni_rok()
+        return [r for r in KALENDARNI_ROKY if int(r) < rok]
+
+    @staticmethod
+    def _stejne_cislo(a, b) -> bool:
+        try:
+            return abs(float(a) - float(b)) < 5e-5   # DB ukládá 4 desetinná místa
+        except (TypeError, ValueError):
+            return False
+
+    def _chran_uzavrene_roky(self, r: Dict, old: Dict, roky: List[str]):
+        """Uzavřený kalendářní rok, který zdroj přestal uvádět, se v DB NEPŘEPÍŠE na null.
+
+        justETF ukazuje jen posledních 5 let: v lednu přidá nový rok a nejstarší vyřadí (tak zmizel 2021 –
+        upload ho přepsal na null). Hodnota uzavřeného roku se nemění, takže z DB se vezme celá trojice
+        EUR/Kč/USD (ať k sobě patří). Když zdroj rok uvádí a převod do Kč/USD selže (výpadek kurzu), doplní se
+        stará Kč/USD jen tehdy, je-li výnos v EUR stejný jako v DB. Nová NEPRÁZDNÁ hodnota se zapíše vždy
+        (oprava chybného čísla musí projít). Výnosy za období (ytd/1y/…) se nechrání – ty null být smí."""
+        for rok in roky:
+            e, c, u = f'return_{rok}', f'return_{rok}_czk', f'return_{rok}_usd'
+            if e not in r or e not in old:
+                continue
+            if r[e] is None and old.get(e) is not None:
+                for k in (e, c, u):
+                    if k in r and k in old:
+                        r[k] = old[k]
+                self.stat_nahrani['zachovane_roky'][rok] = self.stat_nahrani['zachovane_roky'].get(rok, 0) + 1
+            elif r[e] is not None and self._stejne_cislo(r[e], old.get(e)):
+                for k in (c, u):
+                    if k in r and k in old and r[k] is None and old[k] is not None:
+                        r[k] = old[k]
+
     def _chran_stavajici_hodnoty(self, rows: List[Dict]) -> List[Dict]:
         """Prázdné hodnoty doplní z toho, co už je v DB; řádek bez názvu nezapíše vůbec."""
         # Fond bez názvu = rozbitý scrape (bez TER, měny, data vzniku) – na webu dělal stránky „ETF fond".
@@ -4190,7 +4245,9 @@ class CompleteProductionScraper:
         if not rows:
             return rows
         burzy = [k for k in rows[0].keys() if k.startswith('exchange_')] + ['primary_ticker', 'primary_exchange', 'total_exchanges']
-        sloupce = ['isin'] + [k for k in self.CHRANENA_POLE + burzy if k in rows[0]]
+        uzavrene = [rok for rok in self._uzavrene_roky() if f'return_{rok}' in rows[0]]
+        roky_pole = [f'return_{rok}{m}' for rok in uzavrene for m in ('', '_czk', '_usd')]
+        sloupce = ['isin'] + [k for k in self.CHRANENA_POLE + burzy + roky_pole if k in rows[0]]
         try:
             stare = self.supabase.table('etf_funds').select(','.join(sloupce)).in_('isin', [r['isin'] for r in rows]).execute().data or []
         except Exception as e:
@@ -4217,7 +4274,46 @@ class CompleteProductionScraper:
                 for k in burzy:
                     if k in r and k in old:
                         r[k] = old[k]
+            self._chran_uzavrene_roky(r, old, uzavrene)
         return rows
+
+    # Roky, jejichž sloupce return_YYYY / _czk / _usd v etf_funds určitě jsou. Ostatní z KALENDARNI_ROKY (2026, 2027)
+    # se jednou za běh ověří dotazem (_roky_se_sloupci): přidání sloupců čeká na schválení majitele a poslat sloupec,
+    # který v tabulce není, by shodilo upsert celé dávky (PGRST204). Po migraci se nové roky začnou posílat samy.
+    ROKY_SE_SLOUPCI_V_DB = ('2021', '2022', '2023', '2024', '2025')
+
+    def _roky_se_sloupci(self) -> set:
+        if getattr(self, '_roky_v_db', None) is None:
+            roky = set(self.ROKY_SE_SLOUPCI_V_DB)
+            for rok in KALENDARNI_ROKY:
+                if rok in roky:
+                    continue
+                sloupce = ','.join(f'return_{rok}{m}' for m in ('', '_czk', '_usd'))
+                try:
+                    self.supabase.table('etf_funds').select(sloupce).limit(1).execute()
+                    roky.add(rok)
+                    safe_log("info", f"ROKY: sloupce roku {rok} v etf_funds jsou – rok {rok} se nahrává")
+                except Exception as e:
+                    txt = str(e)
+                    if '42703' in txt or 'does not exist' in txt:
+                        safe_log("info", f"ROKY: sloupce roku {rok} v etf_funds zatím nejsou – rok {rok} se nenahrává")
+                    else:
+                        safe_log("warning", f"ROKY: nejde ověřit sloupce roku {rok} ({e}) – rok {rok} se v tomto běhu nenahrává")
+            self._roky_v_db = roky
+        return self._roky_v_db
+
+    def _odeber_chybejici_sloupce(self, row: Dict) -> Dict:
+        """Vyřadí z řádku roky, jejichž sloupce v DB nejsou. Má-li takový rok hodnotu (zdroj ho už uvádí),
+        započte se do souhrnu – je čas přidat sloupce (jinak by výnos za ten rok na webu chyběl)."""
+        roky_db = self._roky_se_sloupci()
+        for rok in KALENDARNI_ROKY:
+            if rok in roky_db:
+                continue
+            hodnoty = [row.pop(f'return_{rok}{m}', None) for m in ('', '_czk', '_usd')]
+            if hodnoty[0] is not None:
+                n = self.stat_nahrani['roky_bez_sloupce']
+                n[rok] = n.get(rok, 0) + 1
+        return row
 
     # ── Rozsahy číselných sloupců etf_funds (information_schema, ověřeno 22. 10. 2026) ──────────────────────
     # Hodnota mimo rozsah sloupce shodí upsert CELÉ dávky („numeric field overflow“, 22003): 21.–22. 10. 2026
@@ -4263,9 +4359,21 @@ class CompleteProductionScraper:
     def _zapis_souhrn_nahrani(self, celkem: int, nahrano: int, chyba: Optional[str] = None):
         """Souhrn nahrání pro workflow (job kontrola_nahrani) a GitHub step summary."""
         s = self.stat_nahrani
+        # Převod do Kč/USD: období s výnosem v EUR, kde chyběl kurz (ČNB/Frankfurter) → hodnota None
+        prevod = {'obdobi_bez_prevodu': 0, 'fondy': []}
+        if getattr(self, 'currency_integrator', None) is not None and self.currency_integrator.is_available():
+            prevod = self.currency_integrator.converter.stat_prevodu
         souhrn = {'celkem': celkem, 'nahrano': nahrano, 'nenahrano': len(s['nenahrane']),
                   'nenahrane': s['nenahrane'], 'bez_nazvu': s['bez_nazvu'], 'oriznuto': s['oriznuto'],
+                  'prevod_kurzu_chybi': prevod['obdobi_bez_prevodu'], 'prevod_kurzu_fondy': prevod['fondy'][:100],
+                  'roky_bez_sloupce': s.get('roky_bez_sloupce', {}), 'zachovane_roky': s.get('zachovane_roky', {}),
                   'chyba': chyba, 'cas_utc': datetime.utcnow().isoformat(timespec='seconds')}
+        print(f"SOUHRN PŘEVODU DO Kč/USD: {prevod['obdobi_bez_prevodu']} období s výnosem v EUR bez převodu "
+              f"(chybí kurz) u {len(prevod['fondy'])} fondů"
+              + (": " + ', '.join(f['isin'] for f in prevod['fondy'][:20]) + (' …' if len(prevod['fondy']) > 20 else '')
+                 if prevod['fondy'] else ''), flush=True)
+        if souhrn['roky_bez_sloupce']:
+            print(f"SOUHRN ROKŮ: zdroj uvádí roky bez sloupce v DB (nenahráno): {souhrn['roky_bez_sloupce']}", flush=True)
         try:
             with open(self.NAHRANI_SOUHRN, 'w', encoding='utf-8') as f:
                 json.dump(souhrn, f, ensure_ascii=False, indent=1)
@@ -4277,6 +4385,8 @@ class CompleteProductionScraper:
                 with open(cesta, 'a', encoding='utf-8') as f:
                     f.write(f"### Nahrání do etf_funds\n\nNahráno **{nahrano}/{celkem}**, nenahráno **{len(s['nenahrane'])}**"
                             f", hodnot mimo rozsah sloupce → None: {len(s['oriznuto'])}"
+                            f", období bez převodu do Kč/USD (chybí kurz): **{prevod['obdobi_bez_prevodu']}**"
+                            + (f", roky bez sloupce v DB: {souhrn['roky_bez_sloupce']}" if souhrn['roky_bez_sloupce'] else '')
                             + (f", chyba: {chyba}" if chyba else '') + "\n\n")
                     for x in s['nenahrane'][:50]:
                         f.write(f"- `{x['isin']}`: {x['chyba'][:200]}\n")
@@ -4287,7 +4397,7 @@ class CompleteProductionScraper:
         """Nahraje fondy po dávkách. Spadne-li dávka, nahrává její fondy po jednom – jeden vadný fond nesmí
         shodit čtyři další (21.–22. 10. 2026: 25 fondů bez aktualizace kvůli 7 vadným). Vadný fond se zaloguje
         (ISIN + chyba) a počítá do „nenahráno“ – souhrn jde do NAHRANI_SOUHRN, workflow při > 5 selže."""
-        self.stat_nahrani = {'nenahrane': [], 'bez_nazvu': [], 'oriznuto': []}
+        self.stat_nahrani = {'nenahrane': [], 'bez_nazvu': [], 'oriznuto': [], 'roky_bez_sloupce': {}, 'zachovane_roky': {}}
         success_count = 0
         total_etfs = len(etfs)
 
@@ -4302,7 +4412,7 @@ class CompleteProductionScraper:
                 safe_log("info", f"📦 Chunk {chunk_num}/{total_chunks}: Uploading {len(chunk)} ETFs...")
                 for etf in chunk:
                     try:
-                        rows.append(self._hlidej_rozsah(self.transform_etf_for_database(etf)))
+                        rows.append(self._odeber_chybejici_sloupce(self._hlidej_rozsah(self.transform_etf_for_database(etf))))
                     except Exception as e:
                         safe_log("error", f"❌ NENAHRÁNO {etf.isin}: chyba převodu pro DB: {e}")
                         self.stat_nahrani['nenahrane'].append({'isin': etf.isin, 'chyba': f'převod: {e}'})
@@ -4337,6 +4447,12 @@ class CompleteProductionScraper:
             safe_log("error", f"❌ NENAHRÁNO {nenahrano} fondů: " + ', '.join(x['isin'] for x in self.stat_nahrani['nenahrane']))
         if self.stat_nahrani['oriznuto']:
             safe_log("warning", f"⚠️ ROZSAH: {len(self.stat_nahrani['oriznuto'])} hodnot mimo rozsah sloupce → None")
+        if self.stat_nahrani['roky_bez_sloupce']:
+            safe_log("warning", "⚠️ ROKY: zdroj uvádí rok, pro který v etf_funds není sloupec (nenahráno, přidat migrací): "
+                     + ', '.join(f"{rok}: {n} fondů" for rok, n in sorted(self.stat_nahrani['roky_bez_sloupce'].items())))
+        if self.stat_nahrani['zachovane_roky']:
+            safe_log("info", "ROKY: uzavřené roky, které zdroj už neuvádí, ponechány z DB: "
+                     + ', '.join(f"{rok}: {n} fondů" for rok, n in sorted(self.stat_nahrani['zachovane_roky'].items())))
         self._zapis_souhrn_nahrani(total_etfs, success_count)
         return nenahrano == 0
     
