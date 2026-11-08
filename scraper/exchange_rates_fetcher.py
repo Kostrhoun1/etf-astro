@@ -4,6 +4,7 @@ Exchange Rates Fetcher - modul pro získávání směnných kurzů z ČNB a ECB
 Integruje se do ETF scraperu pro automatické získávání historických kurzů
 """
 
+import time
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
@@ -25,12 +26,14 @@ def safe_log(level: str, message: str):
     """Utility logging function - respects VERBOSE_MODE from final_scraper"""
     VERBOSE_MODE = _get_verbose_mode()
     
-    # V non-verbose módu skryj VŠECHNY debug zprávy a všechny currency zprávy
-    if not VERBOSE_MODE:
+    # V non-verbose módu skryj debug zprávy a běžné (info) zprávy o kurzech. Chyby a varování NIKDY:
+    # do 8. 11. 2026 filtr podle slov („kurz“, „CZK“, „USD“, „rate“) zahazoval i „CNB fetch error“
+    # a „kurz … nepoužiji“ → výpadek ČNB/Frankfurteru v logu běhu vůbec nebyl vidět.
+    if not VERBOSE_MODE and level not in ('error', 'warning'):
         # Žádné debug zprávy vůbec
         if level == 'debug':
             return
-        # Žádné currency-related zprávy
+        # Žádné currency-related info zprávy
         if any(keyword in message for keyword in [
             'CNB:', 'Frankfurter:', 'ECB:', 'k 2025-', 'k 2024-', 'CZK', 'USD', 'EUR =', 'získáno',
             'Získávám historické kurzy', 'period rates', '💱', 'kurz', 'rate'
@@ -48,8 +51,58 @@ class ExchangeRatesFetcher:
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         })
         
-        # Cache pro kurzy během session
+        # Cache pro kurzy během session (jen úspěšně stažené kurzy – None se neukládá)
         self.rates_cache = {}
+        # Pojistka proti dlouhému výpadku zdroje: po VYPADEK_PO_SELHANI selháních za sebou (každé už po
+        # POKUSY_PAUZY opakováních) se zdroj na VYPADEK_PAUZA_S vynechá. Bez ní by úplný výpadek ČNB stál
+        # ~40 s na každé datum kurzu × desítky dat × tisíce fondů a noční běh by nedoběhl (timeout = nic se nenahraje).
+        self._selhani_za_sebou: Dict[str, int] = {}
+        self._vynechat_do: Dict[str, float] = {}
+
+    # Opakování při síťové chybě, timeoutu nebo HTTP 5xx: 3 pokusy, mezi nimi pauza 2 s a 5 s.
+    # 21. 9. 2026 jeden přechodný výpadek (1 pokus, timeout 10 s) dal None celému zbytku běhu (4 fondy Janus bez USD).
+    POKUSY_PAUZY = (2, 5)
+    TIMEOUT_S = 10
+    VYPADEK_PO_SELHANI = 5
+    VYPADEK_PAUZA_S = 300
+
+    def _get_s_opakovanim(self, url: str, zdroj: str) -> Optional[requests.Response]:
+        """GET s opakováním. Vrátí odpověď 2xx, jinak None (důvod zaloguje jako error).
+
+        Opakuje se jen přechodná chyba (spojení, timeout, HTTP 5xx). HTTP 4xx se neopakuje (stejný dotaz
+        dopadne stejně). Datum kurzu kontroluje volající (_datum_kurzu_ok) – tady se nemění nic."""
+        if time.monotonic() < self._vynechat_do.get(zdroj, 0.0):
+            safe_log("debug", f"{zdroj}: zdroj dočasně vynechán po opakovaných výpadcích – {url}")
+            return None
+        pauzy = list(self.POKUSY_PAUZY)
+        pokusu = len(pauzy) + 1
+        posledni_chyba = ''
+        for pokus in range(1, pokusu + 1):
+            try:
+                response = self.session.get(url, timeout=self.TIMEOUT_S)
+                if response.status_code >= 500:
+                    posledni_chyba = f"HTTP {response.status_code}"
+                elif response.status_code >= 400:
+                    safe_log("error", f"{zdroj} fetch error: HTTP {response.status_code} – {url} (neopakuji)")
+                    return None
+                else:
+                    self._selhani_za_sebou[zdroj] = 0
+                    if pokus > 1:
+                        safe_log("warning", f"{zdroj}: kurz stažen až na {pokus}. pokus – {url}")
+                    return response
+            except requests.RequestException as e:  # spojení, timeout, přerušený přenos …
+                posledni_chyba = f"{type(e).__name__}: {e}"
+            if pokus < pokusu:
+                safe_log("warning", f"{zdroj}: pokus {pokus}/{pokusu} selhal ({posledni_chyba}), znovu za {pauzy[pokus - 1]} s – {url}")
+                time.sleep(pauzy[pokus - 1])
+        safe_log("error", f"{zdroj} fetch error: {pokusu} pokusy selhaly ({posledni_chyba}) – {url}")
+        n = self._selhani_za_sebou.get(zdroj, 0) + 1
+        self._selhani_za_sebou[zdroj] = n
+        if n >= self.VYPADEK_PO_SELHANI:
+            self._vynechat_do[zdroj] = time.monotonic() + self.VYPADEK_PAUZA_S
+            safe_log("error", f"{zdroj}: {n} stažení kurzu za sebou selhalo – zdroj na {self.VYPADEK_PAUZA_S} s vynechávám "
+                              f"(převody do Kč/USD budou None a započítají se do souhrnu běhu)")
+        return None
     
     def get_date_days_ago(self, days: int) -> datetime:
         """Získá datum před X dny"""
@@ -77,10 +130,10 @@ class ExchangeRatesFetcher:
         date_str = self.format_date_for_cnb(target_date)
         url = f"https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt?date={date_str}"
         
+        response = self._get_s_opakovanim(url, 'CNB')
+        if response is None:
+            return None
         try:
-            response = self.session.get(url, timeout=10)
-            response.raise_for_status()
-            
             content = response.text
             lines = content.strip().split('\n')
 
@@ -112,7 +165,7 @@ class ExchangeRatesFetcher:
             return None
             
         except Exception as e:
-            safe_log("error", f"CNB fetch error: {e}")
+            safe_log("error", f"CNB: nečitelná odpověď pro {date_str}: {e}")
             return None
     
     @staticmethod
@@ -143,10 +196,10 @@ class ExchangeRatesFetcher:
         # Frankfurter API endpoint
         url = f"https://api.frankfurter.dev/v1/{date_str}?base=EUR&symbols={currency}"
         
+        response = self._get_s_opakovanim(url, 'Frankfurter')
+        if response is None:
+            return None
         try:
-            response = self.session.get(url, timeout=10)
-            response.raise_for_status()
-            
             data = response.json()
             
             if not self._datum_kurzu_ok(str(data.get('date', '')), '%Y-%m-%d', target_date, 'Frankfurter', currency):
@@ -162,7 +215,7 @@ class ExchangeRatesFetcher:
                 return None
             
         except Exception as e:
-            safe_log("error", f"Frankfurter fetch error: {e}")
+            safe_log("error", f"Frankfurter: nečitelná odpověď pro {date_str}: {e}")
             return None
     
     def _find_closest_ecb_rate(self, target_date: datetime, currency: str, root) -> Optional[float]:

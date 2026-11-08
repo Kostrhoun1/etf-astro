@@ -24,12 +24,13 @@ def safe_log(level: str, message: str):
     """Utility logging function - respects VERBOSE_MODE from final_scraper"""
     VERBOSE_MODE = _get_verbose_mode()
     
-    # V non-verbose módu skryj VŠECHNY debug zprávy a všechny currency zprávy
-    if not VERBOSE_MODE:
+    # V non-verbose módu skryj debug zprávy a běžné (info) zprávy o měnách. Chyby a varování NIKDY
+    # (do 8. 11. 2026 filtr podle slov „kurz“, „CZK“, „USD“, „rate“ zahazoval i je → výpadek kurzu nebyl vidět).
+    if not VERBOSE_MODE and level not in ('error', 'warning'):
         # Žádné debug zprávy vůbec
         if level == 'debug':
             return
-        # Žádné currency-related zprávy
+        # Žádné currency-related info zprávy
         if any(keyword in message for keyword in [
             '💱', 'Currency', 'Convert', 'EUR ->', 'CZK', 'USD', 'pp)', 'CNB:', 'Frankfurter:', 
             'Přepočítávám performance', 'performance přidána', 'Přidány CZK/USD', 'k 2025-', 'k 2024-',
@@ -51,6 +52,14 @@ def safe_log(level: str, message: str):
 # o víkendu/svátku platí poslední kurz ≤ ten den (ČNB i Frankfurter tak odpovídají samy).
 
 MESICU = {'1m': 1, '3m': 3, '6m': 6, '1y': 12, '3y': 36, '5y': 60}
+
+# Kalendářní roky, které scraper čte z profilu justETF (řádek s popiskem „2026“ …) a převádí do Kč/USD.
+# justETF ukazuje posledních 5 uzavřených let: v lednu 2027 přidá 2026 a vyřadí 2022 (tak už zmizel 2021).
+# Jediné místo, kde se roky vyjmenovávají – datová třída, převod měn i řádek pro DB se odvozují odtud.
+# Sloupce return_2026* / return_2027* v etf_funds zatím nejsou: upload je pošle, až v DB budou
+# (final_scraper._roky_se_sloupci). Nový rok (2028 …) = přidat sem + migrace sloupců.
+KALENDARNI_ROKY = ('2021', '2022', '2023', '2024', '2025', '2026', '2027')
+OBDOBI_ZA_OBDOBI = ('1m', '3m', '6m', 'ytd', '1y', '3y', '5y')
 
 
 def datum_dat(stazeno: Optional[datetime] = None) -> date:
@@ -100,6 +109,16 @@ class PerformanceConverter:
     def __init__(self):
         self.exchange_fetcher = ExchangeRatesFetcher()
         self.rates_cache = {}
+        # Období s výnosem v EUR, jehož převod do Kč/USD vyšel None (chybí kurz) – do souhrnu běhu
+        self.stat_prevodu = {'obdobi_bez_prevodu': 0, 'fondy': []}
+
+    def zaznamenej_chybejici_prevod(self, isin: str, chybi: list):
+        """chybi = ['1y/CZK', '2025/USD', …] – období, kde je EUR výnos, ale převod je None."""
+        if not chybi:
+            return
+        self.stat_prevodu['obdobi_bez_prevodu'] += len(chybi)
+        self.stat_prevodu['fondy'].append({'isin': isin, 'obdobi': chybi})
+        safe_log("warning", f"PŘEVOD: {isin} – chybí kurz pro {', '.join(chybi)} → hodnota v Kč/USD None")
 
     def _kurz(self, den: date, target_currency: str) -> Optional[float]:
         d = datetime(den.year, den.month, den.day)
@@ -122,7 +141,11 @@ class PerformanceConverter:
             safe_log("warning", f"Neznámé období: {period}")
             return None, None
         result = (self._kurz(dny[0], target_currency), self._kurz(dny[1], target_currency))
-        self.rates_cache[cache_key] = result
+        # Do cache jen úplný výsledek. Do 8. 11. 2026 se ukládal i (None, kurz) po jednom přechodném výpadku
+        # ČNB/Frankfurteru → všechny další fondy se stejným dnem a obdobím dostaly None (21. 9. 2026 4 fondy
+        # Janus bez USD). Teď se chybějící kurz u dalšího fondu stáhne znovu.
+        if None not in result:
+            self.rates_cache[cache_key] = result
         return result
 
     def convert_performance_eur_to_target(
@@ -153,7 +176,9 @@ class PerformanceConverter:
         historical_rate, current_rate = self.get_exchange_rates_for_period(period, target_currency, den_dat)
         
         if historical_rate is None or current_rate is None:
-            safe_log("warning", f"Kurzy nedostupné pro {period} -> {target_currency}")
+            # Varování s ISINem a seznamem období dává add_currency_performance (1 řádek na fond) a počet jde do
+            # souhrnu běhu; příčinu (výpadek, staré datum kurzu) loguje ExchangeRatesFetcher jako error/warning.
+            safe_log("debug", f"Kurzy nedostupné pro {period} -> {target_currency}")
             return None
         
         # Simulace investice
@@ -268,10 +293,7 @@ def create_performance_conversion_for_scraper():
         # Extraktuj EUR performance z ETF dat
         eur_performance = {}
         
-        performance_fields = [
-            'return_1m', 'return_3m', 'return_6m', 'return_ytd', 'return_1y', 
-            'return_3y', 'return_5y', 'return_2021', 'return_2022', 'return_2023', 'return_2024', 'return_2025'
-        ]
+        performance_fields = [f'return_{o}' for o in OBDOBI_ZA_OBDOBI + KALENDARNI_ROKY]
         
         for field in performance_fields:
             if field in etf_data and etf_data[field] is not None:
@@ -309,6 +331,12 @@ def create_performance_conversion_for_scraper():
             if usd_val is not None:
                 field_name = f"return_{period}_usd"
                 etf_data[field_name] = round(usd_val, 4)
+
+        # Období, kde je výnos v EUR, ale převod vyšel None (chybějící kurz) → varování + počet do souhrnu běhu
+        chybi = [f"{period}/{mena}" for period in eur_performance
+                 for mena, vysledek in (('CZK', czk_performance), ('USD', usd_performance))
+                 if vysledek.get(period) is None]
+        converter.zaznamenej_chybejici_prevod(etf_data.get('isin', 'unknown'), chybi)
         
         safe_log("info", f"✅ Přidány CZK/USD performance pro {etf_data.get('isin', 'unknown')}")
         
